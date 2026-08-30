@@ -4,49 +4,26 @@
  * CRITICAL ISOLATION: the SMTP probe runs from a dedicated verification IP that
  * never sends campaigns. Probing generates connection patterns some receivers
  * penalise; it must never touch campaign IP reputation (E12-016, E12-017).
+ *
+ * Types live in ./engine and are re-exported here. Declaring them in both places
+ * shadows the richer definitions silently — TypeScript does not error on it.
  */
 
-export type VerifyStatus =
-  | "VALID" | "INVALID" | "CATCH_ALL" | "ROLE" | "DISPOSABLE" | "TRAP_SUSPECT" | "UNKNOWN";
-
-export interface VerifyResult {
-  email: string;
-  status: VerifyStatus;
-  syntaxOk: boolean;
-  domainOk: boolean;
-  mxOk: boolean;
-  /** null when not probed — we say so rather than implying a check happened. */
-  smtpOk: boolean | null;
-  catchAll: boolean;
-  disposable: boolean;
-  role: boolean;
-  trapScore: number;
-  smtpResponse: string | null;
-  checkedAt: Date;
-  expiresAt: Date;
-}
-
-/** Shorter TTL for risky verdicts than for clean ones (E12-033). */
-export const TTL_DAYS: Record<VerifyStatus, number> = {
-  VALID: 90, INVALID: 180, CATCH_ALL: 30, ROLE: 90,
-  DISPOSABLE: 180, TRAP_SUSPECT: 14, UNKNOWN: 7,
-};
-
-export const ROLE_LOCAL_PARTS = [
-  "abuse", "admin", "administrator", "billing", "contact", "help", "hello",
-  "info", "marketing", "noreply", "no-reply", "office", "postmaster", "root",
-  "sales", "security", "support", "webmaster", "team",
-] as const;
-
-export function isRoleAddress(email: string): boolean {
-  const local = email.split("@")[0]?.toLowerCase() ?? "";
-  return (ROLE_LOCAL_PARTS as readonly string[]).includes(local);
-}
+export * from "./engine.js";
 
 /**
- * A catch-all domain accepts anything, so "valid" would be a lie. We report
- * deliverable-unknown and explain the limitation in the UI (E12-025, E12-026).
+ * Statuses that mean "deliverable-unknown" rather than good or bad. Surfaced in
+ * the UI so a customer understands what we could and could not establish
+ * (E12-026, E12-083).
  */
-export function statusForCatchAll(): VerifyStatus {
-  return "CATCH_ALL";
-}
+export const INCONCLUSIVE_STATUSES = ["CATCH_ALL", "UNKNOWN"] as const;
+
+export const STATUS_EXPLANATION: Record<string, string> = {
+  VALID: "The receiving server accepted this address and rejected a random one, so the mailbox exists.",
+  INVALID: "The receiving server rejected this address, or the domain cannot receive mail.",
+  CATCH_ALL: "This domain accepts every address, so we cannot tell whether this mailbox exists. Deliverable-unknown, not valid.",
+  ROLE: "A shared or departmental address. Deliverable, but usually lower engagement and higher complaint risk.",
+  DISPOSABLE: "A throwaway address provider. Blocked.",
+  TRAP_SUSPECT: "Signals consistent with a spam trap. Blocked — one hit can cost a sending IP.",
+  UNKNOWN: "We could not establish a verdict. The provider accepts everything at this stage, or the probe did not run.",
+};

@@ -2,40 +2,40 @@
 
 Self-hosted, five stages, on a dedicated IP that never sends campaigns.
 
-- [ ] E12-001 — Create packages/verify with the five-stage pipeline
-- [ ] E12-002 — Implement RFC 5322 syntax validation plus practical rules
-- [ ] E12-003 — Reject addresses with characters no real mailbox uses
-- [ ] E12-004 — Normalise the address: lowercase domain, preserve local-part case, strip plus-tags optionally
-- [ ] E12-005 — Implement domain resolution with a shared DNS cache
-- [ ] E12-006 — Implement MX lookup with an A-record fallback per RFC
-- [ ] E12-007 — Detect parked domains from their nameservers and A records
-- [ ] E12-008 — Detect a null MX record and mark the address invalid
-- [ ] E12-009 — Maintain a disposable-domain list with an automated refresh
-- [ ] E12-010 — Detect disposable providers by MX pattern as well as by domain
-- [ ] E12-011 — Maintain the role-address local-part list
-- [ ] E12-012 — Flag role addresses without automatically invalidating them
-- [ ] E12-013 — Implement spam-trap heuristics: recycled domains, no web presence, honeypot patterns
-- [ ] E12-014 — Score trap risk rather than making a binary call
-- [ ] E12-015 — Block sending above the trap-risk threshold
+- [x] E12-001 — Create packages/verify with the five-stage pipeline
+- [x] E12-002 — Implement RFC 5322 syntax validation plus practical rules
+- [x] E12-003 — Reject addresses with characters no real mailbox uses
+- [x] E12-004 — Normalise the address: lowercase domain, preserve local-part case, strip plus-tags optionally
+- [x] E12-005 — Implement domain resolution with a shared DNS cache
+- [x] E12-006 — Implement MX lookup with an A-record fallback per RFC
+- [x] E12-007 — Detect parked domains from their nameservers and A records
+- [x] E12-008 — Detect a null MX record and mark the address invalid
+- [x] E12-009 — Maintain a disposable-domain list with an automated refresh
+- [x] E12-010 — Detect disposable providers by MX pattern as well as by domain
+- [x] E12-011 — Maintain the role-address local-part list
+- [x] E12-012 — Flag role addresses without automatically invalidating them
+- [x] E12-013 — Implement spam-trap heuristics: recycled domains, no web presence, honeypot patterns
+- [x] E12-014 — Score trap risk rather than making a binary call
+- [x] E12-015 — Block sending above the trap-risk threshold
 - [ ] E12-016 — Implement the SMTP probe from the dedicated verification IP only
-- [ ] E12-017 — Assert in code that the probe never runs from a campaign IP
-- [ ] E12-018 — Use a null MAIL FROM for the probe
-- [ ] E12-019 — Never issue DATA during a probe
+- [x] E12-017 — Assert in code that the probe never runs from a campaign IP
+- [x] E12-018 — Use a null MAIL FROM for the probe
+- [x] E12-019 — Never issue DATA during a probe
 - [ ] E12-020 — Send RSET and QUIT cleanly after every probe
 - [ ] E12-021 — Respect per-destination probe concurrency limits
 - [ ] E12-022 — Back off aggressively when a destination greylists or throttles
 - [ ] E12-023 — Handle greylisting by retrying on the correct schedule rather than failing
-- [ ] E12-024 — Implement catch-all detection with a random local-part probe
-- [ ] E12-025 — Mark catch-all as deliverable-unknown, never as valid
-- [ ] E12-026 — Explain the catch-all limitation clearly in the UI
+- [x] E12-024 — Implement catch-all detection with a random local-part probe
+- [x] E12-025 — Mark catch-all as deliverable-unknown, never as valid
+- [x] E12-026 — Explain the catch-all limitation clearly in the UI
 - [ ] E12-027 — Cache the catch-all verdict per domain with a TTL
-- [ ] E12-028 — Skip the SMTP probe entirely for known catch-all domains
-- [ ] E12-029 — Skip the SMTP probe for providers that always accept, and say so
-- [ ] E12-030 — Record the verbatim SMTP response on every verification
-- [ ] E12-031 — Store results in VerificationResult with an explicit expiry
+- [x] E12-028 — Skip the SMTP probe entirely for known catch-all domains
+- [x] E12-029 — Skip the SMTP probe for providers that always accept, and say so
+- [x] E12-030 — Record the verbatim SMTP response on every verification
+- [x] E12-031 — Store results in VerificationResult with an explicit expiry
 - [ ] E12-032 — Re-verify automatically when a result expires and the lead is about to be sent to
-- [ ] E12-033 — Set a shorter TTL for RISKY results than for VALID
-- [ ] E12-034 — Never send to an address whose verification has expired
+- [x] E12-033 — Set a shorter TTL for RISKY results than for VALID
+- [x] E12-034 — Never send to an address whose verification has expired
 - [ ] E12-035 — Implement bulk verification as a job with progress reporting
 - [ ] E12-036 — Report bulk progress live so a large list does not look stalled
 - [ ] E12-037 — Make bulk verification resumable after a crash
@@ -66,11 +66,11 @@ Self-hosted, five stages, on a dedicated IP that never sends campaigns.
 - [ ] E12-062 — Handle internationalised domain names correctly
 - [ ] E12-063 — Handle internationalised local parts or reject them explicitly
 - [ ] E12-064 — Handle very long addresses at the RFC limits
-- [ ] E12-065 — Fuzz the parser with malformed input and assert no crash
-- [ ] E12-066 — Test against a corpus of known-valid and known-invalid addresses
-- [ ] E12-067 — Test catch-all detection against a known catch-all domain
+- [x] E12-065 — Fuzz the parser with malformed input and assert no crash
+- [x] E12-066 — Test against a corpus of known-valid and known-invalid addresses
+- [x] E12-067 — Test catch-all detection against a known catch-all domain
 - [ ] E12-068 — Test greylisting handling against a greylisting destination
-- [ ] E12-069 — Test that the verification IP is never used for a campaign send
+- [x] E12-069 — Test that the verification IP is never used for a campaign send
 - [ ] E12-070 — Load-test 100,000 verifications and record throughput
 - [ ] E12-071 — Measure cost per thousand verifications on our own infrastructure
 - [ ] E12-072 — Compare that cost against commercial verification pricing for the marketing page
@@ -83,8 +83,8 @@ Self-hosted, five stages, on a dedicated IP that never sends campaigns.
 - [ ] E12-079 — Log every verification with the requesting org for abuse attribution
 - [ ] E12-080 — Add the verification subsystem to the security review
 - [ ] E12-081 — Document the engine in planning/specs/verification/
-- [ ] E12-082 — Publish the customer-facing explanation of statuses and what to do with each
-- [ ] E12-083 — Explain honestly why catch-all cannot be resolved
+- [x] E12-082 — Publish the customer-facing explanation of statuses and what to do with each
+- [x] E12-083 — Explain honestly why catch-all cannot be resolved
 - [ ] E12-084 — Explain honestly why a valid address can still bounce
 - [ ] E12-085 — Add verification results to the tenant export
 - [ ] E12-086 — Purge verification results for erased leads while keeping aggregate counts

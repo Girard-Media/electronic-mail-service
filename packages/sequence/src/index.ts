@@ -20,12 +20,7 @@ export const ENROLLMENT_TRANSITIONS: Record<EnrollmentState, EnrollmentState[]> 
   REPLIED: [], BOUNCED: [], UNSUBSCRIBED: [], COMPLETED: [], STOPPED: [], BLOCKED_BY_POLICY: [],
 };
 
-export interface SendWindow {
-  start: string; // "09:00"
-  end: string;   // "17:00"
-  days: number[]; // 1=Mon..7=Sun
-  timezone: string;
-}
+// SendWindow lives in ./schedule.ts — declaring it here would shadow it.
 
 /**
  * Variant assignment is deterministic from (leadId, stepId) so re-runs are

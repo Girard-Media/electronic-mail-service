@@ -41,7 +41,7 @@ inherited subsystem is consciously kept, retargeted, or deleted.
 - [x] E01-034 — Create the empty package skeletons for ai, billing, registrar
 - [x] E01-035 — Give every new package a package.json, tsconfig, src/index.ts, and a typecheck script
 - [x] E01-036 — Confirmed no tsconfig path aliases are needed: packages export ./src directly and resolve through the pnpm workspace link
-- [ ] E01-037 — Add a dependency-direction lint rule: no cross-domain package imports except via interfaces
+- [x] E01-037 — Add a dependency-direction lint rule: no cross-domain package imports except via interfaces
 - [x] E01-038 — Create apps/dmarc-ingest skeleton (Hono, receives RUA/TLS-RPT mail)
 - [x] E01-039 — Create apps/seedbox skeleton (placement probe agent)
 - [x] E01-040 — Create apps/fleet-agent skeleton (per-node agent)
