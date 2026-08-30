@@ -1,0 +1,21 @@
+{
+  "name": "@ems/router",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "The send-path decision engine — the only package permitted to make a final send decision",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@ems/core": "workspace:*",
+    "@ems/db": "workspace:*",
+    "zod": "^3.23.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.0"
+  }
+}

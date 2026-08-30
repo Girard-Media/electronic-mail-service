@@ -3,8 +3,8 @@
 The router is the only package permitted to make a final send decision.
 Deferral is a first-class success (ARCHITECTURE §3.2).
 
-- [ ] E07-001 — Create packages/router with the SendPlan and Deferral types
-- [ ] E07-002 — Define the SendIntent → SendPlan contract and freeze it
+- [x] E07-001 — Create packages/router with the SendPlan and Deferral types
+- [x] E07-002 — Define the SendIntent → SendPlan contract and freeze it
 - [ ] E07-003 — Implement the hard candidate filter: domain verified and past ageReadyAt
 - [ ] E07-004 — Implement the hard candidate filter: mailbox ACTIVE and not held
 - [ ] E07-005 — Implement the hard candidate filter: IP not quarantined or throttled

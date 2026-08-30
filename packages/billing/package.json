@@ -1,0 +1,20 @@
+{
+  "name": "@ems/billing",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "BillingProvider seam and usage metering",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@ems/db": "workspace:*",
+    "zod": "^3.23.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.0"
+  }
+}

@@ -3,11 +3,11 @@
 Goal: a node goes from "VPS does not exist" to "routable" with one command and
 no manual step, and cannot become routable until it proves it is safe.
 
-- [ ] E03-001 — Write scripts/ip-diligence.mts: DNSBL sweep of a candidate IP across all configured lists
-- [ ] E03-002 — Add passive-DNS / prior-hostname lookup to the diligence script
-- [ ] E03-003 — Add an outbound port 25 egress test to the diligence script
-- [ ] E03-004 — Add an rDNS-control confirmation step to the diligence script
-- [ ] E03-005 — Make the diligence script emit a machine-readable verdict written to SendingIp.diligenceJson
+- [x] E03-001 — Write scripts/ip-diligence.mts: DNSBL sweep of a candidate IP across all configured lists
+- [x] E03-002 — Add passive-DNS / prior-hostname lookup to the diligence script
+- [x] E03-003 — Add an outbound port 25 egress test to the diligence script
+- [x] E03-004 — Add an rDNS-control confirmation step to the diligence script
+- [x] E03-005 — Make the diligence script emit a machine-readable verdict written to SendingIp.diligenceJson
 - [ ] E03-006 — Document the "release a dirty IP" procedure with the provider
 - [ ] E03-007 — Purchase blast-node-01 on Hostinger (KVM 2, Ubuntu 24.04, 1 dedicated IPv4)
 - [ ] E03-008 — Run diligence on the assigned IP before any other step

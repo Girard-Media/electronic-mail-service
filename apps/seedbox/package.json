@@ -1,0 +1,20 @@
+{
+  "name": "@ems/seedbox",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Inbox-placement probe agent — reads seed accounts and reports the landing folder",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "start": "tsx src/index.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@ems/core": "workspace:*",
+    "@ems/db": "workspace:*"
+  },
+  "devDependencies": {
+    "tsx": "^4.19.0",
+    "typescript": "^5.6.0"
+  }
+}

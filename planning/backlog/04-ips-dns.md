@@ -1,15 +1,15 @@
 # Epic 04 — IPs, DNS Automation & the Registrar Seam
 
-- [ ] E04-001 — Define the RegistrarProvider interface (search, purchase, renew, setNameservers, listDomains)
+- [x] E04-001 — Define the RegistrarProvider interface (search, purchase, renew, setNameservers, listDomains)
 - [ ] E04-002 — Implement the Cloudflare Registrar adapter
 - [ ] E04-003 — Implement a second adapter (Namecheap or Porkbun) to prove the seam
 - [ ] E04-004 — Add registrar credential storage with encryption and a rotation runbook
 - [ ] E04-005 — Add a registrar cost ledger so domain spend is attributable per org
-- [ ] E04-006 — Define the DnsProvider interface (upsertRecord, deleteRecord, listRecords, verifyPropagation)
+- [x] E04-006 — Define the DnsProvider interface (upsertRecord, deleteRecord, listRecords, verifyPropagation)
 - [ ] E04-007 — Implement the Cloudflare DNS adapter using the scoped Zone:DNS:Edit token
 - [ ] E04-008 — Never use the platform DNS token for a customer-owned zone; enforce in code
-- [ ] E04-009 — Implement DNS record templating per FleetDomain from planning/INFRA.md §5
-- [ ] E04-010 — Generate the SPF record as a single hard-fail ip4 with no includes
+- [x] E04-009 — Implement DNS record templating per FleetDomain from planning/INFRA.md §5
+- [x] E04-010 — Generate the SPF record as a single hard-fail ip4 with no includes
 - [ ] E04-011 — Refuse to publish an SPF record with more than ten DNS lookups
 - [ ] E04-012 — Generate a 2048-bit DKIM keypair per domain and store the private key encrypted
 - [ ] E04-013 — Publish the DKIM public key TXT and verify it resolves before marking dkimOk

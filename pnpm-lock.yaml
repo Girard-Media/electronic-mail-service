@@ -55,6 +55,22 @@ importers:
         specifier: ^5.6.0
         version: 5.9.3
 
+  apps/dmarc-ingest:
+    dependencies:
+      '@ems/core':
+        specifier: workspace:*
+        version: link:../../packages/core
+      '@ems/db':
+        specifier: workspace:*
+        version: link:../../packages/db
+    devDependencies:
+      tsx:
+        specifier: ^4.19.0
+        version: 4.23.12
+      typescript:
+        specifier: ^5.6.0
+        version: 5.9.3
+
   apps/feedback-ingest:
     dependencies:
       '@ems/core':
@@ -77,6 +93,22 @@ importers:
         specifier: ^5.6.0
         version: 5.9.3
 
+  apps/fleet-agent:
+    dependencies:
+      '@ems/core':
+        specifier: workspace:*
+        version: link:../../packages/core
+      '@ems/db':
+        specifier: workspace:*
+        version: link:../../packages/db
+    devDependencies:
+      tsx:
+        specifier: ^4.19.0
+        version: 4.23.12
+      typescript:
+        specifier: ^5.6.0
+        version: 5.9.3
+
   apps/maillog-bridge:
     dependencies:
       '@ems/core':
@@ -86,6 +118,22 @@ importers:
       '@types/node':
         specifier: ^22.0.0
         version: 22.20.1
+      tsx:
+        specifier: ^4.19.0
+        version: 4.23.12
+      typescript:
+        specifier: ^5.6.0
+        version: 5.9.3
+
+  apps/seedbox:
+    dependencies:
+      '@ems/core':
+        specifier: workspace:*
+        version: link:../../packages/core
+      '@ems/db':
+        specifier: workspace:*
+        version: link:../../packages/db
+    devDependencies:
       tsx:
         specifier: ^4.19.0
         version: 4.23.12
@@ -170,6 +218,35 @@ importers:
         specifier: ^5.6.0
         version: 5.9.3
 
+  packages/ai:
+    dependencies:
+      '@ems/core':
+        specifier: workspace:*
+        version: link:../core
+      '@ems/db':
+        specifier: workspace:*
+        version: link:../db
+      zod:
+        specifier: ^3.23.0
+        version: 3.25.76
+    devDependencies:
+      typescript:
+        specifier: ^5.6.0
+        version: 5.9.3
+
+  packages/billing:
+    dependencies:
+      '@ems/db':
+        specifier: workspace:*
+        version: link:../db
+      zod:
+        specifier: ^3.23.0
+        version: 3.25.76
+    devDependencies:
+      typescript:
+        specifier: ^5.6.0
+        version: 5.9.3
+
   packages/core:
     dependencies:
       bullmq:
@@ -194,6 +271,70 @@ importers:
       prisma:
         specifier: ^6.0.0
         version: 6.19.3(typescript@5.9.3)
+    devDependencies:
+      typescript:
+        specifier: ^5.6.0
+        version: 5.9.3
+
+  packages/deliverability:
+    dependencies:
+      '@ems/core':
+        specifier: workspace:*
+        version: link:../core
+      '@ems/db':
+        specifier: workspace:*
+        version: link:../db
+      zod:
+        specifier: ^3.23.0
+        version: 3.25.76
+    devDependencies:
+      typescript:
+        specifier: ^5.6.0
+        version: 5.9.3
+
+  packages/fleet:
+    dependencies:
+      '@ems/core':
+        specifier: workspace:*
+        version: link:../core
+      '@ems/db':
+        specifier: workspace:*
+        version: link:../db
+      zod:
+        specifier: ^3.23.0
+        version: 3.25.76
+    devDependencies:
+      typescript:
+        specifier: ^5.6.0
+        version: 5.9.3
+
+  packages/inbox:
+    dependencies:
+      '@ems/core':
+        specifier: workspace:*
+        version: link:../core
+      '@ems/db':
+        specifier: workspace:*
+        version: link:../db
+      zod:
+        specifier: ^3.23.0
+        version: 3.25.76
+    devDependencies:
+      typescript:
+        specifier: ^5.6.0
+        version: 5.9.3
+
+  packages/leads:
+    dependencies:
+      '@ems/core':
+        specifier: workspace:*
+        version: link:../core
+      '@ems/db':
+        specifier: workspace:*
+        version: link:../db
+      zod:
+        specifier: ^3.23.0
+        version: 3.25.76
     devDependencies:
       typescript:
         specifier: ^5.6.0
@@ -228,6 +369,22 @@ importers:
         specifier: ^5.6.0
         version: 5.9.3
 
+  packages/policy:
+    dependencies:
+      '@ems/core':
+        specifier: workspace:*
+        version: link:../core
+      '@ems/db':
+        specifier: workspace:*
+        version: link:../db
+      zod:
+        specifier: ^3.23.0
+        version: 3.25.76
+    devDependencies:
+      typescript:
+        specifier: ^5.6.0
+        version: 5.9.3
+
   packages/providers:
     dependencies:
       nodemailer:
@@ -241,7 +398,97 @@ importers:
         specifier: ^5.6.0
         version: 5.9.3
 
+  packages/registrar:
+    dependencies:
+      zod:
+        specifier: ^3.23.0
+        version: 3.25.76
+    devDependencies:
+      typescript:
+        specifier: ^5.6.0
+        version: 5.9.3
+
+  packages/reputation:
+    dependencies:
+      '@ems/core':
+        specifier: workspace:*
+        version: link:../core
+      '@ems/db':
+        specifier: workspace:*
+        version: link:../db
+      zod:
+        specifier: ^3.23.0
+        version: 3.25.76
+    devDependencies:
+      typescript:
+        specifier: ^5.6.0
+        version: 5.9.3
+
+  packages/router:
+    dependencies:
+      '@ems/core':
+        specifier: workspace:*
+        version: link:../core
+      '@ems/db':
+        specifier: workspace:*
+        version: link:../db
+      zod:
+        specifier: ^3.23.0
+        version: 3.25.76
+    devDependencies:
+      typescript:
+        specifier: ^5.6.0
+        version: 5.9.3
+
   packages/sdk:
+    devDependencies:
+      typescript:
+        specifier: ^5.6.0
+        version: 5.9.3
+
+  packages/sequence:
+    dependencies:
+      '@ems/core':
+        specifier: workspace:*
+        version: link:../core
+      '@ems/db':
+        specifier: workspace:*
+        version: link:../db
+      zod:
+        specifier: ^3.23.0
+        version: 3.25.76
+    devDependencies:
+      typescript:
+        specifier: ^5.6.0
+        version: 5.9.3
+
+  packages/verify:
+    dependencies:
+      '@ems/core':
+        specifier: workspace:*
+        version: link:../core
+      '@ems/db':
+        specifier: workspace:*
+        version: link:../db
+      zod:
+        specifier: ^3.23.0
+        version: 3.25.76
+    devDependencies:
+      typescript:
+        specifier: ^5.6.0
+        version: 5.9.3
+
+  packages/warmup:
+    dependencies:
+      '@ems/core':
+        specifier: workspace:*
+        version: link:../core
+      '@ems/db':
+        specifier: workspace:*
+        version: link:../db
+      zod:
+        specifier: ^3.23.0
+        version: 3.25.76
     devDependencies:
       typescript:
         specifier: ^5.6.0

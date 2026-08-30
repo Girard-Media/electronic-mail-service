@@ -3,8 +3,8 @@
 `packages/policy` sits between the scheduler and the MTA and can block anything.
 Blocked is the default for whatever we cannot resolve.
 
-- [ ] E14-001 — Create packages/policy with the PolicyEngine entry point
-- [ ] E14-002 — Define the PolicyInput and PolicyResult types and freeze them
+- [x] E14-001 — Create packages/policy with the PolicyEngine entry point
+- [x] E14-002 — Define the PolicyInput and PolicyResult types and freeze them
 - [ ] E14-003 — Implement JurisdictionPolicy lookup by country with a wildcard default
 - [ ] E14-004 — Implement policy versioning with effectiveFrom and effectiveTo
 - [ ] E14-005 — Always resolve the policy version in force at decision time, not the latest

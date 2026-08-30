@@ -1,0 +1,21 @@
+{
+  "name": "@ems/fleet",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Node, IP, sending-domain and mailbox registry plus the capacity model",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@ems/core": "workspace:*",
+    "@ems/db": "workspace:*",
+    "zod": "^3.23.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.0"
+  }
+}

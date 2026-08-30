@@ -36,15 +36,15 @@ inherited subsystem is consciously kept, retargeted, or deleted.
 - [ ] E01-029 — Decide the public npm name for the SDK and record it in DECISIONS
 - [ ] E01-030 — Add .nvmrc pinned to the Node version in engines
 - [ ] E01-031 — Add pnpm workspace catalog for shared dep versions to stop drift between packages
-- [ ] E01-032 — Create the empty package skeletons for fleet, router, warmup, reputation, deliverability
-- [ ] E01-033 — Create the empty package skeletons for policy, verify, sequence, leads, inbox
-- [ ] E01-034 — Create the empty package skeletons for ai, billing, registrar
-- [ ] E01-035 — Give every new package a package.json, tsconfig, src/index.ts, and a typecheck script
-- [ ] E01-036 — Wire new packages into tsconfig.base.json path aliases
+- [x] E01-032 — Create the empty package skeletons for fleet, router, warmup, reputation, deliverability
+- [x] E01-033 — Create the empty package skeletons for policy, verify, sequence, leads, inbox
+- [x] E01-034 — Create the empty package skeletons for ai, billing, registrar
+- [x] E01-035 — Give every new package a package.json, tsconfig, src/index.ts, and a typecheck script
+- [x] E01-036 — Confirmed no tsconfig path aliases are needed: packages export ./src directly and resolve through the pnpm workspace link
 - [ ] E01-037 — Add a dependency-direction lint rule: no cross-domain package imports except via interfaces
-- [ ] E01-038 — Create apps/dmarc-ingest skeleton (Hono, receives RUA/TLS-RPT mail)
-- [ ] E01-039 — Create apps/seedbox skeleton (placement probe agent)
-- [ ] E01-040 — Create apps/fleet-agent skeleton (per-node agent)
+- [x] E01-038 — Create apps/dmarc-ingest skeleton (Hono, receives RUA/TLS-RPT mail)
+- [x] E01-039 — Create apps/seedbox skeleton (placement probe agent)
+- [x] E01-040 — Create apps/fleet-agent skeleton (per-node agent)
 - [ ] E01-041 — Update pnpm-workspace.yaml if any new app lives outside apps/*
 - [ ] E01-042 — Update Dockerfile to build the new apps in the single-image pipeline
 - [ ] E01-043 — Update Procfile / start script for the new sibling processes

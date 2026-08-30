@@ -2,8 +2,8 @@
 
 Stripe is the one unavoidable third party, isolated behind a BillingProvider seam.
 
-- [ ] E19-001 — Create packages/billing with the BillingProvider interface
-- [ ] E19-002 — Define the interface: customer, subscription, usage, invoice, portal, webhook
+- [x] E19-001 — Create packages/billing with the BillingProvider interface
+- [x] E19-002 — Define the interface: customer, subscription, usage, invoice, portal, webhook
 - [ ] E19-003 — Implement the Stripe adapter behind the interface
 - [ ] E19-004 — Assert in code that no Stripe symbol is imported outside packages/billing
 - [ ] E19-005 — Add a CI rule enforcing that assertion

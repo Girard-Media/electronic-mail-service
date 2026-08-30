@@ -1,0 +1,21 @@
+{
+  "name": "@ems/reputation",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "The five reputation ledgers, decay, scoring and DNSBL polling",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@ems/core": "workspace:*",
+    "@ems/db": "workspace:*",
+    "zod": "^3.23.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.0"
+  }
+}

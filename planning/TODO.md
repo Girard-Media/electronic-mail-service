@@ -5,7 +5,7 @@
 The build-loop queue (`bootspring build next` reads this).
 Status: `[ ]` todo · `[~]` in progress · `[x]` done.
 
-**16 / 2502 complete.**
+**39 / 2502 complete.**
 
 Governing documents — read before taking a task:
 
@@ -26,7 +26,7 @@ invariant it protects.
 
 ---
 
-<!-- source: planning/backlog/01-foundation.md · 12/82 -->
+<!-- source: planning/backlog/01-foundation.md · 20/82 -->
 # Epic 01 — Foundation & Fork Hygiene
 
 Goal: the forked repo compiles green, carries no usermails identity, and every
@@ -65,15 +65,15 @@ inherited subsystem is consciously kept, retargeted, or deleted.
 - [ ] E01-029 — Decide the public npm name for the SDK and record it in DECISIONS
 - [ ] E01-030 — Add .nvmrc pinned to the Node version in engines
 - [ ] E01-031 — Add pnpm workspace catalog for shared dep versions to stop drift between packages
-- [ ] E01-032 — Create the empty package skeletons for fleet, router, warmup, reputation, deliverability
-- [ ] E01-033 — Create the empty package skeletons for policy, verify, sequence, leads, inbox
-- [ ] E01-034 — Create the empty package skeletons for ai, billing, registrar
-- [ ] E01-035 — Give every new package a package.json, tsconfig, src/index.ts, and a typecheck script
-- [ ] E01-036 — Wire new packages into tsconfig.base.json path aliases
+- [x] E01-032 — Create the empty package skeletons for fleet, router, warmup, reputation, deliverability
+- [x] E01-033 — Create the empty package skeletons for policy, verify, sequence, leads, inbox
+- [x] E01-034 — Create the empty package skeletons for ai, billing, registrar
+- [x] E01-035 — Give every new package a package.json, tsconfig, src/index.ts, and a typecheck script
+- [x] E01-036 — Confirmed no tsconfig path aliases are needed: packages export ./src directly and resolve through the pnpm workspace link
 - [ ] E01-037 — Add a dependency-direction lint rule: no cross-domain package imports except via interfaces
-- [ ] E01-038 — Create apps/dmarc-ingest skeleton (Hono, receives RUA/TLS-RPT mail)
-- [ ] E01-039 — Create apps/seedbox skeleton (placement probe agent)
-- [ ] E01-040 — Create apps/fleet-agent skeleton (per-node agent)
+- [x] E01-038 — Create apps/dmarc-ingest skeleton (Hono, receives RUA/TLS-RPT mail)
+- [x] E01-039 — Create apps/seedbox skeleton (placement probe agent)
+- [x] E01-040 — Create apps/fleet-agent skeleton (per-node agent)
 - [ ] E01-041 — Update pnpm-workspace.yaml if any new app lives outside apps/*
 - [ ] E01-042 — Update Dockerfile to build the new apps in the single-image pipeline
 - [ ] E01-043 — Update Procfile / start script for the new sibling processes
@@ -216,17 +216,17 @@ Valkey holds nothing that cannot be rebuilt.
 
 ---
 
-<!-- source: planning/backlog/03-nodes.md · 0/120 -->
+<!-- source: planning/backlog/03-nodes.md · 5/120 -->
 # Epic 03 — Blast Nodes: Procurement, Provisioning, Agent
 
 Goal: a node goes from "VPS does not exist" to "routable" with one command and
 no manual step, and cannot become routable until it proves it is safe.
 
-- [ ] E03-001 — Write scripts/ip-diligence.mts: DNSBL sweep of a candidate IP across all configured lists
-- [ ] E03-002 — Add passive-DNS / prior-hostname lookup to the diligence script
-- [ ] E03-003 — Add an outbound port 25 egress test to the diligence script
-- [ ] E03-004 — Add an rDNS-control confirmation step to the diligence script
-- [ ] E03-005 — Make the diligence script emit a machine-readable verdict written to SendingIp.diligenceJson
+- [x] E03-001 — Write scripts/ip-diligence.mts: DNSBL sweep of a candidate IP across all configured lists
+- [x] E03-002 — Add passive-DNS / prior-hostname lookup to the diligence script
+- [x] E03-003 — Add an outbound port 25 egress test to the diligence script
+- [x] E03-004 — Add an rDNS-control confirmation step to the diligence script
+- [x] E03-005 — Make the diligence script emit a machine-readable verdict written to SendingIp.diligenceJson
 - [ ] E03-006 — Document the "release a dirty IP" procedure with the provider
 - [ ] E03-007 — Purchase blast-node-01 on Hostinger (KVM 2, Ubuntu 24.04, 1 dedicated IPv4)
 - [ ] E03-008 — Run diligence on the assigned IP before any other step
@@ -345,19 +345,19 @@ no manual step, and cannot become routable until it proves it is safe.
 
 ---
 
-<!-- source: planning/backlog/04-ips-dns.md · 0/100 -->
+<!-- source: planning/backlog/04-ips-dns.md · 4/100 -->
 # Epic 04 — IPs, DNS Automation & the Registrar Seam
 
-- [ ] E04-001 — Define the RegistrarProvider interface (search, purchase, renew, setNameservers, listDomains)
+- [x] E04-001 — Define the RegistrarProvider interface (search, purchase, renew, setNameservers, listDomains)
 - [ ] E04-002 — Implement the Cloudflare Registrar adapter
 - [ ] E04-003 — Implement a second adapter (Namecheap or Porkbun) to prove the seam
 - [ ] E04-004 — Add registrar credential storage with encryption and a rotation runbook
 - [ ] E04-005 — Add a registrar cost ledger so domain spend is attributable per org
-- [ ] E04-006 — Define the DnsProvider interface (upsertRecord, deleteRecord, listRecords, verifyPropagation)
+- [x] E04-006 — Define the DnsProvider interface (upsertRecord, deleteRecord, listRecords, verifyPropagation)
 - [ ] E04-007 — Implement the Cloudflare DNS adapter using the scoped Zone:DNS:Edit token
 - [ ] E04-008 — Never use the platform DNS token for a customer-owned zone; enforce in code
-- [ ] E04-009 — Implement DNS record templating per FleetDomain from planning/INFRA.md §5
-- [ ] E04-010 — Generate the SPF record as a single hard-fail ip4 with no includes
+- [x] E04-009 — Implement DNS record templating per FleetDomain from planning/INFRA.md §5
+- [x] E04-010 — Generate the SPF record as a single hard-fail ip4 with no includes
 - [ ] E04-011 — Refuse to publish an SPF record with more than ten DNS lookups
 - [ ] E04-012 — Generate a 2048-bit DKIM keypair per domain and store the private key encrypted
 - [ ] E04-013 — Publish the DKIM public key TXT and verify it resolves before marking dkimOk
@@ -636,14 +636,14 @@ No cross-customer warmup pool, ever (ADR-0003).
 
 ---
 
-<!-- source: planning/backlog/07-router.md · 0/105 -->
+<!-- source: planning/backlog/07-router.md · 2/105 -->
 # Epic 07 — Router, Pacing & the Send Path
 
 The router is the only package permitted to make a final send decision.
 Deferral is a first-class success (ARCHITECTURE §3.2).
 
-- [ ] E07-001 — Create packages/router with the SendPlan and Deferral types
-- [ ] E07-002 — Define the SendIntent → SendPlan contract and freeze it
+- [x] E07-001 — Create packages/router with the SendPlan and Deferral types
+- [x] E07-002 — Define the SendIntent → SendPlan contract and freeze it
 - [ ] E07-003 — Implement the hard candidate filter: domain verified and past ageReadyAt
 - [ ] E07-004 — Implement the hard candidate filter: mailbox ACTIVE and not held
 - [ ] E07-005 — Implement the hard candidate filter: IP not quarantined or throttled
@@ -1371,14 +1371,14 @@ Self-hosted, five stages, on a dedicated IP that never sends campaigns.
 
 ---
 
-<!-- source: planning/backlog/14-compliance.md · 0/120 -->
+<!-- source: planning/backlog/14-compliance.md · 2/120 -->
 # Epic 14 — Policy Engine, Consent, Suppression, Trust
 
 `packages/policy` sits between the scheduler and the MTA and can block anything.
 Blocked is the default for whatever we cannot resolve.
 
-- [ ] E14-001 — Create packages/policy with the PolicyEngine entry point
-- [ ] E14-002 — Define the PolicyInput and PolicyResult types and freeze them
+- [x] E14-001 — Create packages/policy with the PolicyEngine entry point
+- [x] E14-002 — Define the PolicyInput and PolicyResult types and freeze them
 - [ ] E14-003 — Implement JurisdictionPolicy lookup by country with a wildcard default
 - [ ] E14-004 — Implement policy versioning with effectiveFrom and effectiveTo
 - [ ] E14-005 — Always resolve the policy version in force at decision time, not the latest
@@ -2092,13 +2092,13 @@ The campaign builder should be plain and fast, not clever.
 
 ---
 
-<!-- source: planning/backlog/19-billing.md · 0/105 -->
+<!-- source: planning/backlog/19-billing.md · 2/105 -->
 # Epic 19 — Billing, Plans & Self-Serve SaaS
 
 Stripe is the one unavoidable third party, isolated behind a BillingProvider seam.
 
-- [ ] E19-001 — Create packages/billing with the BillingProvider interface
-- [ ] E19-002 — Define the interface: customer, subscription, usage, invoice, portal, webhook
+- [x] E19-001 — Create packages/billing with the BillingProvider interface
+- [x] E19-002 — Define the interface: customer, subscription, usage, invoice, portal, webhook
 - [ ] E19-003 — Implement the Stripe adapter behind the interface
 - [ ] E19-004 — Assert in code that no Stripe symbol is imported outside packages/billing
 - [ ] E19-005 — Add a CI rule enforcing that assertion
