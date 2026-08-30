@@ -1,0 +1,95 @@
+# Epic 02 — Data Model, Migrations & Stores
+
+Goal: Postgres holds decisions and configuration, ClickHouse holds observations,
+Valkey holds nothing that cannot be rebuilt.
+
+- [x] E02-001 — Append the EMS cold-outreach domain to schema.prisma (54 models, 32 enums)
+- [x] E02-002 — Add EMS back-relations to Organization
+- [x] E02-003 — Run prisma validate and fix every relation error
+- [x] E02-004 — Run prisma format and commit the canonical schema
+- [ ] E02-005 — Generate the initial EMS migration and review the SQL by hand before applying
+- [ ] E02-006 — Verify every tenant-scoped model carries orgId and an index on it
+- [ ] E02-007 — Add a partial unique index on FleetDomain.name where status <> BURNED
+- [ ] E02-008 — Add a covering index on SendIntent(state, dueAt) sized for the scheduler claim query
+- [ ] E02-009 — Add an index on SendIntent(messageId) and confirm it is unique
+- [ ] E02-010 — Add a GIN index on Lead.customFields for segment queries
+- [ ] E02-011 — Add a trigram index on Lead.email for fuzzy dedupe search
+- [ ] E02-012 — Add a partial index on CampaignLead(state, nextDueAt) where state = ACTIVE
+- [ ] E02-013 — Add a check constraint: FleetMailbox.dailyCap <= hardCap
+- [ ] E02-014 — Add a check constraint: SequenceStep.position >= 0
+- [ ] E02-015 — Add a check constraint: WarmupPlan.startPerDay <= plateau
+- [ ] E02-016 — Add a check constraint: Campaign.sendWindowStart < sendWindowEnd
+- [ ] E02-017 — Make PolicyDecision append-only with a REVOKE UPDATE/DELETE grant
+- [ ] E02-018 — Make GlobalSuppression append-only except for the address plaintext column
+- [ ] E02-019 — Add a database role for the API that cannot DROP or TRUNCATE
+- [ ] E02-020 — Add a read-only reporting role for the cockpit aggregate queries
+- [ ] E02-021 — Write the tenant-scope helper that injects orgId into every Prisma query
+- [ ] E02-022 — Write a CI test that fails if any tenant model is queried without an orgId predicate
+- [ ] E02-023 — Write the soft-delete convention doc and apply it consistently or not at all
+- [ ] E02-024 — Add createdAt/updatedAt to every model that lacks them
+- [ ] E02-025 — Standardise cuid() ids across new models; no serial ints on tenant data
+- [ ] E02-026 — Write the expand/contract migration playbook for send-path tables
+- [ ] E02-027 — Add a migration lint that rejects a DROP COLUMN in the same migration as its code removal
+- [ ] E02-028 — Add migration timing instrumentation; fail CI on a migration estimated over 30s on prod volume
+- [ ] E02-029 — Provision ClickHouse on the .211 data box
+- [ ] E02-030 — Create the ClickHouse database and a dedicated EMS user with least privilege
+- [ ] E02-031 — Design the smtp_transactions table with a MergeTree ordered by (nodeId, ts)
+- [ ] E02-032 — Add a TTL to smtp_transactions (hot 90d, then R2 archive)
+- [ ] E02-033 — Design the email_events table (queued, submitted, delivered, deferred, bounced, opened, clicked, replied, unsubscribed, complained)
+- [ ] E02-034 — Design the reputation_series table keyed by (subject, subjectId, ts)
+- [ ] E02-035 — Design the placement_observations table for seed probe results
+- [ ] E02-036 — Design the dmarc_rows table for per-source-IP aggregate rows
+- [ ] E02-037 — Design the ai_calls table mirroring the Postgres AiCall for cheap aggregation
+- [ ] E02-038 — Write the ClickHouse migration runner (plain SQL files, forward-only, checksummed)
+- [ ] E02-039 — Add materialized views for hourly rollups per domain, per mailbox, per IP
+- [ ] E02-040 — Add a materialized view for per-ESP deferral rate over 15-minute buckets
+- [ ] E02-041 — Add a materialized view for campaign funnel counts
+- [ ] E02-042 — Write packages/db/src/clickhouse.ts with a typed query helper and connection pooling
+- [ ] E02-043 — Add a batching writer that buffers events and flushes on size or interval
+- [ ] E02-044 — Make the ClickHouse writer fail-soft: buffer to disk, never block a send
+- [ ] E02-045 — Add a replay tool that reingests buffered events after a ClickHouse outage
+- [ ] E02-046 — Define the Valkey key namespace and document every key pattern with its TTL
+- [ ] E02-047 — Implement the suppression bloom filter with a documented false-positive rate
+- [ ] E02-048 — Implement the suppression exact set with Postgres as the fallback on miss
+- [ ] E02-049 — Implement the four token buckets as Lua scripts for atomicity
+- [ ] E02-050 — Implement the scheduler distributed lock with a fencing token
+- [ ] E02-051 — Add a Valkey warmup routine that rebuilds every derived key from Postgres on boot
+- [ ] E02-052 — Add a consistency job that reconciles Valkey counters against Postgres nightly
+- [ ] E02-053 — Add R2 buckets: ems-raw-mail, ems-dmarc, ems-exports, ems-backups
+- [ ] E02-054 — Write the R2 client wrapper with signed-URL generation and content-type enforcement
+- [ ] E02-055 — Store raw MIME to R2 with the Message-ID as the key prefix
+- [ ] E02-056 — Store original DMARC XML to R2 before parsing, always
+- [ ] E02-057 — Add lifecycle rules on R2 for cost control on raw mail
+- [ ] E02-058 — Extend the restic → R2 backup runbook to cover ClickHouse
+- [ ] E02-059 — Write and test a full restore drill for Postgres from R2
+- [ ] E02-060 — Write and test a full restore drill for ClickHouse from R2
+- [ ] E02-061 — Seed JurisdictionPolicy with the rows from planning/COMPLIANCE.md §1
+- [ ] E02-062 — Seed BounceRule with the Google response dialect
+- [ ] E02-063 — Seed BounceRule with the Microsoft/Outlook response dialect
+- [ ] E02-064 — Seed BounceRule with the Yahoo response dialect
+- [ ] E02-065 — Seed BounceRule with the Proofpoint, Mimecast, and Barracuda dialects
+- [ ] E02-066 — Seed BounceRule with generic RFC 3463 enhanced status codes as the fallback layer
+- [ ] E02-067 — Seed WarmupPlan with conservative, standard, and aggressive curves
+- [ ] E02-068 — Seed AiTaskConfig rows for all eleven tasks in planning/AI.md
+- [ ] E02-069 — Seed GlobalSuppression with .gov, .mil, and known spam-trap domains
+- [ ] E02-070 — Seed GlobalSuppression with our own and our competitors' domains
+- [ ] E02-071 — Seed the disposable-email-domain list and schedule its refresh
+- [ ] E02-072 — Seed the role-address local-part list
+- [ ] E02-073 — Write the seed runner so it is idempotent and safe to run on prod
+- [ ] E02-074 — Add a data-dictionary generator that emits planning/DATA_DICTIONARY.md from the schema
+- [ ] E02-075 — Add an ERD generator and commit the rendered diagram
+- [ ] E02-076 — Write query-performance tests for the ten hottest queries with EXPLAIN assertions
+- [ ] E02-077 — Add pg_stat_statements and a slow-query report job
+- [ ] E02-078 — Configure PgBouncer pool sizing for the worker concurrency
+- [ ] E02-079 — Load-test the scheduler claim query at 1M pending intents
+- [ ] E02-080 — Load-test the ClickHouse rollups at 100M transaction rows
+- [ ] E02-081 — Document the retention policy per table and get it into the privacy policy
+- [ ] E02-082 — Implement the GDPR erasure job across Postgres, ClickHouse, and R2
+- [ ] E02-083 — Verify erasure preserves the GlobalSuppression hash
+- [ ] E02-084 — Implement the tenant export job producing a single signed archive
+- [ ] E02-085 — Add a schema-drift check comparing prod introspection against the committed schema
+- [ ] E02-086 — Add a fixture factory package for tests (org, node, ip, domain, mailbox, lead, campaign)
+- [ ] E02-087 — Make every test run against a real ephemeral Postgres, not a mock
+- [ ] E02-088 — Add a truncation helper so tests share one database without cross-talk
+- [ ] E02-089 — Benchmark Prisma client cold start in the worker and pin the generated client output
+- [ ] E02-090 — Review every onDelete rule; Restrict on anything a node or domain depends on

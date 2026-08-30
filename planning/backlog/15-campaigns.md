@@ -1,0 +1,127 @@
+# Epic 15 — Campaigns & the Sequence Engine
+
+- [ ] E15-001 — Create packages/sequence with the durable per-enrolment state machine
+- [ ] E15-002 — Define the legal state transitions and reject anything else
+- [ ] E15-003 — Implement enrolment: lead plus campaign creates a CampaignLead
+- [ ] E15-004 — Run the compliance gate at enrolment as well as at send
+- [ ] E15-005 — Mark an enrolment BLOCKED_BY_POLICY with the reason rather than silently skipping
+- [ ] E15-006 — Implement step materialisation into SendIntent with a computed dueAt
+- [ ] E15-007 — Compute dueAt from the previous step, the delay, the window, and the timezone
+- [ ] E15-008 — Never materialise more than the next step per enrolment
+- [ ] E15-009 — Implement step conditions: no reply, opened, clicked, custom field match
+- [ ] E15-010 — Evaluate conditions at materialisation, not at creation
+- [ ] E15-011 — Implement variant assignment deterministically from hash(leadId, stepId)
+- [ ] E15-012 — Keep variant assignment stable across re-runs
+- [ ] E15-013 — Implement weighted variant selection
+- [ ] E15-014 — Track per-variant sent, replied, and bounced counters
+- [ ] E15-015 — Compute variant significance and refuse to declare a winner too early
+- [ ] E15-016 — Show the confidence interval on every variant comparison
+- [ ] E15-017 — Never auto-promote a variant on an underpowered sample
+- [ ] E15-018 — Implement reply detection stopping the enrolment immediately
+- [ ] E15-019 — Propagate a reply as a domain event stopping every campaign for that person
+- [ ] E15-020 — Implement the company-level stop when configured
+- [ ] E15-021 — Implement bounce handling: suppress the address and stop the enrolment
+- [ ] E15-022 — Implement hard-bounce clustering triggering a domain-level pause
+- [ ] E15-023 — Implement unsubscribe stopping everything for that person
+- [ ] E15-024 — Implement manual stop with a reason
+- [ ] E15-025 — Implement campaign pause propagating to every pending intent within seconds
+- [ ] E15-026 — Implement campaign resume without re-sending anything already sent
+- [ ] E15-027 — Implement the auto-pause circuit breakers on bounce and complaint rates
+- [ ] E15-028 — Record autoPauseReason and surface it prominently
+- [ ] E15-029 — Require an operator action to resume an auto-paused campaign
+- [ ] E15-030 — Implement campaign completion when every enrolment reaches a terminal state
+- [ ] E15-031 — Build the campaign creation flow as a linear wizard with no dead ends
+- [ ] E15-032 — Gate campaign creation on the org having capacity and a verified domain
+- [ ] E15-033 — Explain exactly what is missing when the gate blocks
+- [ ] E15-034 — Build the sequence editor with plain-text-first composition
+- [ ] E15-035 — Warn on heavy HTML, many links, and image-only bodies with the reason
+- [ ] E15-036 — Show the live spam-signal score as the user types
+- [ ] E15-037 — Show the rendered message exactly as it will send, including the footer
+- [ ] E15-038 — Preview against a real lead's data, not placeholder text
+- [ ] E15-039 — Show which personalisation tokens will fail to resolve, before launch
+- [ ] E15-040 — Block launch while any required token is unresolvable for any enrolled lead
+- [ ] E15-041 — Implement spintax with a preview of several rendered variations
+- [ ] E15-042 — Validate spintax syntax and show the error position
+- [ ] E15-043 — Implement the variable palette from the list's actual fields
+- [ ] E15-044 — Implement fallback values for optional tokens
+- [ ] E15-045 — Refuse a fallback that produces an obviously templated sentence
+- [ ] E15-046 — Implement the AI copy generation task from ICP, offer, and tone
+- [ ] E15-047 — Present generated copy as a draft the user must accept
+- [ ] E15-048 — Never send AI-generated copy that a human has not seen
+- [ ] E15-049 — Implement the AI subject-variant task with a risk score per variant
+- [ ] E15-050 — Show why a subject scored risky, in specific terms
+- [ ] E15-051 — Implement the AI sequence-optimisation task producing reviewable proposals
+- [ ] E15-052 — Never auto-apply an optimisation proposal
+- [ ] E15-053 — Track whether accepted proposals actually improved outcomes
+- [ ] E15-054 — Build the campaign schedule editor: window, days, timezone mode, daily cap
+- [ ] E15-055 — Show the projected send curve for the configured schedule
+- [ ] E15-056 — Show the projected completion date before launch
+- [ ] E15-057 — Explain the binding constraint when the projection is slower than the user expects
+- [ ] E15-058 — Offer the specific action that would speed it up
+- [ ] E15-059 — Implement the holiday calendar per country and honour it
+- [ ] E15-060 — Let the customer add their own blackout dates
+- [ ] E15-061 — Implement the pre-launch checklist covering compliance, capacity, content, and placement
+- [ ] E15-062 — Make every checklist item link to the thing that fixes it
+- [ ] E15-063 — Block launch on any hard checklist failure
+- [ ] E15-064 — Allow launch with warnings, but record that the user accepted them
+- [ ] E15-065 — Implement a soft launch: send to a small sample and hold for review
+- [ ] E15-066 — Run a placement test on the soft-launch sample automatically
+- [ ] E15-067 — Show soft-launch results before the full send proceeds
+- [ ] E15-068 — Require explicit confirmation to proceed from soft launch to full send
+- [ ] E15-069 — Build the campaign detail view: funnel, timeline, variants, enrolments, issues
+- [ ] E15-070 — Lead with replies, not with opens
+- [ ] E15-071 — Show delivered from the maillog with its source labelled
+- [ ] E15-072 — Show the bounce breakdown by class with verbatim responses available
+- [ ] E15-073 — Show which mailboxes carried the campaign and how each performed
+- [ ] E15-074 — Show the per-ESP performance breakdown
+- [ ] E15-075 — Build the enrolment list with per-lead state and next due time
+- [ ] E15-076 — Let an operator inspect exactly why one lead has not been contacted yet
+- [ ] E15-077 — Build the campaign issues panel listing every blocked and deferred reason
+- [ ] E15-078 — Rank issues by how many leads each affects
+- [ ] E15-079 — Make each issue actionable from the panel
+- [ ] E15-080 — Implement campaign duplication preserving content and resetting outcomes
+- [ ] E15-081 — Implement campaign templates saved at the org level
+- [ ] E15-082 — Implement campaign archiving that preserves the full record
+- [ ] E15-083 — Never delete campaign history; archive it
+- [ ] E15-084 — Implement the usermails handoff on a positive reply or explicit opt-in
+- [ ] E15-085 — Build the HandoffEvent dispatcher with retry and dead-lettering
+- [ ] E15-086 — Include the consent evidence in the handoff payload
+- [ ] E15-087 — Show handoff status on the lead timeline
+- [ ] E15-088 — Make the handoff target configurable so it is not hard-wired to usermails
+- [ ] E15-089 — Implement CRM push on a positive reply via a generic webhook
+- [ ] E15-090 — Implement multi-channel step seams without building the channels yet
+- [ ] E15-091 — Document explicitly that LinkedIn and SMS are out of scope for v1
+- [ ] E15-092 — Implement campaign-level A/Z testing across whole sequences, not only steps
+- [ ] E15-093 — Implement the reply-rate goal and progress against it
+- [ ] E15-094 — Alert the customer when a campaign is materially underperforming its cohort
+- [ ] E15-095 — Give a specific diagnosis rather than a generic underperformance notice
+- [ ] E15-096 — Load-test enrolment at 100,000 leads in one campaign
+- [ ] E15-097 — Load-test materialisation across 50 concurrent campaigns
+- [ ] E15-098 — Test that a paused campaign stops within the stated seconds
+- [ ] E15-099 — Test that a reply stops every campaign for that person
+- [ ] E15-100 — Test that variant assignment is stable across re-runs
+- [ ] E15-101 — Test that a blocked jurisdiction produces BLOCKED_BY_POLICY, not a silent skip
+- [ ] E15-102 — Test the soft-launch gate blocks a full send until confirmed
+- [ ] E15-103 — Test the auto-pause breaker with injected bounces
+- [ ] E15-104 — Test timezone handling across a daylight-saving boundary
+- [ ] E15-105 — Test the holiday calendar against a real national holiday
+- [ ] E15-106 — Fuzz the template renderer with adversarial variable content
+- [ ] E15-107 — Assert the renderer cannot be used to inject headers
+- [ ] E15-108 — Document the sequence engine in planning/specs/sequence/
+- [ ] E15-109 — Publish the customer guide on writing cold sequences that get replies
+- [ ] E15-110 — Publish the guide on why plain text outperforms designed HTML here
+- [ ] E15-111 — Add campaign MCP tools for agent-driven campaign operations
+- [ ] E15-112 — Add a campaign comparison view across the org
+- [ ] E15-113 — Add a benchmark view comparing a campaign to anonymised platform medians
+- [ ] E15-114 — Never expose another tenant's data through the benchmark
+- [ ] E15-115 — Compute benchmarks only above a minimum cohort size
+- [ ] E15-116 — Add a campaign cost view: infrastructure, verification, and AI cost per reply
+- [ ] E15-117 — Make cost per positive reply the headline commercial metric
+- [ ] E15-118 — Track it over time and show the customer their own trend
+- [ ] E15-119 — Alert when cost per positive reply degrades materially
+- [ ] E15-120 — Add the diagnosis for a degrading cost per reply, ranked by contribution
+- [ ] E15-121 — Implement campaign-level suppression of specific companies
+- [ ] E15-122 — Implement campaign scheduling far in advance with a pre-launch re-check
+- [ ] E15-123 — Re-run the full pre-launch checklist at the moment a scheduled campaign starts
+- [ ] E15-124 — Refuse to start a scheduled campaign whose gates no longer pass
+- [ ] E15-125 — Notify the owner with the specific failed gate when a scheduled start is refused

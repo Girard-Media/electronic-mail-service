@@ -1,0 +1,109 @@
+# Epic 16 — Unified Inbox & Reply Handling
+
+Replies are the product's success metric. Inbound is not an afterthought.
+
+- [ ] E16-001 — Create packages/inbox with MIME parsing and threading
+- [ ] E16-002 — Parse inbound MIME into text, HTML, and attachment parts
+- [ ] E16-003 — Prefer the text part; render HTML sanitised when text is absent
+- [ ] E16-004 — Strip quoted history for display while retaining the full body
+- [ ] E16-005 — Detect and collapse signature blocks
+- [ ] E16-006 — Handle every common quoting style across mail clients
+- [ ] E16-007 — Thread on In-Reply-To and References first
+- [ ] E16-008 — Fall back to subject-plus-participants matching with a recorded confidence
+- [ ] E16-009 — Never merge two threads on a weak match
+- [ ] E16-010 — Link the thread to the lead, campaign, and mailbox
+- [ ] E16-011 — Store the full MIME to R2 and reference it from the message
+- [ ] E16-012 — Sanitise HTML before rendering; strip scripts, iframes, and remote-loading tags
+- [ ] E16-013 — Block remote image loading by default and offer a per-message reveal
+- [ ] E16-014 — Quarantine executable and archive attachments
+- [ ] E16-015 — Scan attachments and mark anything suspicious
+- [ ] E16-016 — Never auto-open or auto-render an attachment
+- [ ] E16-017 — Show inbound Authentication-Results so the operator sees whether the sender was authentic
+- [ ] E16-018 — Warn on a reply that fails DMARC alignment for its claimed domain
+- [ ] E16-019 — Implement the AI reply classification task with the eight-value enum
+- [ ] E16-020 — Show the classification with its confidence
+- [ ] E16-021 — Let a human correct the classification in one click
+- [ ] E16-022 — Write the correction to intentCorrectedTo and feed it to the eval fixture set
+- [ ] E16-023 — Act immediately on an unsubscribe classification without corroboration
+- [ ] E16-024 — Require corroboration or human confirmation for any other state-changing classification
+- [ ] E16-025 — Treat inbound content as untrusted data in every AI prompt
+- [ ] E16-026 — Constrain classification output to the enum so injection cannot escape the schema
+- [ ] E16-027 — Give the classifier no tool access and no write authority
+- [ ] E16-028 — Detect out-of-office replies and reschedule the sequence rather than stopping it
+- [ ] E16-029 — Parse the return date from an out-of-office where stated
+- [ ] E16-030 — Resume the sequence after the stated return date plus a buffer
+- [ ] E16-031 — Detect auto-replies and do not count them as engagement
+- [ ] E16-032 — Detect referral replies and surface the referred contact for review
+- [ ] E16-033 — Never auto-enrol a referred contact without a compliance pass
+- [ ] E16-034 — Build the unified inbox view across every mailbox in the workspace
+- [ ] E16-035 — Default the view to interested replies first
+- [ ] E16-036 — Provide filters by classification, campaign, mailbox, and assignment
+- [ ] E16-037 — Provide full-text search across every thread
+- [ ] E16-038 — Show the full lead context alongside the thread
+- [ ] E16-039 — Show which campaign and step produced the original message
+- [ ] E16-040 — Show the send evidence: route, delivery, and timestamps
+- [ ] E16-041 — Implement reply composition sending from the same mailbox that received
+- [ ] E16-042 — Never send a reply from a different identity than the thread expects
+- [ ] E16-043 — Preserve threading headers on the outbound reply
+- [ ] E16-044 — Route replies through the same policy gate as campaign sends
+- [ ] E16-045 — Exempt one-to-one replies from campaign pacing but not from suppression
+- [ ] E16-046 — Implement reply templates and snippets at the org level
+- [ ] E16-047 — Implement an AI reply-draft suggestion the human must accept
+- [ ] E16-048 — Never auto-send an AI-drafted reply
+- [ ] E16-049 — Implement thread assignment to a team member
+- [ ] E16-050 — Implement thread states: open, snoozed, closed, archived
+- [ ] E16-051 — Implement snooze with a wake time and a reminder
+- [ ] E16-052 — Implement an unassigned queue with an age-based alert
+- [ ] E16-053 — Alert when an interested reply has gone unanswered past the SLA
+- [ ] E16-054 — Track time to first response as a customer-facing metric
+- [ ] E16-055 — Show the response-time distribution per team member
+- [ ] E16-056 — Implement real-time inbox updates over SSE
+- [ ] E16-057 — Show a new-reply notification without a full page refresh
+- [ ] E16-058 — Implement optimistic state changes with rollback on failure
+- [ ] E16-059 — Implement keyboard navigation across the whole inbox
+- [ ] E16-060 — Implement bulk actions across selected threads
+- [ ] E16-061 — Implement a read and unread state per user, not per org
+- [ ] E16-062 — Implement mentions and internal notes on a thread
+- [ ] E16-063 — Never let an internal note leak into an outbound message
+- [ ] E16-064 — Test that internal notes are excluded from every send path
+- [ ] E16-065 — Implement the positive-reply handoff to usermails or a CRM
+- [ ] E16-066 — Show handoff status inline on the thread
+- [ ] E16-067 — Implement a manual handoff trigger for a human-identified opportunity
+- [ ] E16-068 — Implement lead-status updates driven from the thread
+- [ ] E16-069 — Implement the meeting-booked outcome and track it as the terminal success
+- [ ] E16-070 — Report cost per meeting booked alongside cost per positive reply
+- [ ] E16-071 — Implement inbox export for a specific thread or the whole workspace
+- [ ] E16-072 — Implement inbox retention and purge per the retention schedule
+- [ ] E16-073 — Purge threads for erased leads while retaining aggregate counts
+- [ ] E16-074 — Test threading against a corpus of real reply formats
+- [ ] E16-075 — Test quoted-history stripping across five mail clients
+- [ ] E16-076 — Test classification accuracy against the labelled fixture set
+- [ ] E16-077 — Enforce the accuracy gate in CI at 92% overall and 80% per class
+- [ ] E16-078 — Test prompt-injection resistance with adversarial reply bodies
+- [ ] E16-079 — Assert an injected instruction cannot produce an out-of-schema value
+- [ ] E16-080 — Test that a malformed MIME message does not crash the ingest worker
+- [ ] E16-081 — Test that a very large attachment is truncated with a record, not dropped silently
+- [ ] E16-082 — Load-test the inbox at 100,000 threads
+- [ ] E16-083 — Benchmark thread search at that volume
+- [ ] E16-084 — Measure and alert on inbound processing lag
+- [ ] E16-085 — Never lose an inbound message; acknowledge only after durable storage
+- [ ] E16-086 — Test inbound durability by killing the worker mid-ingest
+- [ ] E16-087 — Document the inbox subsystem in planning/specs/inbox/
+- [ ] E16-088 — Publish the customer guide on handling cold replies well
+- [ ] E16-089 — Add inbox MCP tools so an agent can triage replies
+- [ ] E16-090 — Never let an MCP agent send a reply without human confirmation
+- [ ] E16-091 — Add an inbox digest email summarising what needs attention
+- [ ] E16-092 — Make the digest actionable with direct links to each thread
+- [ ] E16-093 — Add mobile-responsive inbox layout per app-feel standards
+- [ ] E16-094 — Add an inbox empty state that explains what will appear here and when
+- [ ] E16-095 — Add a per-mailbox inbox view for operators diagnosing a specific mailbox
+- [ ] E16-096 — Show non-campaign mail arriving at a mailbox so nothing is invisible
+- [ ] E16-097 — Alert on unexpected inbound volume to a mailbox; it may be a backscatter attack
+- [ ] E16-098 — Implement backscatter detection and suppression at the node
+- [ ] E16-099 — Test the backscatter path with a synthetic bounce storm
+- [ ] E16-100 — Add the inbox to the tenant export
+- [ ] E16-101 — Add per-user inbox preferences that persist across sessions
+- [ ] E16-102 — Add a saved-view feature for common triage queries
+- [ ] E16-103 — Add reply-rate reporting sliced by mailbox, persona, and domain
+- [ ] E16-104 — Correlate persona characteristics with reply rate and report what the data says
+- [ ] E16-105 — Feed that correlation into persona creation guidance

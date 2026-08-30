@@ -1,0 +1,117 @@
+# Epic 13 — Leads: Import, Normalise, Dedupe, Segment, Enrich
+
+- [ ] E13-001 — Create packages/leads with the import pipeline
+- [ ] E13-002 — Implement CSV import with delimiter and encoding detection
+- [ ] E13-003 — Handle UTF-8 BOM, Latin-1, and Windows-1252 without mangling names
+- [ ] E13-004 — Implement column mapping with a suggested mapping from the header row
+- [ ] E13-005 — Let the user correct the mapping before the import commits
+- [ ] E13-006 — Preview the first rows as they will be stored, before committing
+- [ ] E13-007 — Support custom fields mapped into Lead.customFields
+- [ ] E13-008 — Validate that every custom field referenced by a sequence exists on the list
+- [ ] E13-009 — Block a campaign whose template references a field the list does not have
+- [ ] E13-010 — Implement streaming import so a large file does not exhaust memory
+- [ ] E13-011 — Make import resumable and idempotent on retry
+- [ ] E13-012 — Report per-row errors with the row number and the specific problem
+- [ ] E13-013 — Produce a rejected-rows file the user can fix and re-upload
+- [ ] E13-014 — Normalise names: trim, collapse whitespace, fix all-caps, preserve real capitalisation
+- [ ] E13-015 — Never mangle a name we are unsure about; leave it as supplied
+- [ ] E13-016 — Normalise company names by stripping legal suffixes into a separate field
+- [ ] E13-017 — Derive companyDomain from an email address when absent
+- [ ] E13-018 — Never derive a company domain from a free-mail address
+- [ ] E13-019 — Normalise phone numbers to E.164 where a country is known
+- [ ] E13-020 — Normalise LinkedIn URLs to a canonical form
+- [ ] E13-021 — Implement exact deduplication on (orgId, email)
+- [ ] E13-022 — Implement fuzzy duplicate detection across name and company
+- [ ] E13-023 — Present fuzzy duplicates for review rather than merging automatically
+- [ ] E13-024 — Implement a merge that preserves the union of fields and the earliest consent record
+- [ ] E13-025 — Never lose a consent record or a suppression during a merge
+- [ ] E13-026 — Detect the same person at a different company and treat it as a new lead
+- [ ] E13-027 — Detect a role address masquerading as a person
+- [ ] E13-028 — Resolve the lead's country per COMPLIANCE §2 precedence order
+- [ ] E13-029 — Record countrySource and countryConfidence on every lead
+- [ ] E13-030 — Never let a weak signal loosen the jurisdiction; only tighten
+- [ ] E13-031 — Resolve the lead's timezone from the country and city where known
+- [ ] E13-032 — Fall back to the campaign's fixed timezone when the lead's is unknown
+- [ ] E13-033 — Surface how many leads lack a resolvable timezone before launch
+- [ ] E13-034 — Implement the list compliance gate before a list can reach READY
+- [ ] E13-035 — Require sourceType, sourceDetail, and an attestation on every list
+- [ ] E13-036 — Record the attesting user, timestamp, and IP
+- [ ] E13-037 — Generate the per-batch compliance report artifact and store it in R2
+- [ ] E13-038 — Make the compliance report downloadable for the customer's counsel
+- [ ] E13-039 — Show sendable, blocked, and needs-basis counts with the reasons
+- [ ] E13-040 — Block list activation while any row is unresolvable
+- [ ] E13-041 — Offer to remove or quarantine unresolvable rows
+- [ ] E13-042 — Implement segments as saved queries over leads and custom fields
+- [ ] E13-043 — Support boolean composition of segment conditions
+- [ ] E13-044 — Show the live count of a segment as it is built
+- [ ] E13-045 — Make segments dynamic so new imports flow into them
+- [ ] E13-046 — Support static snapshots of a segment for reproducible campaigns
+- [ ] E13-047 — Warn when a dynamic segment changes size after a campaign starts
+- [ ] E13-048 — Implement lead search across every field with sub-second response
+- [ ] E13-049 — Implement bulk lead actions: tag, suppress, delete, move, enrol
+- [ ] E13-050 — Confirm bulk actions with the exact count and an undo where possible
+- [ ] E13-051 — Never allow a bulk action to bypass the compliance gate
+- [ ] E13-052 — Implement lead import from the API with the same gates as the UI
+- [ ] E13-053 — Implement lead import from a CRM via a generic webhook receiver
+- [ ] E13-054 — Never let an API import skip the provenance requirement
+- [ ] E13-055 — Implement the enrichment seam with a provider interface
+- [ ] E13-056 — Implement enrichment from public company data we can fetch ourselves
+- [ ] E13-057 — Implement enrichment from the company website we are allowed to read
+- [ ] E13-058 — Respect robots.txt on any fetch we perform
+- [ ] E13-059 — Never scrape behind an authentication wall
+- [ ] E13-060 — Never scrape a source whose terms forbid it
+- [ ] E13-061 — Cache enrichment results with a TTL and a source record
+- [ ] E13-062 — Show the source of every enriched field in the UI
+- [ ] E13-063 — Let the user reject an enriched value and keep their own
+- [ ] E13-064 — Implement the AI ICP fit scoring task with a stated rubric
+- [ ] E13-065 — Show the fit reason, not only the score
+- [ ] E13-066 — Let the user correct a fit score and feed it back as an eval fixture
+- [ ] E13-067 — Never auto-remove a lead purely on a low AI fit score
+- [ ] E13-068 — Implement the personalisation-line generation task per lead
+- [ ] E13-069 — Fail the send rather than sending an unresolved personalisation token
+- [ ] E13-070 — Offer a fallback line when personalisation cannot be generated
+- [ ] E13-071 — Let the user review generated lines in bulk before launch
+- [ ] E13-072 — Flag generated lines that reference something we cannot verify
+- [ ] E13-073 — Never generate a claim about a lead that we cannot source
+- [ ] E13-074 — Implement lead status transitions driven by real events only
+- [ ] E13-075 — Implement the frozen flag for GDPR restriction and exclude frozen leads from routing
+- [ ] E13-076 — Implement lead erasure with suppression-hash preservation
+- [ ] E13-077 — Implement lead export per data-portability requirements
+- [ ] E13-078 — Build the lead detail view: fields, consent, verification, campaigns, threads, events
+- [ ] E13-079 — Make the lead timeline show every message sent and every event received
+- [ ] E13-080 — Link every timeline entry to its underlying evidence
+- [ ] E13-081 — Build the list view with import status, counts, and compliance state
+- [ ] E13-082 — Build the import wizard as a linear flow with no dead ends
+- [ ] E13-083 — Make every import step reversible before commit
+- [ ] E13-084 — Add an import history with the original file retained in R2
+- [ ] E13-085 — Support re-running an import after fixing the mapping
+- [ ] E13-086 — Add a lead-quality score combining verification, fit, and completeness
+- [ ] E13-087 — Show the expected campaign performance from the list's quality distribution
+- [ ] E13-088 — Warn before launching against a low-quality list
+- [ ] E13-089 — Add duplicate detection across lists within an org
+- [ ] E13-090 — Prevent enrolling one lead in two campaigns simultaneously by default
+- [ ] E13-091 — Make the multi-campaign policy configurable with a warning
+- [ ] E13-092 — Implement a company-level fan-out cap so one company is not saturated
+- [ ] E13-093 — Surface the company view: all leads at one company across all campaigns
+- [ ] E13-094 — Stop every lead at a company when one replies, when configured
+- [ ] E13-095 — Implement the do-not-contact list at the company-domain level
+- [ ] E13-096 — Import an existing customer list as automatic do-not-contact
+- [ ] E13-097 — Offer CRM sync of do-not-contact as a first-class integration
+- [ ] E13-098 — Load-test import at one million rows
+- [ ] E13-099 — Measure and report import throughput and time to first sendable lead
+- [ ] E13-100 — Load-test segment evaluation at ten million leads
+- [ ] E13-101 — Benchmark lead search at ten million leads
+- [ ] E13-102 — Test the compliance gate blocks a list with unresolvable jurisdictions
+- [ ] E13-103 — Test that erasure preserves suppression
+- [ ] E13-104 — Test that a merge preserves the earliest consent
+- [ ] E13-105 — Test that a frozen lead is never routed
+- [ ] E13-106 — Fuzz the CSV parser with malformed files
+- [ ] E13-107 — Test import of a file with mixed encodings
+- [ ] E13-108 — Document the leads subsystem in planning/specs/leads/
+- [ ] E13-109 — Publish the customer guide on list quality and provenance
+- [ ] E13-110 — Add lead MCP tools for agent-driven list operations
+- [ ] E13-111 — Add a data-quality dashboard across all lists in an org
+- [ ] E13-112 — Alert the customer when list quality is the binding constraint on results
+- [ ] E13-113 — Add the migration importer path from Instantly, Smartlead, and Lemlist exports
+- [ ] E13-114 — Preserve consent and suppression from a competitor export where present
+- [ ] E13-115 — Refuse to import a competitor list that carries no provenance at all

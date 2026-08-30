@@ -1,0 +1,85 @@
+# Epic 01 — Foundation & Fork Hygiene
+
+Goal: the forked repo compiles green, carries no usermails identity, and every
+inherited subsystem is consciously kept, retargeted, or deleted.
+
+- [x] E01-001 — Hard-fork usermails into electronic-mail-service (exclude .git, node_modules, lockfile)
+- [x] E01-002 — Global rebrand usermails → ems / @usermails → @ems across 172 files
+- [x] E01-003 — Rename infra/sidecars/usermails-{mta,feedback}.md → ems-*
+- [x] E01-004 — Set root package name to electronic-mail-service with EMS description
+- [x] E01-005 — Rename SDK package to @ems/sdk and fix the @ems/mcp workspace dependency
+- [x] E01-006 — git init and commit the fork baseline
+- [ ] E01-007 — Run pnpm install and record the resolved lockfile as a fork artifact
+- [ ] E01-008 — pnpm typecheck must pass green on the untouched fork before any new code
+- [ ] E01-009 — pnpm lint must pass green; fix inherited violations rather than widening the config
+- [ ] E01-010 — Run the inherited pnpm test suite; triage every failure into keep/retarget/delete
+- [x] E01-011 — Update bootspring.config.js: name ems, hosting hostssh, analytics clickhouse, email own-mta
+- [x] E01-012 — Rewrite CLAUDE.md for EMS: product definition, constraints, repo map, commands
+- [ ] E01-013 — Rewrite AGENTS.md with the EMS send-path invariants I1–I7 as agent-visible rules
+- [x] E01-014 — Rewrite README.md: what ships, what does not, honest status line
+- [ ] E01-015 — Rewrite SEED.md as the EMS seed brief; archive the usermails original under planning/lineage/
+- [ ] E01-016 — Delete .bootspring/specs/transactional-core (usermails lineage, not ours)
+- [ ] E01-017 — Rewrite .bootspring/context/VISION.md from planning/VISION.md
+- [ ] E01-018 — Rewrite .bootspring/context/ARCHITECTURE.md from planning/ARCHITECTURE.md
+- [ ] E01-019 — Rewrite .bootspring/context/DELIVERABILITY.md for cold-outreach physics
+- [ ] E01-020 — Rewrite .bootspring/context/INFRA.md for the blast-node fleet
+- [ ] E01-021 — Rewrite .bootspring/context/COMPETITORS.md: Instantly, Smartlead, Lemlist, Apollo, Woodpecker, Reply, Salesforge, QuickMail
+- [ ] E01-022 — Rewrite .bootspring/context/BUSINESS_MODEL.md with the cost model from planning/INFRA.md §12
+- [ ] E01-023 — Rewrite .bootspring/context/AUDIENCE.md: agency, SDR team, founder-led sales
+- [ ] E01-024 — Write .bootspring/context/DECISIONS.md D1..D20 for EMS (own MTA, no warmup pool, opens off by default…)
+- [ ] E01-025 — Reset .bootspring/facts and project-memory to EMS facts only
+- [ ] E01-026 — Decide and record: keep apps/dashboard (legacy Hono SPA) or delete in favour of apps/web
+- [ ] E01-027 — Delete apps/api/public/*.html static marketing pages superseded by apps/web
+- [ ] E01-028 — Audit packages/migrate sources; retarget from ESP-migration to outreach-platform migration
+- [ ] E01-029 — Decide the public npm name for the SDK and record it in DECISIONS
+- [ ] E01-030 — Add .nvmrc pinned to the Node version in engines
+- [ ] E01-031 — Add pnpm workspace catalog for shared dep versions to stop drift between packages
+- [ ] E01-032 — Create the empty package skeletons for fleet, router, warmup, reputation, deliverability
+- [ ] E01-033 — Create the empty package skeletons for policy, verify, sequence, leads, inbox
+- [ ] E01-034 — Create the empty package skeletons for ai, billing, registrar
+- [ ] E01-035 — Give every new package a package.json, tsconfig, src/index.ts, and a typecheck script
+- [ ] E01-036 — Wire new packages into tsconfig.base.json path aliases
+- [ ] E01-037 — Add a dependency-direction lint rule: no cross-domain package imports except via interfaces
+- [ ] E01-038 — Create apps/dmarc-ingest skeleton (Hono, receives RUA/TLS-RPT mail)
+- [ ] E01-039 — Create apps/seedbox skeleton (placement probe agent)
+- [ ] E01-040 — Create apps/fleet-agent skeleton (per-node agent)
+- [ ] E01-041 — Update pnpm-workspace.yaml if any new app lives outside apps/*
+- [ ] E01-042 — Update Dockerfile to build the new apps in the single-image pipeline
+- [ ] E01-043 — Update Procfile / start script for the new sibling processes
+- [ ] E01-044 — Update .env.example with every new EMS variable, grouped and commented
+- [ ] E01-045 — Add packages/core/src/env.ts entries for all new variables with zod validation
+- [ ] E01-046 — Fail fast at boot on any missing required env var, with the variable name in the error
+- [ ] E01-047 — Add a git remote for the EMS hostssh deploy target (do not push yet)
+- [ ] E01-048 — Create the GitHub repo Girard-Media/electronic-mail-service and push main
+- [ ] E01-049 — Update .github/workflows/ci.yml for the new packages and gates
+- [ ] E01-050 — Add a CI job that runs prisma validate on every push
+- [ ] E01-051 — Add a CI job that runs prisma format --check to keep the schema canonical
+- [ ] E01-052 — Add CODEOWNERS with the send path and policy package requiring review
+- [ ] E01-053 — Add a PR template that asks which send-path invariant the change touches
+- [ ] E01-054 — Add .editorconfig and confirm formatter settings match the inherited code
+- [ ] E01-055 — Document the fork lineage and the licence boundary in planning/lineage/FORK.md
+- [ ] E01-056 — Confirm the freeresend (MIT) attribution survives the fork; keep NOTICE current
+- [ ] E01-057 — Restate the usesend AGPLv3 clean-room rule in CLAUDE.md and AGENTS.md
+- [ ] E01-058 — Remove every usermails-specific test that asserts Resend API compatibility we no longer need
+- [ ] E01-059 — Keep and retarget scripts/ssrf-test.mts to the new outbound surfaces
+- [ ] E01-060 — Keep and retarget scripts/security-headers-test.mts to apps/web and apps/api
+- [ ] E01-061 — Keep scripts/totp-test.mts unchanged; God Mode carries over
+- [ ] E01-062 — Retarget scripts/unsub-test.mts to the RFC 8058 one-click requirements
+- [ ] E01-063 — Retarget scripts/abuse-test.mts to the cold-outreach AUP rules
+- [ ] E01-064 — Delete scripts/plans-test.mts assertions tied to usermails plan names
+- [ ] E01-065 — Create scripts/ip-diligence.mts referenced by planning/INFRA.md §3
+- [ ] E01-066 — Add a make-style task runner or justfile documenting every developer command
+- [ ] E01-067 — Write CONTRIBUTING.md covering the expand/contract migration discipline
+- [ ] E01-068 — Add a repo-level ADR directory and write ADR-0001 (own MTA vs rented mailboxes)
+- [ ] E01-069 — Write ADR-0002 (ClickHouse for observations, Postgres for decisions)
+- [ ] E01-070 — Write ADR-0003 (no cross-customer warmup pool)
+- [ ] E01-071 — Write ADR-0004 (open tracking off by default)
+- [ ] E01-072 — Write ADR-0005 (OpenRouter as the single inference dependency)
+- [ ] E01-073 — Write ADR-0006 (Stripe behind a BillingProvider seam)
+- [ ] E01-074 — Write ADR-0007 (registrar behind a RegistrarProvider seam)
+- [ ] E01-075 — Set up the local docker-compose to include ClickHouse alongside postgres and valkey
+- [ ] E01-076 — Add pnpm infra:up smoke check that all three stores answer
+- [ ] E01-077 — Add a seed script that creates a dev org, workspace, and admin user
+- [ ] E01-078 — Add a dev fixture script that fabricates a node, IP, domain, and two mailboxes
+- [ ] E01-079 — Verify the whole repo boots locally end to end with the fixtures
+- [ ] E01-080 — Tag v0.1.0-fork and record the baseline commit in planning/lineage/FORK.md

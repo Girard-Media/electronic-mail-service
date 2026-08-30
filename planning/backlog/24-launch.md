@@ -1,0 +1,102 @@
+# Epic 24 — Docs, Positioning & Launch
+
+- [ ] E24-001 — Write the product one-liner and test it on five people outside the project
+- [ ] E24-002 — Write the positioning statement against Instantly, Smartlead, and Lemlist
+- [ ] E24-003 — Lead positioning with owned infrastructure, not with feature count
+- [ ] E24-004 — Write the honest comparison table on structure, not adjectives
+- [ ] E24-005 — Never claim a competitor lacks something without verifying it this quarter
+- [ ] E24-006 — Write the "what delivered actually means" explainer
+- [ ] E24-007 — Write the "why your sent count is a lie" explainer
+- [ ] E24-008 — Write the "why we refuse warmup pools" explainer
+- [ ] E24-009 — Write the "why open rates are fiction" explainer
+- [ ] E24-010 — Write the "cold email and the law" guide with the jurisdiction map
+- [ ] E24-011 — Have counsel review the legal guide before publishing
+- [ ] E24-012 — Write the compliance posture page for prospects' legal teams
+- [ ] E24-013 — Write the security page describing the controls we have
+- [ ] E24-014 — Publish the AUP, privacy policy, terms, DPA, and subprocessor list
+- [ ] E24-015 — Publish the data retention schedule
+- [ ] E24-016 — Write the getting-started guide from signup to first safe send
+- [ ] E24-017 — Set the warmup expectation on the first screen of onboarding
+- [ ] E24-018 — Write the domain and mailbox strategy guide
+- [ ] E24-019 — Write the list quality and provenance guide
+- [ ] E24-020 — Write the sequence writing guide
+- [ ] E24-021 — Write the reply handling guide
+- [ ] E24-022 — Write the deliverability troubleshooting guide
+- [ ] E24-023 — Write the migration guides per source platform
+- [ ] E24-024 — Write the API reference from the OpenAPI spec
+- [ ] E24-025 — Write the SDK quickstart
+- [ ] E24-026 — Write the webhook guide with signature verification examples
+- [ ] E24-027 — Write the MCP guide
+- [ ] E24-028 — Write the glossary covering every term the product uses
+- [ ] E24-029 — Make every docs page link to the product surface it describes
+- [ ] E24-030 — Add search across the docs
+- [ ] E24-031 — Add a docs feedback control and act on what comes in
+- [ ] E24-032 — Keep the docs in the repo so they version with the code
+- [ ] E24-033 — Fail CI when a documented endpoint no longer exists
+- [ ] E24-034 — Publish the changelog generated from releases
+- [ ] E24-035 — Publish the roadmap at the level we are willing to be held to
+- [ ] E24-036 — Never publish a roadmap item we have not decided to build
+- [ ] E24-037 — Build the pricing page with the real plan limits
+- [ ] E24-038 — Build the signup flow with the KYC gate placed honestly
+- [ ] E24-039 — Build the trial with a real warmed shared mailbox
+- [ ] E24-040 — Build the demo mode with clearly labelled fabricated data
+- [ ] E24-041 — Build the sales one-pager from the compliance and infrastructure differentiators
+- [ ] E24-042 — Build the security questionnaire answer set
+- [ ] E24-043 — Build the enterprise procurement pack
+- [ ] E24-044 — Define the ideal customer profile from the first ten conversations
+- [ ] E24-045 — Run ten customer discovery conversations before public launch
+- [ ] E24-046 — Record what they actually asked for versus what we assumed
+- [ ] E24-047 — Change the plan where the conversations contradict it
+- [ ] E24-048 — Recruit five design partners on the agency side
+- [ ] E24-049 — Run the platform for Girard Media's own outreach first
+- [ ] E24-050 — Fix everything that dogfooding exposes before onboarding a design partner
+- [ ] E24-051 — Publish our own measured placement numbers on the marketing site
+- [ ] E24-052 — Automate the update so a stale number cannot persist
+- [ ] E24-053 — Add the methodology page every published number links to
+- [ ] E24-054 — Define the launch readiness checklist covering every gate
+- [ ] E24-055 — Require the external penetration test as a launch gate
+- [ ] E24-056 — Require the compliance review as a launch gate
+- [ ] E24-057 — Require the disaster recovery drill as a launch gate
+- [ ] E24-058 — Require the SLO agreement as a launch gate
+- [ ] E24-059 — Require the runbook index as a launch gate
+- [ ] E24-060 — Require the honesty audit as a launch gate
+- [ ] E24-061 — Run the honesty audit: every claim on every surface traced to a measurement
+- [ ] E24-062 — Remove or qualify every claim that fails the audit
+- [ ] E24-063 — Write the "what we do not ship" section and publish it
+- [ ] E24-064 — Publish the refused-capabilities list from planning/COMPLIANCE.md §9
+- [ ] E24-065 — Treat the refused list as positioning, not as an apology
+- [ ] E24-066 — Define the launch sequence: design partners, waitlist, public
+- [ ] E24-067 — Build the waitlist with an honest expectation of timing
+- [ ] E24-068 — Build the onboarding email sequence and send it through usermails
+- [ ] E24-069 — Never send product transactional mail through the cold-outreach fleet
+- [ ] E24-070 — Build the in-app onboarding checklist tied to real state
+- [ ] E24-071 — Measure activation as first safe send, not as signup
+- [ ] E24-072 — Measure time to first positive reply as the north-star onboarding metric
+- [ ] E24-073 — Instrument the funnel from signup to first reply
+- [ ] E24-074 — Find and fix the largest drop-off before scaling acquisition
+- [ ] E24-075 — Build the support surface with a real response commitment
+- [ ] E24-076 — Staff support against the commitment before launch, not after
+- [ ] E24-077 — Build the internal support tooling: impersonation, message journey, policy lookup
+- [ ] E24-078 — Make every support question answerable from the product, not from a database console
+- [ ] E24-079 — Track the top ten support questions and remove each cause
+- [ ] E24-080 — Build the customer health score from real usage and outcomes
+- [ ] E24-081 — Alert internally when a customer's results degrade before they notice
+- [ ] E24-082 — Reach out proactively with the diagnosis, not with a check-in
+- [ ] E24-083 — Define the expansion motion from measured capacity constraints
+- [ ] E24-084 — Define the churn signals and the intervention for each
+- [ ] E24-085 — Write the launch announcement grounded in what the product actually does
+- [ ] E24-086 — Prepare the founder narrative on why owning the infrastructure matters
+- [ ] E24-087 — Prepare the technical deep-dive post on the maillog truth architecture
+- [ ] E24-088 — Prepare the technical deep-dive post on the five reputation ledgers
+- [ ] E24-089 — Prepare the technical deep-dive post on the policy engine
+- [ ] E24-090 — Publish the deep-dives as the primary demand generation, not as ads
+- [ ] E24-091 — Instrument attribution honestly and accept that some of it is unknowable
+- [ ] E24-092 — Set the ninety-day post-launch targets and the review date
+- [ ] E24-093 — Hold the ninety-day review and write down what was wrong in this plan
+- [ ] E24-094 — Feed those corrections back into planning/ and into the Bootspring notes
+- [ ] E24-095 — Decide at the review whether the product deserves more investment, on the data
+- [ ] E24-096 — Keep the refusal list intact under commercial pressure
+- [ ] E24-097 — Re-verify the legal jurisdiction table annually
+- [ ] E24-098 — Re-verify the published numbers weekly, automatically
+- [ ] E24-099 — Re-verify the competitor comparison quarterly
+- [ ] E24-100 — Retire any claim we can no longer substantiate, the same week we notice

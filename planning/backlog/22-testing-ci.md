@@ -1,0 +1,107 @@
+# Epic 22 — Testing, CI & Quality Gates
+
+- [ ] E22-001 — Define the test taxonomy: unit, integration, contract, e2e, load, abuse
+- [ ] E22-002 — Establish the rule that every send-path change needs an integration test
+- [ ] E22-003 — Run every test against a real ephemeral Postgres, never a mock
+- [ ] E22-004 — Run every test against a real ephemeral Valkey
+- [ ] E22-005 — Run ClickHouse-dependent tests against a real ephemeral instance
+- [ ] E22-006 — Build the fixture factory package for every core entity
+- [ ] E22-007 — Build a fake SMTP sink that records the exact message received
+- [ ] E22-008 — Build a fake maillog emitter replaying recorded Postfix lines
+- [ ] E22-009 — Build a DNS simulator so CI never touches a live zone
+- [ ] E22-010 — Build an inference stub returning fixture responses deterministically
+- [ ] E22-011 — Build a registrar stub
+- [ ] E22-012 — Build a billing stub implementing the BillingProvider interface
+- [ ] E22-013 — Make every external dependency stubbable without changing production code
+- [ ] E22-014 — Write the send-path integration test covering all ten stages
+- [ ] E22-015 — Write the test asserting no path to the MTA skips the policy gate
+- [ ] E22-016 — Write the test asserting PolicyDecision is written for every send
+- [ ] E22-017 — Write the test asserting suppression is re-checked before emit
+- [ ] E22-018 — Write the test asserting the emit path fails closed on a store error
+- [ ] E22-019 — Write the test asserting cap buckets cannot be overspent under concurrency
+- [ ] E22-020 — Write the test asserting Message-ID uniqueness under concurrency
+- [ ] E22-021 — Write the test asserting an intent processed twice sends once
+- [ ] E22-022 — Write the cross-tenant isolation test suite
+- [ ] E22-023 — Write the compliance test suite from planning/COMPLIANCE.md
+- [ ] E22-024 — Write the deliverability test suite from the bounce corpus
+- [ ] E22-025 — Write the router property tests over randomised fleet states
+- [ ] E22-026 — Write the warmup tests including hold and rollback
+- [ ] E22-027 — Write the verification tests against a known-address corpus
+- [ ] E22-028 — Write the sequence engine tests including timezone and holiday edges
+- [ ] E22-029 — Write the inbox threading tests against a real reply corpus
+- [ ] E22-030 — Write the AI eval suite per task with CI gates
+- [ ] E22-031 — Write the prompt-injection test suite
+- [ ] E22-032 — Write the billing tests including idempotency and reconciliation
+- [ ] E22-033 — Write the API contract tests against the OpenAPI spec
+- [ ] E22-034 — Write the SDK tests against a live staging environment
+- [ ] E22-035 — Write the frontend interaction tests for the critical flows
+- [ ] E22-036 — Write the visual regression tests for the ten most important screens
+- [ ] E22-037 — Write the accessibility tests
+- [ ] E22-038 — Write the performance budget tests per route
+- [ ] E22-039 — Write the load tests for the scheduler, the router, and the ingest pipeline
+- [ ] E22-040 — Write the chaos tests for node loss, store loss, and provider outage
+- [ ] E22-041 — Write the abuse-case tests alongside the use cases
+- [ ] E22-042 — Establish coverage targets per package, weighted toward the send path
+- [ ] E22-043 — Never chase a global coverage number at the expense of meaningful tests
+- [ ] E22-044 — Make the test suite run in under ten minutes on CI
+- [ ] E22-045 — Parallelise the suite across workers with database isolation
+- [ ] E22-046 — Make every test independently runnable and order-independent
+- [ ] E22-047 — Eliminate every flaky test rather than retrying it
+- [ ] E22-048 — Track flake rate and treat a flaky test as a bug
+- [ ] E22-049 — Build the CI pipeline: typecheck, lint, schema, unit, integration, contract
+- [ ] E22-050 — Add the e2e job against an ephemeral full stack
+- [ ] E22-051 — Add the AI eval job
+- [ ] E22-052 — Add the security scanning jobs
+- [ ] E22-053 — Add the performance budget job
+- [ ] E22-054 — Add the migration safety job
+- [ ] E22-055 — Add the OpenAPI drift job
+- [ ] E22-056 — Add the dependency-direction lint job
+- [ ] E22-057 — Add the tenant-scope lint job
+- [ ] E22-058 — Add the no-Stripe-outside-billing lint job
+- [ ] E22-059 — Add the no-AI-outside-workers lint job
+- [ ] E22-060 — Add the no-SMTP-outside-sender lint job
+- [ ] E22-061 — Make every gate blocking on the default branch
+- [ ] E22-062 — Enable branch protection requiring the gates and a review
+- [ ] E22-063 — Require a second reviewer on send-path, policy, and prompt changes
+- [ ] E22-064 — Add the PR template asking which invariant the change touches
+- [ ] E22-065 — Add a changelog fragment requirement on user-visible changes
+- [ ] E22-066 — Build the staging environment mirroring production topology
+- [ ] E22-067 — Include a staging blast node in the staging environment
+- [ ] E22-068 — Never point staging at production data
+- [ ] E22-069 — Seed staging with realistic synthetic data at production scale
+- [ ] E22-070 — Run the full e2e suite against staging on every merge
+- [ ] E22-071 — Run a nightly long-running soak test against staging
+- [ ] E22-072 — Run a weekly full disaster-recovery drill against staging
+- [ ] E22-073 — Implement preview environments per pull request where cost allows
+- [ ] E22-074 — Never let a preview environment send real mail
+- [ ] E22-075 — Add a hard guard: non-production environments cannot reach a campaign IP
+- [ ] E22-076 — Test that guard explicitly
+- [ ] E22-077 — Implement feature flags for risky changes
+- [ ] E22-078 — Implement per-org flag targeting for gradual rollout
+- [ ] E22-079 — Implement a kill switch for every flagged feature
+- [ ] E22-080 — Remove a flag once the feature is fully rolled out
+- [ ] E22-081 — Track flag age and alert on stale flags
+- [ ] E22-082 — Implement canary deploys with automatic rollback on health regression
+- [ ] E22-083 — Define the health signals that trigger a rollback
+- [ ] E22-084 — Test the rollback path deliberately
+- [ ] E22-085 — Implement deployment gating on the migration safety check
+- [ ] E22-086 — Implement a post-deploy smoke suite that runs automatically
+- [ ] E22-087 — Alert on any post-deploy smoke failure and roll back
+- [ ] E22-088 — Track deployment frequency, lead time, change failure rate, and restore time
+- [ ] E22-089 — Report those four metrics monthly and act on the worst one
+- [ ] E22-090 — Build the local development experience so a new engineer ships on day one
+- [ ] E22-091 — Document every command in one place and keep it current
+- [ ] E22-092 — Add a doctor script diagnosing a broken local environment
+- [ ] E22-093 — Add a reset script returning local state to a known baseline
+- [ ] E22-094 — Add a test-data generator producing a realistic org in one command
+- [ ] E22-095 — Time the setup from clone to running and keep it under fifteen minutes
+- [ ] E22-096 — Add a regression test for every production bug before fixing it
+- [ ] E22-097 — Build the incident-to-test pipeline so no incident recurs untested
+- [ ] E22-098 — Review the test suite quarterly and delete tests that assert nothing
+- [ ] E22-099 — Keep the test suite honest: a passing suite must mean the product works
+- [ ] E22-100 — Document the testing strategy in planning/specs/testing/
+- [ ] E22-101 — Add a mutation-testing pass on the policy and router packages
+- [ ] E22-102 — Act on surviving mutants in those packages
+- [ ] E22-103 — Add a fuzz corpus for the parsers and keep it in the repo
+- [ ] E22-104 — Run continuous fuzzing on the MIME and maillog parsers
+- [ ] E22-105 — Triage every fuzz crash as a bug, not as noise

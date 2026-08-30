@@ -5,17 +5,17 @@
 
 module.exports = {
   project: {
-    name: "ems",
+    name: "electronic-mail-service",
     description:
-      "Developer-first, white-label application-email platform — Resend-compatible transactional API + deliverability suite, marketing/lifecycle later. See .bootspring/context.",
+      "Cold B2B outreach infrastructure we own end to end — our metal, our IPs, our MTA, our mail log. Fleet control plane, warmup engine, send router, deliverability observability, policy gate, AI layer. See planning/INDEX.md.",
     version: "0.1.0",
     status: "development",
   },
   stack: {
-    framework: "nextjs", // dashboard; public API on hono
+    framework: "nextjs", // apps/web cockpits; public API on hono
     language: "typescript",
-    database: "postgresql",
-    hosting: "coolify", // Hostinger fleet App box .207 (NOT vercel)
+    database: "postgresql", // control plane on .211; ClickHouse for observations
+    hosting: "hostssh", // Hostinger fleet hub .223 — NOT vercel, NOT coolify
   },
   frontend: {
     uiLibrary: "shadcn",
@@ -25,9 +25,10 @@ module.exports = {
     orm: "prisma",
     auth: "authjs",
     api: "hono",
-    queue: "bullmq", // redis/valkey on Data box .211
-    email: "aws-ses", // behind a MailProvider abstraction (DECISIONS D2)
-    analytics: "clickhouse", // or tinybird (DECISIONS D10)
-    storage: "cloudflare-r2", // or shared MinIO on .211
+    queue: "bullmq", // Valkey on Data box .211
+    email: "self-hosted-postfix", // our own blast nodes behind MailProvider — never SES
+    analytics: "clickhouse",
+    storage: "cloudflare-r2",
+    inference: "openrouter", // the single sanctioned inference dependency
   },
 };

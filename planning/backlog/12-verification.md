@@ -1,0 +1,99 @@
+# Epic 12 — Email Verification Engine
+
+Self-hosted, five stages, on a dedicated IP that never sends campaigns.
+
+- [ ] E12-001 — Create packages/verify with the five-stage pipeline
+- [ ] E12-002 — Implement RFC 5322 syntax validation plus practical rules
+- [ ] E12-003 — Reject addresses with characters no real mailbox uses
+- [ ] E12-004 — Normalise the address: lowercase domain, preserve local-part case, strip plus-tags optionally
+- [ ] E12-005 — Implement domain resolution with a shared DNS cache
+- [ ] E12-006 — Implement MX lookup with an A-record fallback per RFC
+- [ ] E12-007 — Detect parked domains from their nameservers and A records
+- [ ] E12-008 — Detect a null MX record and mark the address invalid
+- [ ] E12-009 — Maintain a disposable-domain list with an automated refresh
+- [ ] E12-010 — Detect disposable providers by MX pattern as well as by domain
+- [ ] E12-011 — Maintain the role-address local-part list
+- [ ] E12-012 — Flag role addresses without automatically invalidating them
+- [ ] E12-013 — Implement spam-trap heuristics: recycled domains, no web presence, honeypot patterns
+- [ ] E12-014 — Score trap risk rather than making a binary call
+- [ ] E12-015 — Block sending above the trap-risk threshold
+- [ ] E12-016 — Implement the SMTP probe from the dedicated verification IP only
+- [ ] E12-017 — Assert in code that the probe never runs from a campaign IP
+- [ ] E12-018 — Use a null MAIL FROM for the probe
+- [ ] E12-019 — Never issue DATA during a probe
+- [ ] E12-020 — Send RSET and QUIT cleanly after every probe
+- [ ] E12-021 — Respect per-destination probe concurrency limits
+- [ ] E12-022 — Back off aggressively when a destination greylists or throttles
+- [ ] E12-023 — Handle greylisting by retrying on the correct schedule rather than failing
+- [ ] E12-024 — Implement catch-all detection with a random local-part probe
+- [ ] E12-025 — Mark catch-all as deliverable-unknown, never as valid
+- [ ] E12-026 — Explain the catch-all limitation clearly in the UI
+- [ ] E12-027 — Cache the catch-all verdict per domain with a TTL
+- [ ] E12-028 — Skip the SMTP probe entirely for known catch-all domains
+- [ ] E12-029 — Skip the SMTP probe for providers that always accept, and say so
+- [ ] E12-030 — Record the verbatim SMTP response on every verification
+- [ ] E12-031 — Store results in VerificationResult with an explicit expiry
+- [ ] E12-032 — Re-verify automatically when a result expires and the lead is about to be sent to
+- [ ] E12-033 — Set a shorter TTL for RISKY results than for VALID
+- [ ] E12-034 — Never send to an address whose verification has expired
+- [ ] E12-035 — Implement bulk verification as a job with progress reporting
+- [ ] E12-036 — Report bulk progress live so a large list does not look stalled
+- [ ] E12-037 — Make bulk verification resumable after a crash
+- [ ] E12-038 — Deduplicate within a batch before probing
+- [ ] E12-039 — Deduplicate against existing results before probing
+- [ ] E12-040 — Meter verification usage for billing
+- [ ] E12-041 — Enforce the plan's verification quota
+- [ ] E12-042 — Build the verification report per list: counts by status with the reasons
+- [ ] E12-043 — Make the report downloadable as CSV with the per-row reason
+- [ ] E12-044 — Gate list activation on a maximum invalid share
+- [ ] E12-045 — Explain exactly which rows blocked activation
+- [ ] E12-046 — Offer a one-click removal of invalid rows
+- [ ] E12-047 — Never silently drop rows; always show what was removed
+- [ ] E12-048 — Implement the single-address verification API endpoint
+- [ ] E12-049 — Implement the bulk verification API endpoint with async job semantics
+- [ ] E12-050 — Add verification to the SDK
+- [ ] E12-051 — Add verification MCP tools
+- [ ] E12-052 — Add a verification widget to the lead detail view
+- [ ] E12-053 — Show the full verification evidence, not only the verdict
+- [ ] E12-054 — Track verification accuracy against actual bounce outcomes
+- [ ] E12-055 — Report the false-valid rate and treat it as the key quality metric
+- [ ] E12-056 — Tune the trap-risk threshold from measured outcomes
+- [ ] E12-057 — Alert when verification accuracy degrades
+- [ ] E12-058 — Compare our accuracy against the bounce rate of unverified sends
+- [ ] E12-059 — Publish the accuracy number in the docs and keep it current
+- [ ] E12-060 — Never claim an accuracy number we have not measured this quarter
+- [ ] E12-061 — Handle IPv6-only destinations correctly
+- [ ] E12-062 — Handle internationalised domain names correctly
+- [ ] E12-063 — Handle internationalised local parts or reject them explicitly
+- [ ] E12-064 — Handle very long addresses at the RFC limits
+- [ ] E12-065 — Fuzz the parser with malformed input and assert no crash
+- [ ] E12-066 — Test against a corpus of known-valid and known-invalid addresses
+- [ ] E12-067 — Test catch-all detection against a known catch-all domain
+- [ ] E12-068 — Test greylisting handling against a greylisting destination
+- [ ] E12-069 — Test that the verification IP is never used for a campaign send
+- [ ] E12-070 — Load-test 100,000 verifications and record throughput
+- [ ] E12-071 — Measure cost per thousand verifications on our own infrastructure
+- [ ] E12-072 — Compare that cost against commercial verification pricing for the marketing page
+- [ ] E12-073 — Monitor the verification IP for listings; probing can attract them
+- [ ] E12-074 — Rotate the verification IP if it becomes listed, without touching campaign IPs
+- [ ] E12-075 — Keep a second verification IP in reserve
+- [ ] E12-076 — Rate-limit verification per org to protect the shared verification IP
+- [ ] E12-077 — Detect and block abusive verification patterns, such as list-harvesting probes
+- [ ] E12-078 — Never let verification be used as an email-discovery service
+- [ ] E12-079 — Log every verification with the requesting org for abuse attribution
+- [ ] E12-080 — Add the verification subsystem to the security review
+- [ ] E12-081 — Document the engine in planning/specs/verification/
+- [ ] E12-082 — Publish the customer-facing explanation of statuses and what to do with each
+- [ ] E12-083 — Explain honestly why catch-all cannot be resolved
+- [ ] E12-084 — Explain honestly why a valid address can still bounce
+- [ ] E12-085 — Add verification results to the tenant export
+- [ ] E12-086 — Purge verification results for erased leads while keeping aggregate counts
+- [ ] E12-087 — Add a verification health tile to the operator dashboard
+- [ ] E12-088 — Alert when the probe success rate drops, indicating a network or listing problem
+- [ ] E12-089 — Add an automatic weekly re-verification of long-lived active lists
+- [ ] E12-090 — Bill re-verification transparently and show it on the usage page
+- [ ] E12-091 — Offer verification as a standalone product surface once the engine is proven
+- [ ] E12-092 — Price it from the measured cost, not from competitor anchoring
+- [ ] E12-093 — Add an API rate limit tier for standalone verification customers
+- [ ] E12-094 — Add a verification status webhook
+- [ ] E12-095 — Add verification to the migration importer so imported lists are checked on arrival

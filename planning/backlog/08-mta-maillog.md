@@ -1,0 +1,95 @@
+# Epic 08 — MTA Integration, Maillog Truth & Event Pipeline
+
+Our `delivered` comes from the receiving MX's 250, read out of the mail log.
+No number on a dashboard originates from an optimistic counter.
+
+- [ ] E08-001 — Extend apps/maillog-bridge to accept batches from multiple nodes
+- [ ] E08-002 — Authenticate every batch with a per-node signature and reject anything unsigned
+- [ ] E08-003 — Add replay protection with a nonce and a timestamp window
+- [ ] E08-004 — Parse the Postfix qmgr line into a queue-id to Message-ID mapping
+- [ ] E08-005 — Parse the Postfix smtp line into (queue-id, to, relay, delay, dsn, status, response)
+- [ ] E08-006 — Preserve the receiving MX response string verbatim; never summarise it at parse time
+- [ ] E08-007 — Parse the Postfix cleanup line to capture our Message-ID
+- [ ] E08-008 — Parse the bounce and error lines for locally generated failures
+- [ ] E08-009 — Handle multi-recipient messages producing several smtp lines per queue id
+- [ ] E08-010 — Handle log rotation and truncation without losing or duplicating lines
+- [ ] E08-011 — Handle out-of-order line arrival across batches
+- [ ] E08-012 — Build the correlation store mapping queue-id to intent via Message-ID
+- [ ] E08-013 — Expire the correlation store on the same horizon as the Postfix queue lifetime
+- [ ] E08-014 — Alert on correlation misses; an uncorrelated delivery means we lost the join key
+- [ ] E08-015 — Write every parsed line to ClickHouse smtp_transactions
+- [ ] E08-016 — Write the raw line to R2 daily archives before parsing
+- [ ] E08-017 — Make the parser table-driven so a new Postfix version is a data change
+- [ ] E08-018 — Add a parser fixture suite from real captured log lines across all ESPs
+- [ ] E08-019 — Fail CI on any parser regression against the fixture suite
+- [ ] E08-020 — Add an unparsed-line queue and alert when it grows
+- [ ] E08-021 — Never discard an unparsed line; it is evidence
+- [ ] E08-022 — Emit the delivered event only from a status=sent line with a 2xx response
+- [ ] E08-023 — Emit the deferred event from a status=deferred line with the 4xx captured
+- [ ] E08-024 — Emit the bounced event from a status=bounced line with the 5xx captured
+- [ ] E08-025 — Update the SendIntent state from the correlated log event, not from the submit call
+- [ ] E08-026 — Record the delivery latency from submit to the receiving MX 250
+- [ ] E08-027 — Record the number of delivery attempts per message
+- [ ] E08-028 — Record the receiving relay hostname per message for per-MX analysis
+- [ ] E08-029 — Build the per-ESP delivery latency distribution
+- [ ] E08-030 — Alert on a latency regression to any major ESP; it precedes a block
+- [ ] E08-031 — Build the live transaction stream view for an operator
+- [ ] E08-032 — Add filtering by node, IP, domain, mailbox, ESP, and status
+- [ ] E08-033 — Add full-text search across response strings
+- [ ] E08-034 — Make one message's full journey viewable: intent, route, submit, log lines, events
+- [ ] E08-035 — Make that journey view linkable and permanent for support conversations
+- [ ] E08-036 — Extend the MailProvider seam for the EMS node transport
+- [ ] E08-037 — Implement node-aware SMTP submission with connection pooling per node
+- [ ] E08-038 — Implement per-IP source binding on submission
+- [ ] E08-039 — Handle SMTP connection failures as deferrals with node health signalling
+- [ ] E08-040 — Circuit-break a node after consecutive submission failures
+- [ ] E08-041 — Never route to a circuit-broken node until its self-test passes
+- [ ] E08-042 — Implement submission timeouts with a bounded retry
+- [ ] E08-043 — Keep the Google and Microsoft provider adapters for migration compatibility only
+- [ ] E08-044 — Assert in code that the OAuth providers cannot be used for cold campaign sends
+- [ ] E08-045 — Document why connected-mailbox sending is not the EMS architecture
+- [ ] E08-046 — Extend apps/feedback-ingest for ARF and FBL formats from Yahoo, Microsoft, and Comcast
+- [ ] E08-047 — Parse the ARF report to recover the original Message-ID
+- [ ] E08-048 — Suppress the complained address immediately and globally on any FBL report
+- [ ] E08-049 — Attribute the complaint to the org, campaign, mailbox, domain, and IP
+- [ ] E08-050 — Alert the operator on any complaint; the volume is low enough to read every one
+- [ ] E08-051 — Auto-pause a campaign when its complaint rate crosses the threshold
+- [ ] E08-052 — Register for every available FBL programme and track enrolment status per IP
+- [ ] E08-053 — Alert when an FBL enrolment lapses
+- [ ] E08-054 — Implement the VERP bounce receiver decoding the original recipient from the return path
+- [ ] E08-055 — Parse the bounce DSN for the original Message-ID and the diagnostic code
+- [ ] E08-056 — Prefer the DSN diagnostic over our log line when they disagree, and record the disagreement
+- [ ] E08-057 — Build the inbound path: LMTP to maildir to the ingest worker
+- [ ] E08-058 — Watch the maildir with inotify rather than polling
+- [ ] E08-059 — Ship the full MIME to R2 and the parsed envelope to the API
+- [ ] E08-060 — Never lose an inbound message; acknowledge only after durable storage
+- [ ] E08-061 — Handle very large attachments with a size cap and a truncation record
+- [ ] E08-062 — Handle malformed MIME without crashing the ingest worker
+- [ ] E08-063 — Strip and quarantine dangerous attachments before showing them in the UI
+- [ ] E08-064 — Run inbound mail through rspamd and record the score
+- [ ] E08-065 — Record inbound Authentication-Results verbatim
+- [ ] E08-066 — Build the event pipeline writing to ClickHouse email_events with batching
+- [ ] E08-067 — Make the event writer fail-soft with local buffering
+- [ ] E08-068 — Add the replay tool for buffered events after a store outage
+- [ ] E08-069 — Deduplicate events on (messageId, type, at) so replay is safe
+- [ ] E08-070 — Build the hourly rollup materialised views
+- [ ] E08-071 — Verify rollup totals against raw counts nightly and alert on drift
+- [ ] E08-072 — Build the webhook dispatcher for EMS events, reusing the inherited signing
+- [ ] E08-073 — Define the EMS event catalogue and version it
+- [ ] E08-074 — Never emit an event we cannot source from a measurement
+- [ ] E08-075 — Add the open-tracking pixel implementation, disabled by default
+- [ ] E08-076 — Warn in the UI that open rates are unreliable under Apple Mail Privacy Protection
+- [ ] E08-077 — Detect and discard prefetch-style opens where possible
+- [ ] E08-078 — Add click tracking with a per-org tracking domain, disabled by default
+- [ ] E08-079 — Warn that a tracking domain shares the reputation of the links it wraps
+- [ ] E08-080 — Never wrap the unsubscribe link in a tracking redirect
+- [ ] E08-081 — Implement reply detection from inbound correlation on In-Reply-To and References
+- [ ] E08-082 — Implement reply detection fallback on subject and address matching
+- [ ] E08-083 — Emit the replied event and stop the sequence in the same transaction
+- [ ] E08-084 — Test the whole pipeline with a synthetic node emitting recorded log lines
+- [ ] E08-085 — Load-test the maillog ingest at 100,000 lines per minute
+- [ ] E08-086 — Measure end-to-end lag from log line to dashboard; target under 30 seconds
+- [ ] E08-087 — Alert when ingest lag exceeds the target
+- [ ] E08-088 — Document the whole pipeline in planning/specs/maillog-pipeline/
+- [ ] E08-089 — Publish the honesty statement in the docs: what delivered means and where it comes from
+- [ ] E08-090 — Add a comparison page showing why a vendor sent count differs from a real delivered count

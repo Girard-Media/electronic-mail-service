@@ -1,0 +1,97 @@
+# Epic 09 — Deliverability: Bounce Taxonomy, DNSBL, DMARC, TLS-RPT
+
+- [ ] E09-001 — Create packages/deliverability with the BounceClass resolver
+- [ ] E09-002 — Implement rule matching on (espFamily, smtpCode, enhancedCode, substring) with priority
+- [ ] E09-003 — Return UNKNOWN rather than guessing when no rule matches
+- [ ] E09-004 — Queue every UNKNOWN response for classification review
+- [ ] E09-005 — Run the AI classifier only on UNKNOWN responses
+- [ ] E09-006 — Turn AI classifications into proposed BounceRule rows requiring operator approval
+- [ ] E09-007 — Track the UNKNOWN rate as a health metric; it should trend to zero
+- [ ] E09-008 — Seed and test the Google dialect: 550 5.7.1, 421 4.7.0, 452 4.2.2, 550 5.2.1
+- [ ] E09-009 — Seed and test the Microsoft dialect including S3150, S3140, and the 5.7.1 variants
+- [ ] E09-010 — Seed and test the Yahoo dialect including TSS and deferral codes
+- [ ] E09-011 — Seed and test Proofpoint, Mimecast, Barracuda, and Cisco ESA dialects
+- [ ] E09-012 — Seed the generic RFC 3463 enhanced status code fallback layer
+- [ ] E09-013 — Map each class to an action: suppress, retry with backoff, throttle, pause, or escalate
+- [ ] E09-014 — Suppress immediately on HARD without exception
+- [ ] E09-015 — Never suppress on SOFT; retry with the rule's backoff
+- [ ] E09-016 — Throttle the IP for the ESP on BLOCK_RATE rather than suppressing the recipient
+- [ ] E09-017 — Escalate BLOCK_REPUTATION to an incident, not to a retry
+- [ ] E09-018 — Escalate AUTH failures immediately; they mean our DKIM or SPF broke
+- [ ] E09-019 — Pause the campaign on a BLOCK_CONTENT cluster and surface the offending content
+- [ ] E09-020 — Build the bounce explorer: group by class, ESP, domain, mailbox, and campaign
+- [ ] E09-021 — Show the verbatim response alongside every classification
+- [ ] E09-022 — Let an operator reclassify a bounce and have it become a rule proposal
+- [ ] E09-023 — Track hard bounce rate per campaign, mailbox, domain, and IP
+- [ ] E09-024 — Auto-pause a campaign above the hard bounce threshold
+- [ ] E09-025 — Auto-quarantine a list above the hard bounce threshold and require re-verification
+- [ ] E09-026 — Build the DNSBL poller in packages/deliverability
+- [ ] E09-027 — Implement the Spamhaus zen, sbl, css, xbl, pbl, and dbl checks
+- [ ] E09-028 — Implement SpamCop, Barracuda, SORBS, UCEPROTECT, Invaluement, and Backscatterer
+- [ ] E09-029 — Decode the 127.0.0.x response to the specific list and reason
+- [ ] E09-030 — Respect free-tier query limits with scheduling and jitter
+- [ ] E09-031 — Use a dedicated resolver so query volume does not poison a shared resolver's quota
+- [ ] E09-032 — Poll IP listings every 15 minutes and domain listings hourly
+- [ ] E09-033 — Record every check, listed or not, so the time series is continuous
+- [ ] E09-034 — Alert within the mean-time-to-detect target on any new listing
+- [ ] E09-035 — Auto-quarantine an IP on an SBL or CSS listing
+- [ ] E09-036 — Auto-pause a domain on a DBL listing
+- [ ] E09-037 — Store the delisting URL and surface it in the alert
+- [ ] E09-038 — Track time-to-delist per provider and record it in the runbook
+- [ ] E09-039 — Never auto-request delisting; a human confirms the cause is fixed first
+- [ ] E09-040 — Build the listing history view per IP and per domain
+- [ ] E09-041 — Correlate listings with the traffic that preceded them
+- [ ] E09-042 — Build apps/dmarc-ingest to receive aggregate reports by mail
+- [ ] E09-043 — Handle gzip, zip, and plain XML attachments
+- [ ] E09-044 — Store the original attachment to R2 before parsing, always
+- [ ] E09-045 — Parse the RUA XML into per-source-IP rows with disposition, SPF, and DKIM results
+- [ ] E09-046 — Deduplicate on (orgName, reportId) so redelivery is safe
+- [ ] E09-047 — Write parsed rows to ClickHouse dmarc_rows
+- [ ] E09-048 — Compute the alignment rate per domain per day
+- [ ] E09-049 — Detect third-party sources sending as our domain and alert on spoofing
+- [ ] E09-050 — Gate the p=none to p=quarantine promotion on the alignment rate
+- [ ] E09-051 — Gate the p=quarantine to p=reject promotion on 14 days of full alignment
+- [ ] E09-052 — Build the DMARC view: sources, alignment, disposition, trend, per domain
+- [ ] E09-053 — Explain a DMARC failure in plain language with the specific record to fix
+- [ ] E09-054 — Handle forwarding-induced SPF failures without falsely alarming
+- [ ] E09-055 — Parse TLS-RPT JSON reports in the same ingest app
+- [ ] E09-056 — Surface TLS negotiation failures per receiving MX
+- [ ] E09-057 — Alert on a TLS failure spike; it silently kills delivery to strict receivers
+- [ ] E09-058 — Build the deliverability cockpit information architecture
+- [ ] E09-059 — Lead the cockpit with placement, not with opens
+- [ ] E09-060 — Show delivered, deferred, and bounced with their sources labelled
+- [ ] E09-061 — Show the per-ESP breakdown as the primary decomposition
+- [ ] E09-062 — Show the reputation series for IP, domain, and mailbox side by side
+- [ ] E09-063 — Show current listings prominently and unmissably
+- [ ] E09-064 — Show DMARC alignment and TLS health as first-class tiles
+- [ ] E09-065 — Show the last seed placement result with its timestamp and sample size
+- [ ] E09-066 — Never show a metric without its window, its sample size, and its source
+- [ ] E09-067 — Add a confidence indicator when a metric rests on a small sample
+- [ ] E09-068 — Build the alerting policy: what pages, what emails, what only logs
+- [ ] E09-069 — Route deliverability alerts to the operator on call
+- [ ] E09-070 — Notify the affected customer when their campaign is auto-paused, with the reason
+- [ ] E09-071 — Never notify a customer of an infrastructure issue in terms they cannot act on
+- [ ] E09-072 — Build auto-remediation: pause, throttle, drain, rotate, with a recorded decision
+- [ ] E09-073 — Require operator confirmation for any remediation that burns a resource
+- [ ] E09-074 — Log every remediation with its trigger, action, and outcome
+- [ ] E09-075 — Build the remediation history view so patterns become visible
+- [ ] E09-076 — Add the Google Postmaster Tools ingest as an optional enricher
+- [ ] E09-077 — Add the Microsoft SNDS ingest as an optional enricher
+- [ ] E09-078 — Ensure both are strictly optional and never gate a send
+- [ ] E09-079 — Label enriched metrics distinctly from measured ones in the UI
+- [ ] E09-080 — Write the runbook: Spamhaus SBL listing on a sending IP
+- [ ] E09-081 — Write the runbook: Google bulk-sender deferrals began
+- [ ] E09-082 — Write the runbook: Microsoft S3150 block
+- [ ] E09-083 — Write the runbook: DMARC alignment dropped after a DNS change
+- [ ] E09-084 — Write the runbook: complaint spike on one campaign
+- [ ] E09-085 — Write the runbook: a customer list turned out to be purchased
+- [ ] E09-086 — Test the DNSBL poller against a known-listed test address
+- [ ] E09-087 — Test DMARC ingest against real captured reports from three receivers
+- [ ] E09-088 — Test the bounce taxonomy against a corpus of real responses
+- [ ] E09-089 — Measure classification coverage; target above 98% non-UNKNOWN
+- [ ] E09-090 — Document the whole deliverability subsystem in planning/specs/deliverability/
+- [ ] E09-091 — Publish the customer-facing deliverability guide
+- [ ] E09-092 — Add MCP tools so an agent can answer deliverability questions from real data
+- [ ] E09-093 — Add a weekly deliverability digest email per org, generated from measurements
+- [ ] E09-094 — Include the specific recommended actions in the digest, ranked
+- [ ] E09-095 — Never include a recommendation the customer cannot act on themselves

@@ -1,0 +1,97 @@
+# Epic 20 — Public API, SDK, Webhooks & MCP
+
+- [ ] E20-001 — Design the EMS REST surface and freeze the resource naming
+- [ ] E20-002 — Version the API from day one under /v1
+- [ ] E20-003 — Implement API key authentication with scoped permissions
+- [ ] E20-004 — Scope keys per workspace, never per org by default
+- [ ] E20-005 — Implement key rotation with an overlap window
+- [ ] E20-006 — Show the key only once at creation and store a hash
+- [ ] E20-007 — Implement per-key rate limiting with clear headers
+- [ ] E20-008 — Implement idempotency keys on every mutating endpoint
+- [ ] E20-009 — Return consistent error shapes with a machine-readable code
+- [ ] E20-010 — Never leak internal identifiers or stack traces in an error
+- [ ] E20-011 — Implement cursor pagination on every list endpoint
+- [ ] E20-012 — Implement filtering and sorting consistently across resources
+- [ ] E20-013 — Implement leads CRUD and bulk import endpoints
+- [ ] E20-014 — Enforce the provenance requirement on API imports
+- [ ] E20-015 — Implement lists CRUD and the compliance report endpoint
+- [ ] E20-016 — Implement campaigns CRUD, launch, pause, and resume
+- [ ] E20-017 — Implement sequence steps and variants CRUD
+- [ ] E20-018 — Implement enrolment and un-enrolment endpoints
+- [ ] E20-019 — Implement verification single and bulk endpoints
+- [ ] E20-020 — Implement suppression list read and write endpoints
+- [ ] E20-021 — Implement the unsubscribe endpoint honouring RFC 8058 POST
+- [ ] E20-022 — Implement fleet read endpoints for nodes, IPs, domains, and mailboxes
+- [ ] E20-023 — Gate fleet write endpoints behind an operator scope
+- [ ] E20-024 — Implement deliverability read endpoints for placement, reputation, and listings
+- [ ] E20-025 — Implement the message journey endpoint
+- [ ] E20-026 — Implement inbox thread read and reply endpoints
+- [ ] E20-027 — Implement the policy decision lookup endpoint for compliance evidence
+- [ ] E20-028 — Implement the usage endpoint
+- [ ] E20-029 — Implement the export and erasure request endpoints
+- [ ] E20-030 — Publish an OpenAPI specification generated from the route definitions
+- [ ] E20-031 — Fail CI when the spec drifts from the implementation
+- [ ] E20-032 — Publish an interactive API reference built from the spec
+- [ ] E20-033 — Add a copy-paste example in curl and TypeScript for every endpoint
+- [ ] E20-034 — Add a Postman or equivalent collection generated from the spec
+- [ ] E20-035 — Reshape @ems/sdk for the EMS surface
+- [ ] E20-036 — Implement typed methods for every endpoint
+- [ ] E20-037 — Implement automatic retry with backoff on transient errors
+- [ ] E20-038 — Implement idempotency key generation in the SDK
+- [ ] E20-039 — Implement pagination helpers and async iterators
+- [ ] E20-040 — Implement webhook signature verification in the SDK
+- [ ] E20-041 — Ship the SDK with zero runtime dependencies
+- [ ] E20-042 — Test the SDK against a live staging environment in CI
+- [ ] E20-043 — Publish the SDK to npm under the decided name
+- [ ] E20-044 — Never document an SDK method that is not published
+- [ ] E20-045 — Version the SDK independently of the API with a compatibility matrix
+- [ ] E20-046 — Define the webhook event catalogue and version it
+- [ ] E20-047 — Implement webhook signing with the inherited HMAC scheme
+- [ ] E20-048 — Implement webhook delivery with retry, backoff, and dead-lettering
+- [ ] E20-049 — Implement delivery history with the request and response visible
+- [ ] E20-050 — Implement manual redelivery of a specific event
+- [ ] E20-051 — Implement endpoint health and automatic disabling after sustained failure
+- [ ] E20-052 — Notify the customer before disabling an endpoint
+- [ ] E20-053 — Implement SSRF protection on every webhook target using the inherited guard
+- [ ] E20-054 — Test SSRF protection against the standard bypass corpus
+- [ ] E20-055 — Encrypt webhook secrets at rest
+- [ ] E20-056 — Emit the campaign lifecycle events
+- [ ] E20-057 — Emit the message lifecycle events sourced from the maillog
+- [ ] E20-058 — Emit the reply and classification events
+- [ ] E20-059 — Emit the suppression and unsubscribe events
+- [ ] E20-060 — Emit the fleet health and remediation events
+- [ ] E20-061 — Emit the policy block events so a customer can react
+- [ ] E20-062 — Never emit an event we cannot source from a measurement
+- [ ] E20-063 — Retarget packages/mcp for the EMS domain
+- [ ] E20-064 — Implement MCP tools for fleet inspection
+- [ ] E20-065 — Implement MCP tools for deliverability questions
+- [ ] E20-066 — Implement MCP tools for campaign inspection
+- [ ] E20-067 — Implement MCP tools for lead and list inspection
+- [ ] E20-068 — Implement MCP tools for inbox triage
+- [ ] E20-069 — Implement MCP tools for placement tests
+- [ ] E20-070 — Require human confirmation for every state-changing MCP tool
+- [ ] E20-071 — Never expose a send, a billing mutation, or a prompt change through MCP
+- [ ] E20-072 — Scope MCP access to a single workspace per session
+- [ ] E20-073 — Audit every MCP tool call
+- [ ] E20-074 — Publish the MCP server and document its tools
+- [ ] E20-075 — Test the MCP server against a real agent session
+- [ ] E20-076 — Retarget packages/migrate for outreach-platform imports
+- [ ] E20-077 — Implement the Instantly export importer
+- [ ] E20-078 — Implement the Smartlead export importer
+- [ ] E20-079 — Implement the Lemlist export importer
+- [ ] E20-080 — Implement the Apollo sequence export importer
+- [ ] E20-081 — Preserve suppression and consent from every importer where present
+- [ ] E20-082 — Refuse an import carrying no provenance at all
+- [ ] E20-083 — Produce a migration report showing exactly what came across and what did not
+- [ ] E20-084 — Never claim a migration is complete when fields were dropped
+- [ ] E20-085 — Test each importer against a real export file
+- [ ] E20-086 — Document the migration path per source platform
+- [ ] E20-087 — Add API integration tests covering every endpoint
+- [ ] E20-088 — Add contract tests asserting the OpenAPI spec matches responses
+- [ ] E20-089 — Add rate-limit tests
+- [ ] E20-090 — Add authentication and authorisation tests per scope
+- [ ] E20-091 — Add a cross-tenant access test asserting isolation on every endpoint
+- [ ] E20-092 — Load-test the API at the target request rate
+- [ ] E20-093 — Measure and publish API latency percentiles
+- [ ] E20-094 — Add an API status section to the status page
+- [ ] E20-095 — Document the API deprecation policy and honour it

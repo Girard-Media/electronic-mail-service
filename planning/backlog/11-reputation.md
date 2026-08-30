@@ -1,0 +1,100 @@
+# Epic 11 — The Five Reputation Ledgers
+
+Five independent series with different half-lives, composed only at read time.
+There is no stored "the score".
+
+- [ ] E11-001 — Create packages/reputation with the five-ledger model
+- [ ] E11-002 — Define the IP ledger inputs: listings, deferral rate, block rate, SNDS, TLS failures
+- [ ] E11-003 — Define the domain ledger inputs: DMARC alignment, complaints, bounces, placement
+- [ ] E11-004 — Define the mailbox ledger inputs: bounces, defers, complaints, replies, age, warmup stage
+- [ ] E11-005 — Define the content ledger inputs: rspamd score, link reputation, AI risk, historical placement
+- [ ] E11-006 — Define the engagement ledger inputs: replies, positive replies, unsubscribes, complaints
+- [ ] E11-007 — Implement the exponential decay function with a configurable half-life per ledger
+- [ ] E11-008 — Set the IP half-life to roughly 21 days and make it configurable
+- [ ] E11-009 — Set the domain half-life to roughly 10 days
+- [ ] E11-010 — Set the mailbox half-life to roughly 3 days
+- [ ] E11-011 — Set the content half-life to roughly 1 day
+- [ ] E11-012 — Set the engagement half-life to roughly 7 days
+- [ ] E11-013 — Normalise every input to a bounded 0..1 contribution
+- [ ] E11-014 — Handle a zero-volume subject without producing a misleading score
+- [ ] E11-015 — Return an explicit insufficient-data state rather than a default score
+- [ ] E11-016 — Implement the nightly snapshot writer into ReputationSnapshot
+- [ ] E11-017 — Store the full factor decomposition in every snapshot
+- [ ] E11-018 — Make historical charts read snapshots so they are reproducible
+- [ ] E11-019 — Never recompute history with today's weights; version the weights
+- [ ] E11-020 — Implement the composite score at read time with explicit weights
+- [ ] E11-021 — Always return the decomposition alongside the composite
+- [ ] E11-022 — Refuse to expose a composite through any API without its decomposition
+- [ ] E11-023 — Build the reputation view showing all five series on one timeline
+- [ ] E11-024 — Let an operator toggle each series and see the composite recompute
+- [ ] E11-025 — Annotate the timeline with events: listings, DNS changes, campaign starts, incidents
+- [ ] E11-026 — Make annotations clickable through to the underlying evidence
+- [ ] E11-027 — Implement the reputation delta view: what changed since yesterday and why
+- [ ] E11-028 — Rank the contributing factors by their contribution to the delta
+- [ ] E11-029 — Feed reputationScore into the router candidate scoring
+- [ ] E11-030 — Feed riskPenalty into the router from listings and trends
+- [ ] E11-031 — Feed espAffinity into the router from placement measurements
+- [ ] E11-032 — Make every router input traceable back to a measurement
+- [ ] E11-033 — Implement the reputation alert thresholds per ledger
+- [ ] E11-034 — Alert on a rate of change, not only on an absolute level
+- [ ] E11-035 — Detect a slow degradation before it crosses an absolute threshold
+- [ ] E11-036 — Implement anomaly detection on each series with a seasonality-aware baseline
+- [ ] E11-037 — Avoid alerting on the weekly business-day seasonality
+- [ ] E11-038 — Feed anomalies into the AI narration task for a plain-language summary
+- [ ] E11-039 — Never let the narration replace the underlying numbers in the UI
+- [ ] E11-040 — Implement per-tenant reputation accounting inside a shared pool
+- [ ] E11-041 — Attribute every complaint and bounce to the tenant that caused it
+- [ ] E11-042 — Surface a tenant's contribution to shared-pool damage
+- [ ] E11-043 — Implement the eviction trigger from shared to isolated pool
+- [ ] E11-044 — Notify the evicted tenant with the evidence, not a vague policy message
+- [ ] E11-045 — Implement a reputation recovery plan generator per subject
+- [ ] E11-046 — Rank recovery actions by expected impact and time to effect
+- [ ] E11-047 — Track whether a recovery plan actually worked and learn from it
+- [ ] E11-048 — Build the reputation comparison across peers in the fleet
+- [ ] E11-049 — Identify the best-performing domain and what it does differently
+- [ ] E11-050 — Build the reputation forecast: where this subject trends in seven days
+- [ ] E11-051 — Label the forecast as a projection with its confidence interval
+- [ ] E11-052 — Validate forecast accuracy against outcomes and publish the error internally
+- [ ] E11-053 — Retire the forecast if it does not beat persistence as a baseline
+- [ ] E11-054 — Implement reputation-aware campaign admission control
+- [ ] E11-055 — Refuse to start a large campaign on a degrading domain
+- [ ] E11-056 — Explain the refusal with the specific series and threshold
+- [ ] E11-057 — Offer the customer a smaller safe volume rather than a flat refusal
+- [ ] E11-058 — Implement the reputation budget concept: volume a subject can afford this week
+- [ ] E11-059 — Surface the budget to the operator as the primary capacity number
+- [ ] E11-060 — Reconcile the budget against actual sends and report the variance
+- [ ] E11-061 — Write the reputation model documentation with every formula stated
+- [ ] E11-062 — Publish a simplified version of the model in customer docs
+- [ ] E11-063 — Never publish a score without publishing how it is computed
+- [ ] E11-064 — Test decay with a synthetic series and assert the half-life is correct
+- [ ] E11-065 — Test the insufficient-data path with a brand-new subject
+- [ ] E11-066 — Test that a listing immediately depresses the IP ledger
+- [ ] E11-067 — Test that a complaint immediately depresses the mailbox and engagement ledgers
+- [ ] E11-068 — Test that placement improvement lifts the domain ledger
+- [ ] E11-069 — Test snapshot reproducibility by recomputing a historical day
+- [ ] E11-070 — Load-test scoring for 10,000 subjects in one pass
+- [ ] E11-071 — Benchmark read-time composite computation; target under 10ms
+- [ ] E11-072 — Cache the composite with invalidation on any input change
+- [ ] E11-073 — Add MCP tools so an agent can read and explain a reputation score
+- [ ] E11-074 — Add the reputation series to the weekly digest
+- [ ] E11-075 — Add reputation to the fleet overview as a single fleet-health number with decomposition
+- [ ] E11-076 — Refuse to display the fleet-health number without its decomposition available in one click
+- [ ] E11-077 — Add an operator override that pins a subject's usability regardless of score
+- [ ] E11-078 — Require a reason and an expiry on every override
+- [ ] E11-079 — Alert when an override is about to expire
+- [ ] E11-080 — Audit every override in the immutable log
+- [ ] E11-081 — Track how often overrides preceded an incident and report it
+- [ ] E11-082 — Weight the engagement ledger by reply, not by open, given MPP
+- [ ] E11-083 — Document why opens are excluded from reputation
+- [ ] E11-084 — Add a negative-engagement signal from delete-without-read where any provider exposes it
+- [ ] E11-085 — Keep the model simple enough that an operator can predict its behaviour
+- [ ] E11-086 — Review the weights quarterly against outcomes and record the decision
+- [ ] E11-087 — Version every weight change and keep old snapshots on old weights
+- [ ] E11-088 — Add a reputation regression test suite from recorded historical incidents
+- [ ] E11-089 — Assert the model would have alerted before each historical incident
+- [ ] E11-090 — Document the reputation subsystem in planning/specs/reputation/
+- [ ] E11-091 — Add reputation data to the tenant export
+- [ ] E11-092 — Exclude other tenants' data from any shared-pool reputation view
+- [ ] E11-093 — Add a fleet-wide reputation report for the monthly business review
+- [ ] E11-094 — Correlate reputation with revenue retention and record what the data says
+- [ ] E11-095 — Feed that correlation back into where engineering effort goes next

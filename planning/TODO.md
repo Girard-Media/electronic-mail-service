@@ -1,0 +1,2722 @@
+# Electronic Mail Services — Build TODO
+
+**Generated file.** Source of truth is `planning/backlog/*.md`. Re-generate with `pnpm todo:compile`.
+
+The build-loop queue (`bootspring build next` reads this).
+Status: `[ ]` todo · `[~]` in progress · `[x]` done.
+
+**13 / 2500 complete.**
+
+Governing documents — read before taking a task:
+
+| Document | What it settles |
+|---|---|
+| `planning/VISION.md` | Why this exists, what we refuse to build |
+| `planning/ARCHITECTURE.md` | The send path and invariants I1–I7 |
+| `planning/INFRA.md` | The blast-node fleet |
+| `planning/COMPLIANCE.md` | The policy gate and the legal map |
+| `planning/AI.md` | The OpenRouter gateway contract |
+
+**Order.** Epics 01–02 gate everything. 03–05 (fleet) gate 06–08 (warmup, router, send).
+09–11 (deliverability, reputation) can run parallel to 12–16 (product) once the fleet exists.
+17–18 (AI, frontend) follow their subsystems. 19–24 are launch-gated.
+
+**Rule.** No task in epics 07, 08, or 14 ships without an integration test naming the
+invariant it protects.
+
+---
+
+<!-- source: planning/backlog/01-foundation.md · 9/80 -->
+# Epic 01 — Foundation & Fork Hygiene
+
+Goal: the forked repo compiles green, carries no usermails identity, and every
+inherited subsystem is consciously kept, retargeted, or deleted.
+
+- [x] E01-001 — Hard-fork usermails into electronic-mail-service (exclude .git, node_modules, lockfile)
+- [x] E01-002 — Global rebrand usermails → ems / @usermails → @ems across 172 files
+- [x] E01-003 — Rename infra/sidecars/usermails-{mta,feedback}.md → ems-*
+- [x] E01-004 — Set root package name to electronic-mail-service with EMS description
+- [x] E01-005 — Rename SDK package to @ems/sdk and fix the @ems/mcp workspace dependency
+- [x] E01-006 — git init and commit the fork baseline
+- [ ] E01-007 — Run pnpm install and record the resolved lockfile as a fork artifact
+- [ ] E01-008 — pnpm typecheck must pass green on the untouched fork before any new code
+- [ ] E01-009 — pnpm lint must pass green; fix inherited violations rather than widening the config
+- [ ] E01-010 — Run the inherited pnpm test suite; triage every failure into keep/retarget/delete
+- [x] E01-011 — Update bootspring.config.js: name ems, hosting hostssh, analytics clickhouse, email own-mta
+- [x] E01-012 — Rewrite CLAUDE.md for EMS: product definition, constraints, repo map, commands
+- [ ] E01-013 — Rewrite AGENTS.md with the EMS send-path invariants I1–I7 as agent-visible rules
+- [x] E01-014 — Rewrite README.md: what ships, what does not, honest status line
+- [ ] E01-015 — Rewrite SEED.md as the EMS seed brief; archive the usermails original under planning/lineage/
+- [ ] E01-016 — Delete .bootspring/specs/transactional-core (usermails lineage, not ours)
+- [ ] E01-017 — Rewrite .bootspring/context/VISION.md from planning/VISION.md
+- [ ] E01-018 — Rewrite .bootspring/context/ARCHITECTURE.md from planning/ARCHITECTURE.md
+- [ ] E01-019 — Rewrite .bootspring/context/DELIVERABILITY.md for cold-outreach physics
+- [ ] E01-020 — Rewrite .bootspring/context/INFRA.md for the blast-node fleet
+- [ ] E01-021 — Rewrite .bootspring/context/COMPETITORS.md: Instantly, Smartlead, Lemlist, Apollo, Woodpecker, Reply, Salesforge, QuickMail
+- [ ] E01-022 — Rewrite .bootspring/context/BUSINESS_MODEL.md with the cost model from planning/INFRA.md §12
+- [ ] E01-023 — Rewrite .bootspring/context/AUDIENCE.md: agency, SDR team, founder-led sales
+- [ ] E01-024 — Write .bootspring/context/DECISIONS.md D1..D20 for EMS (own MTA, no warmup pool, opens off by default…)
+- [ ] E01-025 — Reset .bootspring/facts and project-memory to EMS facts only
+- [ ] E01-026 — Decide and record: keep apps/dashboard (legacy Hono SPA) or delete in favour of apps/web
+- [ ] E01-027 — Delete apps/api/public/*.html static marketing pages superseded by apps/web
+- [ ] E01-028 — Audit packages/migrate sources; retarget from ESP-migration to outreach-platform migration
+- [ ] E01-029 — Decide the public npm name for the SDK and record it in DECISIONS
+- [ ] E01-030 — Add .nvmrc pinned to the Node version in engines
+- [ ] E01-031 — Add pnpm workspace catalog for shared dep versions to stop drift between packages
+- [ ] E01-032 — Create the empty package skeletons for fleet, router, warmup, reputation, deliverability
+- [ ] E01-033 — Create the empty package skeletons for policy, verify, sequence, leads, inbox
+- [ ] E01-034 — Create the empty package skeletons for ai, billing, registrar
+- [ ] E01-035 — Give every new package a package.json, tsconfig, src/index.ts, and a typecheck script
+- [ ] E01-036 — Wire new packages into tsconfig.base.json path aliases
+- [ ] E01-037 — Add a dependency-direction lint rule: no cross-domain package imports except via interfaces
+- [ ] E01-038 — Create apps/dmarc-ingest skeleton (Hono, receives RUA/TLS-RPT mail)
+- [ ] E01-039 — Create apps/seedbox skeleton (placement probe agent)
+- [ ] E01-040 — Create apps/fleet-agent skeleton (per-node agent)
+- [ ] E01-041 — Update pnpm-workspace.yaml if any new app lives outside apps/*
+- [ ] E01-042 — Update Dockerfile to build the new apps in the single-image pipeline
+- [ ] E01-043 — Update Procfile / start script for the new sibling processes
+- [ ] E01-044 — Update .env.example with every new EMS variable, grouped and commented
+- [ ] E01-045 — Add packages/core/src/env.ts entries for all new variables with zod validation
+- [ ] E01-046 — Fail fast at boot on any missing required env var, with the variable name in the error
+- [ ] E01-047 — Add a git remote for the EMS hostssh deploy target (do not push yet)
+- [ ] E01-048 — Create the GitHub repo Girard-Media/electronic-mail-service and push main
+- [ ] E01-049 — Update .github/workflows/ci.yml for the new packages and gates
+- [ ] E01-050 — Add a CI job that runs prisma validate on every push
+- [ ] E01-051 — Add a CI job that runs prisma format --check to keep the schema canonical
+- [ ] E01-052 — Add CODEOWNERS with the send path and policy package requiring review
+- [ ] E01-053 — Add a PR template that asks which send-path invariant the change touches
+- [ ] E01-054 — Add .editorconfig and confirm formatter settings match the inherited code
+- [ ] E01-055 — Document the fork lineage and the licence boundary in planning/lineage/FORK.md
+- [ ] E01-056 — Confirm the freeresend (MIT) attribution survives the fork; keep NOTICE current
+- [ ] E01-057 — Restate the usesend AGPLv3 clean-room rule in CLAUDE.md and AGENTS.md
+- [ ] E01-058 — Remove every usermails-specific test that asserts Resend API compatibility we no longer need
+- [ ] E01-059 — Keep and retarget scripts/ssrf-test.mts to the new outbound surfaces
+- [ ] E01-060 — Keep and retarget scripts/security-headers-test.mts to apps/web and apps/api
+- [ ] E01-061 — Keep scripts/totp-test.mts unchanged; God Mode carries over
+- [ ] E01-062 — Retarget scripts/unsub-test.mts to the RFC 8058 one-click requirements
+- [ ] E01-063 — Retarget scripts/abuse-test.mts to the cold-outreach AUP rules
+- [ ] E01-064 — Delete scripts/plans-test.mts assertions tied to usermails plan names
+- [ ] E01-065 — Create scripts/ip-diligence.mts referenced by planning/INFRA.md §3
+- [ ] E01-066 — Add a make-style task runner or justfile documenting every developer command
+- [ ] E01-067 — Write CONTRIBUTING.md covering the expand/contract migration discipline
+- [ ] E01-068 — Add a repo-level ADR directory and write ADR-0001 (own MTA vs rented mailboxes)
+- [ ] E01-069 — Write ADR-0002 (ClickHouse for observations, Postgres for decisions)
+- [ ] E01-070 — Write ADR-0003 (no cross-customer warmup pool)
+- [ ] E01-071 — Write ADR-0004 (open tracking off by default)
+- [ ] E01-072 — Write ADR-0005 (OpenRouter as the single inference dependency)
+- [ ] E01-073 — Write ADR-0006 (Stripe behind a BillingProvider seam)
+- [ ] E01-074 — Write ADR-0007 (registrar behind a RegistrarProvider seam)
+- [ ] E01-075 — Set up the local docker-compose to include ClickHouse alongside postgres and valkey
+- [ ] E01-076 — Add pnpm infra:up smoke check that all three stores answer
+- [ ] E01-077 — Add a seed script that creates a dev org, workspace, and admin user
+- [ ] E01-078 — Add a dev fixture script that fabricates a node, IP, domain, and two mailboxes
+- [ ] E01-079 — Verify the whole repo boots locally end to end with the fixtures
+- [ ] E01-080 — Tag v0.1.0-fork and record the baseline commit in planning/lineage/FORK.md
+
+---
+
+<!-- source: planning/backlog/02-data-model.md · 4/90 -->
+# Epic 02 — Data Model, Migrations & Stores
+
+Goal: Postgres holds decisions and configuration, ClickHouse holds observations,
+Valkey holds nothing that cannot be rebuilt.
+
+- [x] E02-001 — Append the EMS cold-outreach domain to schema.prisma (54 models, 32 enums)
+- [x] E02-002 — Add EMS back-relations to Organization
+- [x] E02-003 — Run prisma validate and fix every relation error
+- [x] E02-004 — Run prisma format and commit the canonical schema
+- [ ] E02-005 — Generate the initial EMS migration and review the SQL by hand before applying
+- [ ] E02-006 — Verify every tenant-scoped model carries orgId and an index on it
+- [ ] E02-007 — Add a partial unique index on FleetDomain.name where status <> BURNED
+- [ ] E02-008 — Add a covering index on SendIntent(state, dueAt) sized for the scheduler claim query
+- [ ] E02-009 — Add an index on SendIntent(messageId) and confirm it is unique
+- [ ] E02-010 — Add a GIN index on Lead.customFields for segment queries
+- [ ] E02-011 — Add a trigram index on Lead.email for fuzzy dedupe search
+- [ ] E02-012 — Add a partial index on CampaignLead(state, nextDueAt) where state = ACTIVE
+- [ ] E02-013 — Add a check constraint: FleetMailbox.dailyCap <= hardCap
+- [ ] E02-014 — Add a check constraint: SequenceStep.position >= 0
+- [ ] E02-015 — Add a check constraint: WarmupPlan.startPerDay <= plateau
+- [ ] E02-016 — Add a check constraint: Campaign.sendWindowStart < sendWindowEnd
+- [ ] E02-017 — Make PolicyDecision append-only with a REVOKE UPDATE/DELETE grant
+- [ ] E02-018 — Make GlobalSuppression append-only except for the address plaintext column
+- [ ] E02-019 — Add a database role for the API that cannot DROP or TRUNCATE
+- [ ] E02-020 — Add a read-only reporting role for the cockpit aggregate queries
+- [ ] E02-021 — Write the tenant-scope helper that injects orgId into every Prisma query
+- [ ] E02-022 — Write a CI test that fails if any tenant model is queried without an orgId predicate
+- [ ] E02-023 — Write the soft-delete convention doc and apply it consistently or not at all
+- [ ] E02-024 — Add createdAt/updatedAt to every model that lacks them
+- [ ] E02-025 — Standardise cuid() ids across new models; no serial ints on tenant data
+- [ ] E02-026 — Write the expand/contract migration playbook for send-path tables
+- [ ] E02-027 — Add a migration lint that rejects a DROP COLUMN in the same migration as its code removal
+- [ ] E02-028 — Add migration timing instrumentation; fail CI on a migration estimated over 30s on prod volume
+- [ ] E02-029 — Provision ClickHouse on the .211 data box
+- [ ] E02-030 — Create the ClickHouse database and a dedicated EMS user with least privilege
+- [ ] E02-031 — Design the smtp_transactions table with a MergeTree ordered by (nodeId, ts)
+- [ ] E02-032 — Add a TTL to smtp_transactions (hot 90d, then R2 archive)
+- [ ] E02-033 — Design the email_events table (queued, submitted, delivered, deferred, bounced, opened, clicked, replied, unsubscribed, complained)
+- [ ] E02-034 — Design the reputation_series table keyed by (subject, subjectId, ts)
+- [ ] E02-035 — Design the placement_observations table for seed probe results
+- [ ] E02-036 — Design the dmarc_rows table for per-source-IP aggregate rows
+- [ ] E02-037 — Design the ai_calls table mirroring the Postgres AiCall for cheap aggregation
+- [ ] E02-038 — Write the ClickHouse migration runner (plain SQL files, forward-only, checksummed)
+- [ ] E02-039 — Add materialized views for hourly rollups per domain, per mailbox, per IP
+- [ ] E02-040 — Add a materialized view for per-ESP deferral rate over 15-minute buckets
+- [ ] E02-041 — Add a materialized view for campaign funnel counts
+- [ ] E02-042 — Write packages/db/src/clickhouse.ts with a typed query helper and connection pooling
+- [ ] E02-043 — Add a batching writer that buffers events and flushes on size or interval
+- [ ] E02-044 — Make the ClickHouse writer fail-soft: buffer to disk, never block a send
+- [ ] E02-045 — Add a replay tool that reingests buffered events after a ClickHouse outage
+- [ ] E02-046 — Define the Valkey key namespace and document every key pattern with its TTL
+- [ ] E02-047 — Implement the suppression bloom filter with a documented false-positive rate
+- [ ] E02-048 — Implement the suppression exact set with Postgres as the fallback on miss
+- [ ] E02-049 — Implement the four token buckets as Lua scripts for atomicity
+- [ ] E02-050 — Implement the scheduler distributed lock with a fencing token
+- [ ] E02-051 — Add a Valkey warmup routine that rebuilds every derived key from Postgres on boot
+- [ ] E02-052 — Add a consistency job that reconciles Valkey counters against Postgres nightly
+- [ ] E02-053 — Add R2 buckets: ems-raw-mail, ems-dmarc, ems-exports, ems-backups
+- [ ] E02-054 — Write the R2 client wrapper with signed-URL generation and content-type enforcement
+- [ ] E02-055 — Store raw MIME to R2 with the Message-ID as the key prefix
+- [ ] E02-056 — Store original DMARC XML to R2 before parsing, always
+- [ ] E02-057 — Add lifecycle rules on R2 for cost control on raw mail
+- [ ] E02-058 — Extend the restic → R2 backup runbook to cover ClickHouse
+- [ ] E02-059 — Write and test a full restore drill for Postgres from R2
+- [ ] E02-060 — Write and test a full restore drill for ClickHouse from R2
+- [ ] E02-061 — Seed JurisdictionPolicy with the rows from planning/COMPLIANCE.md §1
+- [ ] E02-062 — Seed BounceRule with the Google response dialect
+- [ ] E02-063 — Seed BounceRule with the Microsoft/Outlook response dialect
+- [ ] E02-064 — Seed BounceRule with the Yahoo response dialect
+- [ ] E02-065 — Seed BounceRule with the Proofpoint, Mimecast, and Barracuda dialects
+- [ ] E02-066 — Seed BounceRule with generic RFC 3463 enhanced status codes as the fallback layer
+- [ ] E02-067 — Seed WarmupPlan with conservative, standard, and aggressive curves
+- [ ] E02-068 — Seed AiTaskConfig rows for all eleven tasks in planning/AI.md
+- [ ] E02-069 — Seed GlobalSuppression with .gov, .mil, and known spam-trap domains
+- [ ] E02-070 — Seed GlobalSuppression with our own and our competitors' domains
+- [ ] E02-071 — Seed the disposable-email-domain list and schedule its refresh
+- [ ] E02-072 — Seed the role-address local-part list
+- [ ] E02-073 — Write the seed runner so it is idempotent and safe to run on prod
+- [ ] E02-074 — Add a data-dictionary generator that emits planning/DATA_DICTIONARY.md from the schema
+- [ ] E02-075 — Add an ERD generator and commit the rendered diagram
+- [ ] E02-076 — Write query-performance tests for the ten hottest queries with EXPLAIN assertions
+- [ ] E02-077 — Add pg_stat_statements and a slow-query report job
+- [ ] E02-078 — Configure PgBouncer pool sizing for the worker concurrency
+- [ ] E02-079 — Load-test the scheduler claim query at 1M pending intents
+- [ ] E02-080 — Load-test the ClickHouse rollups at 100M transaction rows
+- [ ] E02-081 — Document the retention policy per table and get it into the privacy policy
+- [ ] E02-082 — Implement the GDPR erasure job across Postgres, ClickHouse, and R2
+- [ ] E02-083 — Verify erasure preserves the GlobalSuppression hash
+- [ ] E02-084 — Implement the tenant export job producing a single signed archive
+- [ ] E02-085 — Add a schema-drift check comparing prod introspection against the committed schema
+- [ ] E02-086 — Add a fixture factory package for tests (org, node, ip, domain, mailbox, lead, campaign)
+- [ ] E02-087 — Make every test run against a real ephemeral Postgres, not a mock
+- [ ] E02-088 — Add a truncation helper so tests share one database without cross-talk
+- [ ] E02-089 — Benchmark Prisma client cold start in the worker and pin the generated client output
+- [ ] E02-090 — Review every onDelete rule; Restrict on anything a node or domain depends on
+
+---
+
+<!-- source: planning/backlog/03-nodes.md · 0/120 -->
+# Epic 03 — Blast Nodes: Procurement, Provisioning, Agent
+
+Goal: a node goes from "VPS does not exist" to "routable" with one command and
+no manual step, and cannot become routable until it proves it is safe.
+
+- [ ] E03-001 — Write scripts/ip-diligence.mts: DNSBL sweep of a candidate IP across all configured lists
+- [ ] E03-002 — Add passive-DNS / prior-hostname lookup to the diligence script
+- [ ] E03-003 — Add an outbound port 25 egress test to the diligence script
+- [ ] E03-004 — Add an rDNS-control confirmation step to the diligence script
+- [ ] E03-005 — Make the diligence script emit a machine-readable verdict written to SendingIp.diligenceJson
+- [ ] E03-006 — Document the "release a dirty IP" procedure with the provider
+- [ ] E03-007 — Purchase blast-node-01 on Hostinger (KVM 2, Ubuntu 24.04, 1 dedicated IPv4)
+- [ ] E03-008 — Run diligence on the assigned IP before any other step
+- [ ] E03-009 — Set rDNS/PTR to mta01.<sending-domain> via the Hostinger API
+- [ ] E03-010 — Confirm forward-confirmed reverse DNS resolves both directions
+- [ ] E03-011 — Write infra/blast-node/00-preflight.sh (diligence, egress, rDNS assertions)
+- [ ] E03-012 — Write infra/blast-node/10-base.sh (users, ufw, fail2ban, chrony, unattended-upgrades)
+- [ ] E03-013 — Restrict SSH to key-only, non-standard port, and the operator allowlist
+- [ ] E03-014 — Disable IPv6 for outbound mail on the node
+- [ ] E03-015 — Write infra/blast-node/20-postfix.sh with a templated main.cf
+- [ ] E03-016 — Template master.cf with per-transport smtp_bind_address support
+- [ ] E03-017 — Configure sender_dependent_default_transport_maps for per-domain transports
+- [ ] E03-018 — Configure smtp_destination_concurrency_limit per receiving ESP
+- [ ] E03-019 — Configure smtp_destination_rate_delay per receiving ESP
+- [ ] E03-020 — Set soft_bounce=no and a short maximal_queue_lifetime; our scheduler owns retries
+- [ ] E03-021 — Configure mynetworks to loopback plus the workers' private IP only
+- [ ] E03-022 — Configure smtpd_recipient_restrictions to reject relaying explicitly
+- [ ] E03-023 — Configure the VERP return-path envelope rewriting
+- [ ] E03-024 — Configure the bounce subdomain MX to the node
+- [ ] E03-025 — Write infra/blast-node/30-opendkim.sh with key dirs and the signing table
+- [ ] E03-026 — Support multiple domains and selectors in one OpenDKIM instance
+- [ ] E03-027 — Write infra/blast-node/40-rspamd.sh for local content scoring only
+- [ ] E03-028 — Disable every rspamd module that phones home to an external service
+- [ ] E03-029 — Expose a local rspamd HTTP scoring endpoint for the pre-send gate
+- [ ] E03-030 — Write infra/blast-node/50-dmarc.sh for inbound OpenDMARC checks
+- [ ] E03-031 — Write infra/blast-node/70-tls.sh for a Let's Encrypt cert on the PTR hostname
+- [ ] E03-032 — Configure outbound smtp_tls_security_level=may with DANE where available
+- [ ] E03-033 — Configure inbound smtpd TLS with the real certificate
+- [ ] E03-034 — Write infra/blast-node/90-verify.sh: relay test, DKIM sign test, loopback delivery, egress
+- [ ] E03-035 — Make 90-verify.sh exit non-zero on any failure and refuse to mark the node ACTIVE
+- [ ] E03-036 — Make every provisioning script idempotent and safe to re-run
+- [ ] E03-037 — Add a single infra/blast-node/provision.sh that runs all stages in order
+- [ ] E03-038 — Add a --dry-run mode that prints every change without applying it
+- [ ] E03-039 — Scaffold apps/fleet-agent as a systemd service
+- [ ] E03-040 — Implement fleet-agent registration: node announces itself to the API with a signed payload
+- [ ] E03-041 — Implement mTLS or Ed25519 request signing between agent and API
+- [ ] E03-042 — Make the API refuse any unsigned node health report
+- [ ] E03-043 — Implement fleet-agent heartbeat with queue depth, load, disk, and Postfix status
+- [ ] E03-044 — Implement fleet-agent DKIM key installation from the encrypted Postgres value
+- [ ] E03-045 — Never write a decrypted DKIM key to the agent log or to disk unencrypted at rest
+- [ ] E03-046 — Implement fleet-agent domain-add: create the transport, signing entry, and reload
+- [ ] E03-047 — Implement fleet-agent domain-remove with a drain-first guard
+- [ ] E03-048 — Implement fleet-agent mailbox-create: system user, maildir, aliases
+- [ ] E03-049 — Implement fleet-agent mailbox-delete with an archive-to-R2 step first
+- [ ] E03-050 — Implement fleet-agent IP-bind: map a transport to a specific source IP
+- [ ] E03-051 — Implement fleet-agent self-test endpoint reproducing 90-verify.sh on demand
+- [ ] E03-052 — Add an agent version field and refuse commands from an outdated agent
+- [ ] E03-053 — Implement agent auto-update with a rollback on failed health check
+- [ ] E03-054 — Scaffold apps/maillog-shipper or extend maillog-bridge for the new node
+- [ ] E03-055 — Tail /var/log/mail.log with journald fallback and position persistence
+- [ ] E03-056 — Ship maillog lines in signed batches with at-least-once delivery
+- [ ] E03-057 — Buffer maillog locally when the API is unreachable; never lose a line
+- [ ] E03-058 — Archive raw maillog to R2 daily, compressed
+- [ ] E03-059 — Build the BlastNode registry CRUD in packages/fleet
+- [ ] E03-060 — Implement the node status state machine with legal transitions only
+- [ ] E03-061 — Refuse a PROVISIONING → ACTIVE transition without all three verify flags
+- [ ] E03-062 — Implement node DRAINING: router stops selecting, in-flight completes
+- [ ] E03-063 — Implement node QUARANTINE with a required reason and an operator audit entry
+- [ ] E03-064 — Implement node RETIRED with a mailbox-migration prompt
+- [ ] E03-065 — Compute node capacity from live mailbox caps, not from a static number
+- [ ] E03-066 — Alert when a node has not heartbeat in two intervals
+- [ ] E03-067 — Alert when node disk exceeds 80% (maillog growth is the usual cause)
+- [ ] E03-068 — Alert when the Postfix deferred queue exceeds a threshold
+- [ ] E03-069 — Expose a queue-drain command that reports what would be dropped before dropping it
+- [ ] E03-070 — Build the node detail cockpit view: status, IPs, domains, mailboxes, queue, health
+- [ ] E03-071 — Build the node list view with capacity utilisation per node
+- [ ] E03-072 — Implement the node-loss playbook as a runnable script, not a document
+- [ ] E03-073 — Test the node-loss playbook by destroying a staging node and rebuilding it
+- [ ] E03-074 — Measure and record the node rebuild time; target under two hours unattended
+- [ ] E03-075 — Purchase and provision verify-node-01 with its own IP and PTR
+- [ ] E03-076 — Configure verify-node-01 with role VERIFY so the router never selects it
+- [ ] E03-077 — Assert in code that a VERIFY node can never be returned by the router
+- [ ] E03-078 — Write a chaos test: kill Postfix mid-send and assert intents defer rather than fail
+- [ ] E03-079 — Write a chaos test: sever the agent connection and assert maillog buffering holds
+- [ ] E03-080 — Write a chaos test: fill the node disk and assert graceful degradation
+- [ ] E03-081 — Add a node-level rate ceiling independent of per-mailbox caps as a safety net
+- [ ] E03-082 — Add a global kill switch that halts all sending on all nodes in one action
+- [ ] E03-083 — Require two-person confirmation to lift the global kill switch
+- [ ] E03-084 — Log every node command with actor, timestamp, and payload to the audit trail
+- [ ] E03-085 — Write the node hardening checklist and verify it with an automated scan
+- [ ] E03-086 — Run an external open-relay test against every ACTIVE node on a schedule
+- [ ] E03-087 — Page immediately if the open-relay test ever passes
+- [ ] E03-088 — Add a node clock-skew check; DKIM and TLS both care
+- [ ] E03-089 — Document the exact provider steps for buying and releasing an IP
+- [ ] E03-090 — Add a cost-per-node line to the billing cost model, updated from real invoices
+- [ ] E03-091 — Support multiple IPs on one node with independent reputation
+- [ ] E03-092 — Support pool labels so traffic classes can be segregated on shared hardware
+- [ ] E03-093 — Implement pool-aware routing candidate filtering
+- [ ] E03-094 — Build a capacity planner that answers "how many nodes for N sends/day"
+- [ ] E03-095 — Surface the capacity planner in the infra cockpit with the current fleet plugged in
+- [ ] E03-096 — Add a provisioning progress stream so the operator watches a node come up live
+- [ ] E03-097 — Add a one-click "provision node" flow gated behind platform admin plus TOTP
+- [ ] E03-098 — Store the provisioning transcript for every node for later forensics
+- [ ] E03-099 — Add a node comparison view for diagnosing "why is node 2 worse than node 1"
+- [ ] E03-100 — Write the runbook: node listed on Spamhaus, step by step to delisting
+- [ ] E03-101 — Write the runbook: provider blocked port 25 after signup
+- [ ] E03-102 — Write the runbook: PTR change did not propagate
+- [ ] E03-103 — Write the runbook: OpenDKIM signing silently stopped
+- [ ] E03-104 — Add a synthetic canary send from every ACTIVE node every 15 minutes
+- [ ] E03-105 — Alert on canary failure before customer traffic notices
+- [ ] E03-106 — Record canary latency and delivery time as a node SLI
+- [ ] E03-107 — Define node SLOs and wire them to the alerting policy
+- [ ] E03-108 — Add per-node cost and per-node throughput to compute cost per thousand sends
+- [ ] E03-109 — Automate node OS patching with a drain-patch-verify-return cycle
+- [ ] E03-110 — Never patch more than one node at a time when the fleet has fewer than three
+- [ ] E03-111 — Add a staging node that mirrors production configuration for change testing
+- [ ] E03-112 — Require every Postfix configuration change to pass on staging first
+- [ ] E03-113 — Version Postfix configuration in git and diff it against the live node
+- [ ] E03-114 — Alert on configuration drift between git and any live node
+- [ ] E03-115 — Add a node inventory export for the security questionnaire answer set
+- [ ] E03-116 — Confirm the node is not part of the hostssh cluster and cannot be deployed to by mistake
+- [ ] E03-117 — Add an explicit guard preventing the EMS app image from deploying to a blast node
+- [ ] E03-118 — Confirm no EMS traffic ever egresses via 31.220.104.223, with a test
+- [ ] E03-119 — Add a network-level assertion in CI that the transactional and blast IPs differ
+- [ ] E03-120 — Document the node fleet in the security policy as a distinct trust boundary
+
+---
+
+<!-- source: planning/backlog/04-ips-dns.md · 0/100 -->
+# Epic 04 — IPs, DNS Automation & the Registrar Seam
+
+- [ ] E04-001 — Define the RegistrarProvider interface (search, purchase, renew, setNameservers, listDomains)
+- [ ] E04-002 — Implement the Cloudflare Registrar adapter
+- [ ] E04-003 — Implement a second adapter (Namecheap or Porkbun) to prove the seam
+- [ ] E04-004 — Add registrar credential storage with encryption and a rotation runbook
+- [ ] E04-005 — Add a registrar cost ledger so domain spend is attributable per org
+- [ ] E04-006 — Define the DnsProvider interface (upsertRecord, deleteRecord, listRecords, verifyPropagation)
+- [ ] E04-007 — Implement the Cloudflare DNS adapter using the scoped Zone:DNS:Edit token
+- [ ] E04-008 — Never use the platform DNS token for a customer-owned zone; enforce in code
+- [ ] E04-009 — Implement DNS record templating per FleetDomain from planning/INFRA.md §5
+- [ ] E04-010 — Generate the SPF record as a single hard-fail ip4 with no includes
+- [ ] E04-011 — Refuse to publish an SPF record with more than ten DNS lookups
+- [ ] E04-012 — Generate a 2048-bit DKIM keypair per domain and store the private key encrypted
+- [ ] E04-013 — Publish the DKIM public key TXT and verify it resolves before marking dkimOk
+- [ ] E04-014 — Implement quarterly DKIM selector rotation with an overlap window
+- [ ] E04-015 — Generate the DMARC record starting at p=none with rua and ruf
+- [ ] E04-016 — Automate the p=none → p=quarantine promotion after seven days of clean RUA
+- [ ] E04-017 — Automate the p=quarantine → p=reject promotion after fourteen days of full alignment
+- [ ] E04-018 — Set adkim=s and aspf=s from the first publish
+- [ ] E04-019 — Publish the TLS-RPT record pointing at the aggregate-report domain
+- [ ] E04-020 — Publish the MX record pointing at the node PTR hostname
+- [ ] E04-021 — Publish the bounce subdomain CNAME for VERP
+- [ ] E04-022 — Publish the A record for the domain's one-page site
+- [ ] E04-023 — Publish the mta01 A record matching the node IP
+- [ ] E04-024 — Implement DNS propagation verification against multiple public resolvers
+- [ ] E04-025 — Do not mark a domain DNS-complete until every record verifies from three resolvers
+- [ ] E04-026 — Implement a scheduled DNS drift check for every ACTIVE domain
+- [ ] E04-027 — Alert and auto-pause a domain whose SPF, DKIM, or DMARC record disappears
+- [ ] E04-028 — Record every DNS issue in FleetDomain.dnsIssues with a timestamp
+- [ ] E04-029 — Build the DNS record diff view: desired vs live, per domain
+- [ ] E04-030 — Add a one-click repair that republishes the desired record set
+- [ ] E04-031 — Rate-limit registrar and DNS API calls to stay inside provider quotas
+- [ ] E04-032 — Add exponential backoff and idempotency keys to every registrar call
+- [ ] E04-033 — Implement the aggregate-report domain setup (dmarc@ and tlsrpt@ mailboxes)
+- [ ] E04-034 — Route the aggregate-report domain MX to the ingest node, not a blast node
+- [ ] E04-035 — Build the SendingIp registry CRUD in packages/fleet
+- [ ] E04-036 — Implement the IP status state machine with legal transitions only
+- [ ] E04-037 — Refuse NEW → ACTIVE without a confirmed PTR and a clean diligence record
+- [ ] E04-038 — Implement IP warmup day tracking independent of mailbox warmup
+- [ ] E04-039 — Compute the IP hourly cap from warmup day and observed deferral rate
+- [ ] E04-040 — Implement IP quarantine on a Spamhaus SBL or CSS listing
+- [ ] E04-041 — Implement IP throttle on a sustained 4xx rate from any single ESP
+- [ ] E04-042 — Implement automatic un-throttle when the deferral rate recovers
+- [ ] E04-043 — Never auto-un-quarantine; require an operator action with a reason
+- [ ] E04-044 — Build the IP detail view: reputation series, listings, caps, domains, recent transactions
+- [ ] E04-045 — Build the IP list view with a listing-status column across all DNSBLs
+- [ ] E04-046 — Implement PTR verification as a scheduled job, not only at provision time
+- [ ] E04-047 — Alert if PTR ever stops forward-confirming
+- [ ] E04-048 — Add an IP allocation planner: which domains should live on which IP
+- [ ] E04-049 — Enforce a maximum number of domains per IP
+- [ ] E04-050 — Implement domain-to-IP reassignment with a drain and DNS update
+- [ ] E04-051 — Never reassign a domain to an IP with a worse reputation score without confirmation
+- [ ] E04-052 — Implement the pool concept: named IP groups with independent policy
+- [ ] E04-053 — Support a dedicated pool per org on higher plans
+- [ ] E04-054 — Support a shared pool with per-tenant complaint accounting
+- [ ] E04-055 — Implement tenant eviction from the shared pool to an isolated pool on damage
+- [ ] E04-056 — Build the pool management view with capacity and health per pool
+- [ ] E04-057 — Add a "burn" action that permanently retires an IP and blocks its reuse
+- [ ] E04-058 — Record the burn reason and keep the IP in the registry as a tombstone
+- [ ] E04-059 — Implement bulk domain purchase with a name-generation helper
+- [ ] E04-060 — Screen candidate domain names against a blocklist of penalised TLDs
+- [ ] E04-061 — Screen candidate domain names for prior use via passive DNS and archive lookups
+- [ ] E04-062 — Screen candidate domain names against DNSBL domain lists before purchase
+- [ ] E04-063 — Refuse to purchase a domain that appears on any blocklist
+- [ ] E04-064 — Refuse to purchase a domain that trademark-collides with a third party
+- [ ] E04-065 — Automate WHOIS privacy on every purchased domain
+- [ ] E04-066 — Automate domain auto-renewal and alert 60 days before expiry
+- [ ] E04-067 — Track domain cost and renewal date in the cost ledger
+- [ ] E04-068 — Generate the one-page site for each sending domain from a template
+- [ ] E04-069 — Include a real privacy page and postal address on each sending-domain site
+- [ ] E04-070 — Deploy sending-domain sites as static pages behind the existing edge
+- [ ] E04-071 — Verify the site is live before allowing the domain to leave AGING
+- [ ] E04-072 — Implement the aging clock: registeredAt plus the plan's minimum, exposed as ageReadyAt
+- [ ] E04-073 — Make the router refuse any domain before ageReadyAt, with a clear deferral reason
+- [ ] E04-074 — Build the domain-bench view: which warmed domains are available and idle
+- [ ] E04-075 — Alert when the warm bench falls below the configured minimum
+- [ ] E04-076 — Auto-order replacement domains when the bench runs low, behind an approval
+- [ ] E04-077 — Implement domain retirement scheduling based on service life and health trend
+- [ ] E04-078 — Implement the BURNED terminal state and block reuse forever
+- [ ] E04-079 — Export the full DNS record set for a domain for the customer's records
+- [ ] E04-080 — Support customer-owned sending domains with a DNS TXT ownership challenge
+- [ ] E04-081 — Never send from a customer domain before the ownership challenge passes
+- [ ] E04-082 — Give customer-owned domains the same aging and warmup gates as ours
+- [ ] E04-083 — Produce a copy-paste DNS instruction set for customer-managed zones
+- [ ] E04-084 — Verify customer-published records and show a precise diff on failure
+- [ ] E04-085 — Add a DNS health score per domain surfaced on the deliverability cockpit
+- [ ] E04-086 — Add MTA-STS policy publication as an option for customer domains
+- [ ] E04-087 — Add BIMI support gated on p=quarantine holding and a VMC being present
+- [ ] E04-088 — Write the runbook: SPF record broke and mail started failing
+- [ ] E04-089 — Write the runbook: DKIM key rotated and old signatures still in flight
+- [ ] E04-090 — Write the runbook: registrar API outage during a bulk purchase
+- [ ] E04-091 — Add a DNS change audit log with actor, before, after, and reason
+- [ ] E04-092 — Add a dry-run mode to every DNS write path
+- [ ] E04-093 — Add a DNS record simulator for tests so CI never touches a live zone
+- [ ] E04-094 — Test the full domain lifecycle end to end against the simulator
+- [ ] E04-095 — Test the DKIM rotation overlap window with a real sign-and-verify cycle
+- [ ] E04-096 — Measure and record time-to-DNS-ready for each new domain
+- [ ] E04-097 — Target under ten minutes from purchase to fully verified DNS
+- [ ] E04-098 — Add a cost-per-warm-domain metric to the business dashboard
+- [ ] E04-099 — Document the whole DNS automation in planning/specs/dns-automation/
+- [ ] E04-100 — Add a security review of the DNS token blast radius and least-privilege scoping
+
+---
+
+<!-- source: planning/backlog/05-domains-mailboxes.md · 0/90 -->
+# Epic 05 — Domain Fleet Lifecycle, Mailboxes & Personas
+
+- [ ] E05-001 — Build the FleetDomain registry CRUD in packages/fleet
+- [ ] E05-002 — Implement the FleetDomainStatus state machine with legal transitions only
+- [ ] E05-003 — Refuse REGISTERED → WARMING without spfOk, dkimOk, dmarcOk, mxOk, and siteLiveOk
+- [ ] E05-004 — Refuse WARMING → ACTIVE before the warmup plan completes
+- [ ] E05-005 — Implement domain PAUSED with a required reason and automatic router exclusion
+- [ ] E05-006 — Implement domain RETIRING: stop new enrolments, finish in-flight sequences
+- [ ] E05-007 — Implement domain BURNED as terminal with permanent reuse blocking
+- [ ] E05-008 — Compute domain daily cap as the sum of live mailbox caps times a safety factor
+- [ ] E05-009 — Never allow a domain cap to exceed the sum of its mailbox hard caps
+- [ ] E05-010 — Enforce a maximum of three mailboxes per domain by default, configurable per plan
+- [ ] E05-011 — Build the domain detail cockpit: auth status, warmup, caps, mailboxes, reputation, listings
+- [ ] E05-012 — Build the domain list view sortable by health, age, and capacity
+- [ ] E05-013 — Add a domain health timeline showing every status change with its cause
+- [ ] E05-014 — Add a domain comparison view for diagnosing divergent performance
+- [ ] E05-015 — Implement the Persona model CRUD with mandatory postal address
+- [ ] E05-016 — Refuse to create a persona without a postal address (CAN-SPAM element)
+- [ ] E05-017 — Validate the postal address format per country
+- [ ] E05-018 — Generate the plain-text signature block from the persona
+- [ ] E05-019 — Generate the HTML signature block with accessible contrast
+- [ ] E05-020 — Refuse a signature containing a tracking pixel when tracking is disabled
+- [ ] E05-021 — Warn when a persona name does not match its mailbox local part
+- [ ] E05-022 — Refuse role-style local parts (info, sales, noreply, admin) for campaign mailboxes
+- [ ] E05-023 — Build the FleetMailbox registry CRUD in packages/fleet
+- [ ] E05-024 — Implement the FleetMailboxStatus state machine with legal transitions only
+- [ ] E05-025 — Provision the system user and maildir on the node when a mailbox is created
+- [ ] E05-026 — Configure the alias and LMTP delivery for inbound to the mailbox
+- [ ] E05-027 — Verify inbound delivery with a loopback test before marking a mailbox CREATED
+- [ ] E05-028 — Verify outbound signing with a DKIM sign test before marking a mailbox WARMING
+- [ ] E05-029 — Implement mailbox PAUSED with automatic router exclusion
+- [ ] E05-030 — Implement mailbox DRAINING: stop new sends, allow replies, finish in-flight
+- [ ] E05-031 — Implement mailbox RETIRED with a maildir archive to R2 first
+- [ ] E05-032 — Implement mailbox BURNED as terminal
+- [ ] E05-033 — Never delete a maildir without archiving it; make this a hard guard
+- [ ] E05-034 — Compute mailbox health score from bounce, defer, complaint, and reply rates
+- [ ] E05-035 — Recompute rolling 7-day counters on a schedule, not on read
+- [ ] E05-036 — Auto-pause a mailbox whose bounce rate crosses the plan threshold
+- [ ] E05-037 — Auto-pause a mailbox on any complaint above the plan threshold
+- [ ] E05-038 — Auto-pause a mailbox on a spam-trap hit, with no self-serve resume
+- [ ] E05-039 — Require an operator action plus a reason to resume an auto-paused mailbox
+- [ ] E05-040 — Build the mailbox detail view: warmup curve, caps, health, recent sends, replies
+- [ ] E05-041 — Build the mailbox list view with warmup progress bars and headroom
+- [ ] E05-042 — Add a mailbox capacity summary: total daily headroom across the fleet right now
+- [ ] E05-043 — Alert when fleet headroom drops below the sum of active campaign daily caps
+- [ ] E05-044 — Add a bulk mailbox creation flow: pick a domain, pick personas, create N
+- [ ] E05-045 — Add a bulk mailbox pause and resume with a confirmation showing the impact
+- [ ] E05-046 — Add mailbox assignment to a workspace so tenants see only their own
+- [ ] E05-047 — Enforce workspace scoping on every mailbox query
+- [ ] E05-048 — Implement mailbox reassignment between workspaces with a drain first
+- [ ] E05-049 — Track mailbox age and surface it as a routing input
+- [ ] E05-050 — Track time since last send and prevent long-idle mailboxes from resuming at full cap
+- [ ] E05-051 — Implement the re-warm path for a mailbox idle longer than the configured window
+- [ ] E05-052 — Add a mailbox cost model line so cost per mailbox per month is known
+- [ ] E05-053 — Add a mailbox utilisation report: sent vs cap, per day, per mailbox
+- [ ] E05-054 — Alert on chronically underutilised mailboxes; idle capacity is wasted spend
+- [ ] E05-055 — Alert on chronically capped mailboxes; the fleet needs to grow
+- [ ] E05-056 — Add the fleet growth recommendation: domains and mailboxes needed for target volume
+- [ ] E05-057 — Wire the recommendation to the bulk purchase flow behind an approval
+- [ ] E05-058 — Implement the domain warm bench minimum per org and alert when breached
+- [ ] E05-059 — Implement automatic bench replenishment behind an approval and a spend cap
+- [ ] E05-060 — Add the domain and mailbox inventory export for audit
+- [ ] E05-061 — Add an inventory reconciliation job comparing the registry against live node state
+- [ ] E05-062 — Alert on any drift between the registry and the node
+- [ ] E05-063 — Implement registry-wins reconciliation with an operator confirmation for deletions
+- [ ] E05-064 — Write the runbook: mailbox suddenly bouncing everything
+- [ ] E05-065 — Write the runbook: domain reputation collapsed overnight
+- [ ] E05-066 — Write the runbook: emergency full-fleet pause and resume
+- [ ] E05-067 — Test domain lifecycle end to end against the DNS simulator and a staging node
+- [ ] E05-068 — Test mailbox lifecycle end to end including maildir archive and restore
+- [ ] E05-069 — Load-test mailbox selection with a fleet of 500 simulated mailboxes
+- [ ] E05-070 — Measure and record time from domain purchase to first safe send; target 14 days
+- [ ] E05-071 — Measure and record operator minutes per mailbox per month; target under two
+- [ ] E05-072 — Add a fleet overview panel: nodes, IPs, domains, mailboxes, headroom, health, in one screen
+- [ ] E05-073 — Make the fleet overview the default landing page for an operator role
+- [ ] E05-074 — Add a fleet event feed showing every state change across the fleet in real time
+- [ ] E05-075 — Add filtering and search across the whole fleet by any identifier
+- [ ] E05-076 — Add keyboard navigation across the fleet views per app-feel standards
+- [ ] E05-077 — Ensure every fleet mutation is optimistic with a rollback on failure
+- [ ] E05-078 — Ensure every fleet list is cached and deduped, never fetch-on-mount per row
+- [ ] E05-079 — Add an empty state for each fleet view that explains the next action
+- [ ] E05-080 — Add a fleet onboarding checklist for a brand-new org
+- [ ] E05-081 — Gate campaign creation on the org having at least one ACTIVE mailbox
+- [ ] E05-082 — Explain precisely what is missing when the gate blocks, with a link to fix it
+- [ ] E05-083 — Add per-domain and per-mailbox notes for operator context
+- [ ] E05-084 — Add tagging across fleet resources for grouping and reporting
+- [ ] E05-085 — Add saved views across the fleet cockpit
+- [ ] E05-086 — Add a fleet API so an agency can script its own provisioning
+- [ ] E05-087 — Add MCP tools for fleet inspection so an agent can answer fleet questions
+- [ ] E05-088 — Document the whole fleet lifecycle in planning/specs/fleet-lifecycle/
+- [ ] E05-089 — Add a fleet section to the public docs explaining what we own and why it matters
+- [ ] E05-090 — Add an honesty check: no fleet number is displayed that we cannot source
+
+---
+
+<!-- source: planning/backlog/06-warmup.md · 0/80 -->
+# Epic 06 — Warmup Engine
+
+Two mechanisms, both required: ramp scheduling and our own peer network.
+No cross-customer warmup pool, ever (ADR-0003).
+
+- [ ] E06-001 — Create packages/warmup with the WarmupPlan evaluator
+- [ ] E06-002 — Implement the daily-cap curve: startPerDay, incrementWeek, plateau
+- [ ] E06-003 — Support a per-plan and per-domain-age override of the curve
+- [ ] E06-004 — Implement weekday-only ramping when the plan requires it
+- [ ] E06-005 — Implement jittered hourly distribution so sends do not burst on the hour
+- [ ] E06-006 — Never allow two mailboxes on one domain to fire in the same second
+- [ ] E06-007 — Implement the warmup day counter advancing only on days with actual sends
+- [ ] E06-008 — Implement the hold condition: pause the ramp when bounce rate exceeds the plan max
+- [ ] E06-009 — Implement the hold condition on defer rate
+- [ ] E06-010 — Implement the hold condition on complaint rate
+- [ ] E06-011 — Implement rollback: reduce the cap to the last healthy level rather than only holding
+- [ ] E06-012 — Record every hold and rollback with the metric that triggered it
+- [ ] E06-013 — Surface the hold reason on the mailbox detail view in plain language
+- [ ] E06-014 — Implement automatic resume once the metric recovers for a configured window
+- [ ] E06-015 — Require an operator action to resume after a second consecutive hold
+- [ ] E06-016 — Enforce minDomainAgeDays before any warmup send
+- [ ] E06-017 — Build the warmup schedule preview: what this mailbox will send for the next 30 days
+- [ ] E06-018 — Build the fleet warmup calendar: aggregate ramp across all mailboxes
+- [ ] E06-019 — Project future fleet capacity from the warmup calendar
+- [ ] E06-020 — Alert when projected capacity will not meet committed campaign volume
+- [ ] E06-021 — Design the peer warmup network: our mailboxes exchanging real mail with each other
+- [ ] E06-022 — Make peer warmup participation per-mailbox opt-in and default on
+- [ ] E06-023 — Disclose peer warmup in the product UI and in the public docs
+- [ ] E06-024 — Generate realistic peer warmup bodies from a curated corpus, not lorem ipsum
+- [ ] E06-025 — Vary peer warmup subject, length, and structure so messages are not fingerprintable
+- [ ] E06-026 — Never include a tracking pixel or a link in a peer warmup message
+- [ ] E06-027 — Implement the receiving side: open, mark-not-spam, star, and move to inbox
+- [ ] E06-028 — Implement the receiving side reply with a realistic delay distribution
+- [ ] E06-029 — Cap peer warmup reply depth so threads look human, not mechanical
+- [ ] E06-030 — Schedule peer warmup during business hours in the persona's timezone
+- [ ] E06-031 — Ramp peer warmup volume on the same curve as campaign volume
+- [ ] E06-032 — Ensure peer warmup traffic never counts toward a customer's billable sends
+- [ ] E06-033 — Ensure peer warmup traffic is excluded from campaign analytics
+- [ ] E06-034 — Include peer warmup traffic in mailbox reputation, since receivers see it
+- [ ] E06-035 — Tag peer warmup messages with a private header so we can always identify them
+- [ ] E06-036 — Ensure the private header is not a filter-evasion signal and document why
+- [ ] E06-037 — Route peer warmup across different node and IP pairs to exercise the whole fleet
+- [ ] E06-038 — Alert if peer warmup mail ever lands in spam on our own infrastructure
+- [ ] E06-039 — Treat a peer warmup spam landing as a Sev-2; it means our own filter dislikes us
+- [ ] E06-040 — Build the peer warmup dashboard: pairs, volume, placement, reply rate
+- [ ] E06-041 — Implement external seed warmup: send to our own seed accounts on Gmail and Outlook
+- [ ] E06-042 — Use seed placement during warmup as the go/no-go for advancing the ramp
+- [ ] E06-043 — Hold the ramp when Gmail seed placement drops below the configured floor
+- [ ] E06-044 — Build the warmup-to-production handoff: what has to be true before real traffic
+- [ ] E06-045 — Make the handoff a hard gate, not a recommendation
+- [ ] E06-046 — Implement gradual production blending: warmup volume decays as campaign volume rises
+- [ ] E06-047 — Never take a mailbox from zero campaign traffic to full cap in one step
+- [ ] E06-048 — Implement the re-warm path for a mailbox returning from a pause
+- [ ] E06-049 — Implement the re-warm path for a mailbox returning from a long idle
+- [ ] E06-050 — Implement IP warmup separately from mailbox warmup with its own curve
+- [ ] E06-051 — Coordinate IP and mailbox warmup so a new mailbox on a new IP ramps at the slower rate
+- [ ] E06-052 — Implement domain warmup as the aggregate of its mailboxes plus an independent ceiling
+- [ ] E06-053 — Build the warmup simulator: given a plan, project 90 days of capacity and risk
+- [ ] E06-054 — Validate the simulator against real observed ramps and correct the model
+- [ ] E06-055 — Publish the default curve and its rationale in the docs
+- [ ] E06-056 — Allow an operator to author a custom curve with guardrails on the maximum slope
+- [ ] E06-057 — Refuse a curve that exceeds the platform-wide safety ceiling
+- [ ] E06-058 — Log every curve change with actor and reason
+- [ ] E06-059 — A/B the conservative and standard curves across matched mailbox cohorts
+- [ ] E06-060 — Measure time-to-plateau and placement-at-plateau per curve and pick the winner on data
+- [ ] E06-061 — Feed the winning curve back as the new default with a documented decision
+- [ ] E06-062 — Build a warmup health score distinct from the general mailbox health score
+- [ ] E06-063 — Surface warmup progress as a first-class element of the fleet overview
+- [ ] E06-064 — Show the operator exactly when each mailbox becomes production-ready
+- [ ] E06-065 — Alert when a mailbox has been warming longer than the expected duration
+- [ ] E06-066 — Diagnose a stuck warmup automatically and propose the cause
+- [ ] E06-067 — Test the hold condition by injecting synthetic bounces
+- [ ] E06-068 — Test the rollback condition by injecting a complaint
+- [ ] E06-069 — Test the age gate by attempting to warm a domain registered yesterday
+- [ ] E06-070 — Test peer warmup end to end on a staging node with two real mailboxes
+- [ ] E06-071 — Test that peer warmup volume is excluded from billing
+- [ ] E06-072 — Test that peer warmup volume is included in reputation
+- [ ] E06-073 — Load-test warmup scheduling across 500 mailboxes for one simulated day
+- [ ] E06-074 — Verify the scheduler produces no thundering herd at any hour boundary
+- [ ] E06-075 — Document the warmup engine in planning/specs/warmup/
+- [ ] E06-076 — Write the public doc explaining our warmup approach and why we refuse pools
+- [ ] E06-077 — Add warmup state to the fleet API and MCP tools
+- [ ] E06-078 — Add a warmup section to the customer onboarding so expectations are set on day one
+- [ ] E06-079 — Show the customer a countdown to first safe send, with the reason for the wait
+- [ ] E06-080 — Never let a customer override the age gate or the safety ceiling, on any plan
+
+---
+
+<!-- source: planning/backlog/07-router.md · 0/105 -->
+# Epic 07 — Router, Pacing & the Send Path
+
+The router is the only package permitted to make a final send decision.
+Deferral is a first-class success (ARCHITECTURE §3.2).
+
+- [ ] E07-001 — Create packages/router with the SendPlan and Deferral types
+- [ ] E07-002 — Define the SendIntent → SendPlan contract and freeze it
+- [ ] E07-003 — Implement the hard candidate filter: domain verified and past ageReadyAt
+- [ ] E07-004 — Implement the hard candidate filter: mailbox ACTIVE and not held
+- [ ] E07-005 — Implement the hard candidate filter: IP not quarantined or throttled
+- [ ] E07-006 — Implement the hard candidate filter: node ACTIVE with all verify flags true
+- [ ] E07-007 — Implement the hard candidate filter: node role is CAMPAIGN, never VERIFY
+- [ ] E07-008 — Implement the hard candidate filter: cap headroom greater than zero on all four buckets
+- [ ] E07-009 — Implement the hard candidate filter: pool matches the campaign's domain pool
+- [ ] E07-010 — Implement the hard candidate filter: policy allows this domain for this jurisdiction
+- [ ] E07-011 — Implement the per-recipient-domain cooldown so one company is not hit from one mailbox repeatedly
+- [ ] E07-012 — Implement the per-recipient-domain fan-out cap across the whole fleet
+- [ ] E07-013 — Implement reputationScore as a router input from packages/reputation
+- [ ] E07-014 — Implement headroom normalisation across mailboxes with different caps
+- [ ] E07-015 — Implement espAffinity from measured placement per (domain, recipient ESP)
+- [ ] E07-016 — Implement warmupFit so a warming mailbox is not chosen for a large burst
+- [ ] E07-017 — Implement recencyPenalty on the recipient domain
+- [ ] E07-018 — Implement riskPenalty from listings, complaint trend, and bounce trend
+- [ ] E07-019 — Make every weight configurable and versioned, never a magic number in code
+- [ ] E07-020 — Record the full route trace on every decision into SendIntent.routeTrace
+- [ ] E07-021 — Make the route trace human-readable in the UI: why this mailbox, why not the others
+- [ ] E07-022 — Implement deterministic tie-breaking so identical inputs produce identical plans
+- [ ] E07-023 — Implement the deferral path with a reason enum and a next-attempt time
+- [ ] E07-024 — Implement exponential backoff on repeated deferrals with a jittered ceiling
+- [ ] E07-025 — Cap the deferral count and fail the intent with a clear reason at the limit
+- [ ] E07-026 — Never silently drop an intent; every terminal state has a recorded reason
+- [ ] E07-027 — Implement the recipient ESP classifier from the MX record
+- [ ] E07-028 — Maintain the MX-to-ESP-family map as data, refreshable without a deploy
+- [ ] E07-029 — Cache the ESP classification per recipient domain with a TTL
+- [ ] E07-030 — Implement the mailbox daily token bucket as an atomic Lua script
+- [ ] E07-031 — Implement the mailbox hourly token bucket with jitter
+- [ ] E07-032 — Implement the domain daily token bucket
+- [ ] E07-033 — Implement the IP hourly token bucket
+- [ ] E07-034 — Implement the adaptive per-recipient-ESP bucket in 15-minute windows
+- [ ] E07-035 — Auto-tune the ESP bucket from the observed 4xx rate for that IP and ESP
+- [ ] E07-036 — Reduce the ESP rate immediately on a sustained deferral signal
+- [ ] E07-037 — Recover the ESP rate slowly, never in one step
+- [ ] E07-038 — Reconcile every bucket against Postgres counters nightly
+- [ ] E07-039 — Make bucket decrement and intent state transition atomic; no double-spend
+- [ ] E07-040 — Test the four-bucket decrement under concurrency with a race harness
+- [ ] E07-041 — Implement the scheduler: claim-with-lock over SendIntent where dueAt has passed
+- [ ] E07-042 — Never scan the whole table; use the covering index and a bounded batch
+- [ ] E07-043 — Implement a fencing token so a stalled worker cannot resurrect and double-send
+- [ ] E07-044 — Implement graceful shutdown that releases claims rather than orphaning them
+- [ ] E07-045 — Implement claim expiry so a crashed worker's intents return to the pool
+- [ ] E07-046 — Measure and record scheduler claim latency; target p95 under 50ms
+- [ ] E07-047 — Load-test the scheduler at one million pending intents
+- [ ] E07-048 — Implement the send-window evaluator using the lead's resolved timezone
+- [ ] E07-049 — Implement the business-day evaluator using the campaign's sendDays
+- [ ] E07-050 — Implement the holiday calendar per country and honour it when configured
+- [ ] E07-051 — Defer rather than send outside the window; never clamp into the boundary minute
+- [ ] E07-052 — Spread sends across the window rather than firing at the opening minute
+- [ ] E07-053 — Implement send-time optimisation from historical reply-time data, behind a flag
+- [ ] E07-054 — Never let send-time optimisation override the compliance or pacing gates
+- [ ] E07-055 — Implement the composition stage: variable interpolation with a strict unknown-token policy
+- [ ] E07-056 — Fail the send when a required personalisation token cannot be resolved
+- [ ] E07-057 — Implement spintax with deterministic selection from the intent id
+- [ ] E07-058 — Implement the footer builder: identity, postal address, unsubscribe, ad disclosure
+- [ ] E07-059 — Refuse to compose a message missing any CAN-SPAM mandatory element
+- [ ] E07-060 — Implement List-Unsubscribe and List-Unsubscribe-Post headers on every message
+- [ ] E07-061 — Implement the RFC-compliant Message-ID generator using our own domain
+- [ ] E07-062 — Implement threading headers for follow-up steps in the same conversation
+- [ ] E07-063 — Refuse RE: or FW: on a step marked isFirstTouch
+- [ ] E07-064 — Implement the plain-text-first composer with an HTML alternative when supplied
+- [ ] E07-065 — Warn and score down heavy HTML, many links, and image-only bodies
+- [ ] E07-066 — Implement the pre-send rspamd score call against the node's local scorer
+- [ ] E07-067 — Block the send above the configured rspamd threshold with the specific symbols listed
+- [ ] E07-068 — Implement link-domain reputation checks against SURBL and our own history
+- [ ] E07-069 — Block a message containing a link on a listed domain
+- [ ] E07-070 — Implement the AI content risk advisory as a priority input, never a gate
+- [ ] E07-071 — Implement the emit stage: SMTP submit to the chosen node bound to the chosen IP
+- [ ] E07-072 — Set the VERP return-path so bounce attribution is exact
+- [ ] E07-073 — Record the SMTP response verbatim on the intent
+- [ ] E07-074 — Handle a submission-time 4xx as a defer, not a failure
+- [ ] E07-075 — Handle a submission-time 5xx by classifying it immediately through the taxonomy
+- [ ] E07-076 — Re-check suppression in Valkey immediately before emit, with a Postgres fallback on miss
+- [ ] E07-077 — Fail closed on a suppression-check error; never assume allowed
+- [ ] E07-078 — Write the send-path integration test covering all ten stages
+- [ ] E07-079 — Write a test asserting there is no code path to the MTA that skips the policy stage
+- [ ] E07-080 — Add a static analysis rule that fails CI if the SMTP client is imported outside the sender
+- [ ] E07-081 — Implement idempotency: an intent can be processed twice without sending twice
+- [ ] E07-082 — Key idempotency on the intent id and enforce it at the database level
+- [ ] E07-083 — Implement the cancel path: an intent can be cancelled up to the emit moment
+- [ ] E07-084 — Implement campaign pause propagating to every pending intent immediately
+- [ ] E07-085 — Implement the global kill switch short-circuiting the router before any candidate work
+- [ ] E07-086 — Add router decision metrics: allowed, deferred, blocked, by reason, per minute
+- [ ] E07-087 — Build the router observability view: live decision stream with traces
+- [ ] E07-088 — Add a router simulation mode: given a campaign, show the plan without sending
+- [ ] E07-089 — Use simulation mode to answer "when will this campaign finish"
+- [ ] E07-090 — Surface the projected completion date on the campaign view
+- [ ] E07-091 — Explain a slow campaign in terms of the binding constraint, not a generic message
+- [ ] E07-092 — Add a what-if tool: how much faster with N more mailboxes
+- [ ] E07-093 — Benchmark the router decision at 10,000 candidates; target p95 under 50ms
+- [ ] E07-094 — Cache the candidate set per pool with invalidation on any fleet state change
+- [ ] E07-095 — Test router behaviour when every candidate is exhausted
+- [ ] E07-096 — Test router behaviour when the fleet is empty
+- [ ] E07-097 — Test router behaviour when policy blocks every domain for a jurisdiction
+- [ ] E07-098 — Fuzz the router with randomised fleet states and assert no invariant breaks
+- [ ] E07-099 — Document the router scoring function and weights in planning/specs/router/
+- [ ] E07-100 — Publish a plain-language explanation of routing in the customer docs
+- [ ] E07-101 — Add MCP tools so an agent can ask why a specific message was routed as it was
+- [ ] E07-102 — Add a per-org routing report: which mailboxes carried which share of volume
+- [ ] E07-103 — Detect and alert on routing concentration; one mailbox carrying too much is a risk
+- [ ] E07-104 — Add an explicit even-distribution mode for operators who want it
+- [ ] E07-105 — Verify invariant I3 with a test that attempts a cap overflow under load
+
+---
+
+<!-- source: planning/backlog/08-mta-maillog.md · 0/90 -->
+# Epic 08 — MTA Integration, Maillog Truth & Event Pipeline
+
+Our `delivered` comes from the receiving MX's 250, read out of the mail log.
+No number on a dashboard originates from an optimistic counter.
+
+- [ ] E08-001 — Extend apps/maillog-bridge to accept batches from multiple nodes
+- [ ] E08-002 — Authenticate every batch with a per-node signature and reject anything unsigned
+- [ ] E08-003 — Add replay protection with a nonce and a timestamp window
+- [ ] E08-004 — Parse the Postfix qmgr line into a queue-id to Message-ID mapping
+- [ ] E08-005 — Parse the Postfix smtp line into (queue-id, to, relay, delay, dsn, status, response)
+- [ ] E08-006 — Preserve the receiving MX response string verbatim; never summarise it at parse time
+- [ ] E08-007 — Parse the Postfix cleanup line to capture our Message-ID
+- [ ] E08-008 — Parse the bounce and error lines for locally generated failures
+- [ ] E08-009 — Handle multi-recipient messages producing several smtp lines per queue id
+- [ ] E08-010 — Handle log rotation and truncation without losing or duplicating lines
+- [ ] E08-011 — Handle out-of-order line arrival across batches
+- [ ] E08-012 — Build the correlation store mapping queue-id to intent via Message-ID
+- [ ] E08-013 — Expire the correlation store on the same horizon as the Postfix queue lifetime
+- [ ] E08-014 — Alert on correlation misses; an uncorrelated delivery means we lost the join key
+- [ ] E08-015 — Write every parsed line to ClickHouse smtp_transactions
+- [ ] E08-016 — Write the raw line to R2 daily archives before parsing
+- [ ] E08-017 — Make the parser table-driven so a new Postfix version is a data change
+- [ ] E08-018 — Add a parser fixture suite from real captured log lines across all ESPs
+- [ ] E08-019 — Fail CI on any parser regression against the fixture suite
+- [ ] E08-020 — Add an unparsed-line queue and alert when it grows
+- [ ] E08-021 — Never discard an unparsed line; it is evidence
+- [ ] E08-022 — Emit the delivered event only from a status=sent line with a 2xx response
+- [ ] E08-023 — Emit the deferred event from a status=deferred line with the 4xx captured
+- [ ] E08-024 — Emit the bounced event from a status=bounced line with the 5xx captured
+- [ ] E08-025 — Update the SendIntent state from the correlated log event, not from the submit call
+- [ ] E08-026 — Record the delivery latency from submit to the receiving MX 250
+- [ ] E08-027 — Record the number of delivery attempts per message
+- [ ] E08-028 — Record the receiving relay hostname per message for per-MX analysis
+- [ ] E08-029 — Build the per-ESP delivery latency distribution
+- [ ] E08-030 — Alert on a latency regression to any major ESP; it precedes a block
+- [ ] E08-031 — Build the live transaction stream view for an operator
+- [ ] E08-032 — Add filtering by node, IP, domain, mailbox, ESP, and status
+- [ ] E08-033 — Add full-text search across response strings
+- [ ] E08-034 — Make one message's full journey viewable: intent, route, submit, log lines, events
+- [ ] E08-035 — Make that journey view linkable and permanent for support conversations
+- [ ] E08-036 — Extend the MailProvider seam for the EMS node transport
+- [ ] E08-037 — Implement node-aware SMTP submission with connection pooling per node
+- [ ] E08-038 — Implement per-IP source binding on submission
+- [ ] E08-039 — Handle SMTP connection failures as deferrals with node health signalling
+- [ ] E08-040 — Circuit-break a node after consecutive submission failures
+- [ ] E08-041 — Never route to a circuit-broken node until its self-test passes
+- [ ] E08-042 — Implement submission timeouts with a bounded retry
+- [ ] E08-043 — Keep the Google and Microsoft provider adapters for migration compatibility only
+- [ ] E08-044 — Assert in code that the OAuth providers cannot be used for cold campaign sends
+- [ ] E08-045 — Document why connected-mailbox sending is not the EMS architecture
+- [ ] E08-046 — Extend apps/feedback-ingest for ARF and FBL formats from Yahoo, Microsoft, and Comcast
+- [ ] E08-047 — Parse the ARF report to recover the original Message-ID
+- [ ] E08-048 — Suppress the complained address immediately and globally on any FBL report
+- [ ] E08-049 — Attribute the complaint to the org, campaign, mailbox, domain, and IP
+- [ ] E08-050 — Alert the operator on any complaint; the volume is low enough to read every one
+- [ ] E08-051 — Auto-pause a campaign when its complaint rate crosses the threshold
+- [ ] E08-052 — Register for every available FBL programme and track enrolment status per IP
+- [ ] E08-053 — Alert when an FBL enrolment lapses
+- [ ] E08-054 — Implement the VERP bounce receiver decoding the original recipient from the return path
+- [ ] E08-055 — Parse the bounce DSN for the original Message-ID and the diagnostic code
+- [ ] E08-056 — Prefer the DSN diagnostic over our log line when they disagree, and record the disagreement
+- [ ] E08-057 — Build the inbound path: LMTP to maildir to the ingest worker
+- [ ] E08-058 — Watch the maildir with inotify rather than polling
+- [ ] E08-059 — Ship the full MIME to R2 and the parsed envelope to the API
+- [ ] E08-060 — Never lose an inbound message; acknowledge only after durable storage
+- [ ] E08-061 — Handle very large attachments with a size cap and a truncation record
+- [ ] E08-062 — Handle malformed MIME without crashing the ingest worker
+- [ ] E08-063 — Strip and quarantine dangerous attachments before showing them in the UI
+- [ ] E08-064 — Run inbound mail through rspamd and record the score
+- [ ] E08-065 — Record inbound Authentication-Results verbatim
+- [ ] E08-066 — Build the event pipeline writing to ClickHouse email_events with batching
+- [ ] E08-067 — Make the event writer fail-soft with local buffering
+- [ ] E08-068 — Add the replay tool for buffered events after a store outage
+- [ ] E08-069 — Deduplicate events on (messageId, type, at) so replay is safe
+- [ ] E08-070 — Build the hourly rollup materialised views
+- [ ] E08-071 — Verify rollup totals against raw counts nightly and alert on drift
+- [ ] E08-072 — Build the webhook dispatcher for EMS events, reusing the inherited signing
+- [ ] E08-073 — Define the EMS event catalogue and version it
+- [ ] E08-074 — Never emit an event we cannot source from a measurement
+- [ ] E08-075 — Add the open-tracking pixel implementation, disabled by default
+- [ ] E08-076 — Warn in the UI that open rates are unreliable under Apple Mail Privacy Protection
+- [ ] E08-077 — Detect and discard prefetch-style opens where possible
+- [ ] E08-078 — Add click tracking with a per-org tracking domain, disabled by default
+- [ ] E08-079 — Warn that a tracking domain shares the reputation of the links it wraps
+- [ ] E08-080 — Never wrap the unsubscribe link in a tracking redirect
+- [ ] E08-081 — Implement reply detection from inbound correlation on In-Reply-To and References
+- [ ] E08-082 — Implement reply detection fallback on subject and address matching
+- [ ] E08-083 — Emit the replied event and stop the sequence in the same transaction
+- [ ] E08-084 — Test the whole pipeline with a synthetic node emitting recorded log lines
+- [ ] E08-085 — Load-test the maillog ingest at 100,000 lines per minute
+- [ ] E08-086 — Measure end-to-end lag from log line to dashboard; target under 30 seconds
+- [ ] E08-087 — Alert when ingest lag exceeds the target
+- [ ] E08-088 — Document the whole pipeline in planning/specs/maillog-pipeline/
+- [ ] E08-089 — Publish the honesty statement in the docs: what delivered means and where it comes from
+- [ ] E08-090 — Add a comparison page showing why a vendor sent count differs from a real delivered count
+
+---
+
+<!-- source: planning/backlog/09-deliverability.md · 0/95 -->
+# Epic 09 — Deliverability: Bounce Taxonomy, DNSBL, DMARC, TLS-RPT
+
+- [ ] E09-001 — Create packages/deliverability with the BounceClass resolver
+- [ ] E09-002 — Implement rule matching on (espFamily, smtpCode, enhancedCode, substring) with priority
+- [ ] E09-003 — Return UNKNOWN rather than guessing when no rule matches
+- [ ] E09-004 — Queue every UNKNOWN response for classification review
+- [ ] E09-005 — Run the AI classifier only on UNKNOWN responses
+- [ ] E09-006 — Turn AI classifications into proposed BounceRule rows requiring operator approval
+- [ ] E09-007 — Track the UNKNOWN rate as a health metric; it should trend to zero
+- [ ] E09-008 — Seed and test the Google dialect: 550 5.7.1, 421 4.7.0, 452 4.2.2, 550 5.2.1
+- [ ] E09-009 — Seed and test the Microsoft dialect including S3150, S3140, and the 5.7.1 variants
+- [ ] E09-010 — Seed and test the Yahoo dialect including TSS and deferral codes
+- [ ] E09-011 — Seed and test Proofpoint, Mimecast, Barracuda, and Cisco ESA dialects
+- [ ] E09-012 — Seed the generic RFC 3463 enhanced status code fallback layer
+- [ ] E09-013 — Map each class to an action: suppress, retry with backoff, throttle, pause, or escalate
+- [ ] E09-014 — Suppress immediately on HARD without exception
+- [ ] E09-015 — Never suppress on SOFT; retry with the rule's backoff
+- [ ] E09-016 — Throttle the IP for the ESP on BLOCK_RATE rather than suppressing the recipient
+- [ ] E09-017 — Escalate BLOCK_REPUTATION to an incident, not to a retry
+- [ ] E09-018 — Escalate AUTH failures immediately; they mean our DKIM or SPF broke
+- [ ] E09-019 — Pause the campaign on a BLOCK_CONTENT cluster and surface the offending content
+- [ ] E09-020 — Build the bounce explorer: group by class, ESP, domain, mailbox, and campaign
+- [ ] E09-021 — Show the verbatim response alongside every classification
+- [ ] E09-022 — Let an operator reclassify a bounce and have it become a rule proposal
+- [ ] E09-023 — Track hard bounce rate per campaign, mailbox, domain, and IP
+- [ ] E09-024 — Auto-pause a campaign above the hard bounce threshold
+- [ ] E09-025 — Auto-quarantine a list above the hard bounce threshold and require re-verification
+- [ ] E09-026 — Build the DNSBL poller in packages/deliverability
+- [ ] E09-027 — Implement the Spamhaus zen, sbl, css, xbl, pbl, and dbl checks
+- [ ] E09-028 — Implement SpamCop, Barracuda, SORBS, UCEPROTECT, Invaluement, and Backscatterer
+- [ ] E09-029 — Decode the 127.0.0.x response to the specific list and reason
+- [ ] E09-030 — Respect free-tier query limits with scheduling and jitter
+- [ ] E09-031 — Use a dedicated resolver so query volume does not poison a shared resolver's quota
+- [ ] E09-032 — Poll IP listings every 15 minutes and domain listings hourly
+- [ ] E09-033 — Record every check, listed or not, so the time series is continuous
+- [ ] E09-034 — Alert within the mean-time-to-detect target on any new listing
+- [ ] E09-035 — Auto-quarantine an IP on an SBL or CSS listing
+- [ ] E09-036 — Auto-pause a domain on a DBL listing
+- [ ] E09-037 — Store the delisting URL and surface it in the alert
+- [ ] E09-038 — Track time-to-delist per provider and record it in the runbook
+- [ ] E09-039 — Never auto-request delisting; a human confirms the cause is fixed first
+- [ ] E09-040 — Build the listing history view per IP and per domain
+- [ ] E09-041 — Correlate listings with the traffic that preceded them
+- [ ] E09-042 — Build apps/dmarc-ingest to receive aggregate reports by mail
+- [ ] E09-043 — Handle gzip, zip, and plain XML attachments
+- [ ] E09-044 — Store the original attachment to R2 before parsing, always
+- [ ] E09-045 — Parse the RUA XML into per-source-IP rows with disposition, SPF, and DKIM results
+- [ ] E09-046 — Deduplicate on (orgName, reportId) so redelivery is safe
+- [ ] E09-047 — Write parsed rows to ClickHouse dmarc_rows
+- [ ] E09-048 — Compute the alignment rate per domain per day
+- [ ] E09-049 — Detect third-party sources sending as our domain and alert on spoofing
+- [ ] E09-050 — Gate the p=none to p=quarantine promotion on the alignment rate
+- [ ] E09-051 — Gate the p=quarantine to p=reject promotion on 14 days of full alignment
+- [ ] E09-052 — Build the DMARC view: sources, alignment, disposition, trend, per domain
+- [ ] E09-053 — Explain a DMARC failure in plain language with the specific record to fix
+- [ ] E09-054 — Handle forwarding-induced SPF failures without falsely alarming
+- [ ] E09-055 — Parse TLS-RPT JSON reports in the same ingest app
+- [ ] E09-056 — Surface TLS negotiation failures per receiving MX
+- [ ] E09-057 — Alert on a TLS failure spike; it silently kills delivery to strict receivers
+- [ ] E09-058 — Build the deliverability cockpit information architecture
+- [ ] E09-059 — Lead the cockpit with placement, not with opens
+- [ ] E09-060 — Show delivered, deferred, and bounced with their sources labelled
+- [ ] E09-061 — Show the per-ESP breakdown as the primary decomposition
+- [ ] E09-062 — Show the reputation series for IP, domain, and mailbox side by side
+- [ ] E09-063 — Show current listings prominently and unmissably
+- [ ] E09-064 — Show DMARC alignment and TLS health as first-class tiles
+- [ ] E09-065 — Show the last seed placement result with its timestamp and sample size
+- [ ] E09-066 — Never show a metric without its window, its sample size, and its source
+- [ ] E09-067 — Add a confidence indicator when a metric rests on a small sample
+- [ ] E09-068 — Build the alerting policy: what pages, what emails, what only logs
+- [ ] E09-069 — Route deliverability alerts to the operator on call
+- [ ] E09-070 — Notify the affected customer when their campaign is auto-paused, with the reason
+- [ ] E09-071 — Never notify a customer of an infrastructure issue in terms they cannot act on
+- [ ] E09-072 — Build auto-remediation: pause, throttle, drain, rotate, with a recorded decision
+- [ ] E09-073 — Require operator confirmation for any remediation that burns a resource
+- [ ] E09-074 — Log every remediation with its trigger, action, and outcome
+- [ ] E09-075 — Build the remediation history view so patterns become visible
+- [ ] E09-076 — Add the Google Postmaster Tools ingest as an optional enricher
+- [ ] E09-077 — Add the Microsoft SNDS ingest as an optional enricher
+- [ ] E09-078 — Ensure both are strictly optional and never gate a send
+- [ ] E09-079 — Label enriched metrics distinctly from measured ones in the UI
+- [ ] E09-080 — Write the runbook: Spamhaus SBL listing on a sending IP
+- [ ] E09-081 — Write the runbook: Google bulk-sender deferrals began
+- [ ] E09-082 — Write the runbook: Microsoft S3150 block
+- [ ] E09-083 — Write the runbook: DMARC alignment dropped after a DNS change
+- [ ] E09-084 — Write the runbook: complaint spike on one campaign
+- [ ] E09-085 — Write the runbook: a customer list turned out to be purchased
+- [ ] E09-086 — Test the DNSBL poller against a known-listed test address
+- [ ] E09-087 — Test DMARC ingest against real captured reports from three receivers
+- [ ] E09-088 — Test the bounce taxonomy against a corpus of real responses
+- [ ] E09-089 — Measure classification coverage; target above 98% non-UNKNOWN
+- [ ] E09-090 — Document the whole deliverability subsystem in planning/specs/deliverability/
+- [ ] E09-091 — Publish the customer-facing deliverability guide
+- [ ] E09-092 — Add MCP tools so an agent can answer deliverability questions from real data
+- [ ] E09-093 — Add a weekly deliverability digest email per org, generated from measurements
+- [ ] E09-094 — Include the specific recommended actions in the digest, ranked
+- [ ] E09-095 — Never include a recommendation the customer cannot act on themselves
+
+---
+
+<!-- source: planning/backlog/10-placement.md · 0/85 -->
+# Epic 10 — Seed Accounts & Inbox Placement Testing
+
+The only true measure of placement. Everything else is a proxy.
+
+- [ ] E10-001 — Scaffold apps/seedbox as an isolated probe agent
+- [ ] E10-002 — Create the SeedAccount registry with encrypted credentials
+- [ ] E10-003 — Store seed credentials so only the seedbox process can decrypt them
+- [ ] E10-004 — Create Gmail seed accounts across several account ages and activity profiles
+- [ ] E10-005 — Create Outlook and Hotmail seed accounts
+- [ ] E10-006 — Create Yahoo and AOL seed accounts
+- [ ] E10-007 — Create Zoho, Proton, GMX, and iCloud seed accounts
+- [ ] E10-008 — Create a corporate-style seed behind a Proofpoint or Mimecast-like filter
+- [ ] E10-009 — Document how each seed was created and keep the accounts genuinely usable
+- [ ] E10-010 — Implement IMAP reading for every provider that offers it
+- [ ] E10-011 — Implement the Gmail category detection: Primary, Promotions, Social, Updates
+- [ ] E10-012 — Implement spam-folder detection for every provider
+- [ ] E10-013 — Implement missing detection when a message never arrives within the window
+- [ ] E10-014 — Capture the full received headers for every probe result
+- [ ] E10-015 — Capture Authentication-Results and any provider spam headers verbatim
+- [ ] E10-016 — Capture the X-Spam score where the receiver exposes one
+- [ ] E10-017 — Record delivery latency to each seed
+- [ ] E10-018 — Never let a seed account interact with the message beyond reading it
+- [ ] E10-019 — Do not mark seed messages as read in a way that pollutes engagement signals
+- [ ] E10-020 — Implement the PlacementTest orchestrator: pick seeds, send, wait, collect
+- [ ] E10-021 — Send the actual campaign content, not a synthetic proxy
+- [ ] E10-022 — Route the probe through the same router path the campaign will use
+- [ ] E10-023 — Exclude probe sends from customer billing
+- [ ] E10-024 — Include probe sends in mailbox reputation, because receivers see them
+- [ ] E10-025 — Implement a configurable collection window with a default of 15 minutes
+- [ ] E10-026 — Mark unreturned probes MISSING rather than assuming delivery
+- [ ] E10-027 — Aggregate results into placement rate per folder per provider
+- [ ] E10-028 — Compute an inbox rate that excludes Promotions, and show both numbers
+- [ ] E10-029 — Never present a Promotions landing as an inbox landing
+- [ ] E10-030 — Schedule a recurring placement test per active domain
+- [ ] E10-031 — Run a placement test automatically before a campaign's first bulk send
+- [ ] E10-032 — Block the campaign if pre-flight placement is below the plan's floor
+- [ ] E10-033 — Explain precisely which provider failed and what the headers said
+- [ ] E10-034 — Run a placement test after any content change to an active campaign
+- [ ] E10-035 — Run a placement test after any DNS or authentication change
+- [ ] E10-036 — Feed placement results into the espAffinity router input
+- [ ] E10-037 — Feed placement results into the domain reputation ledger
+- [ ] E10-038 — Gate warmup advancement on placement, not only on bounce rate
+- [ ] E10-039 — Build the placement view: per provider, per folder, over time
+- [ ] E10-040 — Build the placement comparison across domains for the same content
+- [ ] E10-041 — Build the placement comparison across content for the same domain
+- [ ] E10-042 — Isolate the variable that changed when placement drops
+- [ ] E10-043 — Surface the specific header difference between an inbox landing and a spam landing
+- [ ] E10-044 — Alert on any placement regression beyond the noise threshold
+- [ ] E10-045 — Distinguish a real regression from small-sample noise before alerting
+- [ ] E10-046 — Track seed account health and alert when one stops working
+- [ ] E10-047 — Rotate seed accounts on a schedule so none becomes uniquely trained on our mail
+- [ ] E10-048 — Maintain a reserve of unused seed accounts
+- [ ] E10-049 — Never use a seed account for anything other than probing
+- [ ] E10-050 — Handle provider authentication changes gracefully with a clear operator alert
+- [ ] E10-051 — Handle rate limits and lockouts on seed providers with backoff
+- [ ] E10-052 — Run the seedbox on its own host, not on a blast node
+- [ ] E10-053 — Keep seedbox credentials off every other host
+- [ ] E10-054 — Audit every seedbox credential access
+- [ ] E10-055 — Implement a manual placement test an operator can trigger with arbitrary content
+- [ ] E10-056 — Show the manual test result live as seeds report in
+- [ ] E10-057 — Let a customer run a placement test on their own content, rate-limited by plan
+- [ ] E10-058 — Show the customer the same evidence we see, not a summarised score
+- [ ] E10-059 — Explain what we can and cannot conclude from a placement test in the UI
+- [ ] E10-060 — Document the seed methodology publicly; it is a trust asset
+- [ ] E10-061 — State the sample size on every placement number shown
+- [ ] E10-062 — Never extrapolate a placement rate beyond the providers actually tested
+- [ ] E10-063 — Correlate placement with rspamd score to build a predictive model
+- [ ] E10-064 — Use the correlation to give a pre-send placement estimate
+- [ ] E10-065 — Label the estimate clearly as an estimate, never as a measurement
+- [ ] E10-066 — Feed placement outcomes back into the AI content risk task as training data
+- [ ] E10-067 — Track the estimate's accuracy against real outcomes and publish it internally
+- [ ] E10-068 — Retire the estimate if its accuracy does not beat a trivial baseline
+- [ ] E10-069 — Build a placement leaderboard across domains to spot the best and worst performers
+- [ ] E10-070 — Retire domains that persistently underperform on placement
+- [ ] E10-071 — Test the seedbox against a deliberately spammy message and assert it lands in spam
+- [ ] E10-072 — Test the seedbox against a known-good message and assert it lands in Primary
+- [ ] E10-073 — Test the MISSING path by sending to a suspended seed
+- [ ] E10-074 — Test header capture fidelity against a message with known headers
+- [ ] E10-075 — Load-test placement collection with 50 concurrent tests
+- [ ] E10-076 — Measure the cost per placement test and keep it under the plan allowance
+- [ ] E10-077 — Document the placement subsystem in planning/specs/placement/
+- [ ] E10-078 — Add MCP tools so an agent can run and read a placement test
+- [ ] E10-079 — Include the latest placement result in the weekly deliverability digest
+- [ ] E10-080 — Make placement the headline number on the deliverability cockpit
+- [ ] E10-081 — Make it impossible to ship a dashboard where opens outrank placement visually
+- [ ] E10-082 — Add a placement SLO and report against it monthly
+- [ ] E10-083 — Publish our own placement numbers on the marketing site, updated automatically
+- [ ] E10-084 — Never publish a placement number we did not measure this week
+- [ ] E10-085 — Add a public methodology page the number links to
+
+---
+
+<!-- source: planning/backlog/11-reputation.md · 0/95 -->
+# Epic 11 — The Five Reputation Ledgers
+
+Five independent series with different half-lives, composed only at read time.
+There is no stored "the score".
+
+- [ ] E11-001 — Create packages/reputation with the five-ledger model
+- [ ] E11-002 — Define the IP ledger inputs: listings, deferral rate, block rate, SNDS, TLS failures
+- [ ] E11-003 — Define the domain ledger inputs: DMARC alignment, complaints, bounces, placement
+- [ ] E11-004 — Define the mailbox ledger inputs: bounces, defers, complaints, replies, age, warmup stage
+- [ ] E11-005 — Define the content ledger inputs: rspamd score, link reputation, AI risk, historical placement
+- [ ] E11-006 — Define the engagement ledger inputs: replies, positive replies, unsubscribes, complaints
+- [ ] E11-007 — Implement the exponential decay function with a configurable half-life per ledger
+- [ ] E11-008 — Set the IP half-life to roughly 21 days and make it configurable
+- [ ] E11-009 — Set the domain half-life to roughly 10 days
+- [ ] E11-010 — Set the mailbox half-life to roughly 3 days
+- [ ] E11-011 — Set the content half-life to roughly 1 day
+- [ ] E11-012 — Set the engagement half-life to roughly 7 days
+- [ ] E11-013 — Normalise every input to a bounded 0..1 contribution
+- [ ] E11-014 — Handle a zero-volume subject without producing a misleading score
+- [ ] E11-015 — Return an explicit insufficient-data state rather than a default score
+- [ ] E11-016 — Implement the nightly snapshot writer into ReputationSnapshot
+- [ ] E11-017 — Store the full factor decomposition in every snapshot
+- [ ] E11-018 — Make historical charts read snapshots so they are reproducible
+- [ ] E11-019 — Never recompute history with today's weights; version the weights
+- [ ] E11-020 — Implement the composite score at read time with explicit weights
+- [ ] E11-021 — Always return the decomposition alongside the composite
+- [ ] E11-022 — Refuse to expose a composite through any API without its decomposition
+- [ ] E11-023 — Build the reputation view showing all five series on one timeline
+- [ ] E11-024 — Let an operator toggle each series and see the composite recompute
+- [ ] E11-025 — Annotate the timeline with events: listings, DNS changes, campaign starts, incidents
+- [ ] E11-026 — Make annotations clickable through to the underlying evidence
+- [ ] E11-027 — Implement the reputation delta view: what changed since yesterday and why
+- [ ] E11-028 — Rank the contributing factors by their contribution to the delta
+- [ ] E11-029 — Feed reputationScore into the router candidate scoring
+- [ ] E11-030 — Feed riskPenalty into the router from listings and trends
+- [ ] E11-031 — Feed espAffinity into the router from placement measurements
+- [ ] E11-032 — Make every router input traceable back to a measurement
+- [ ] E11-033 — Implement the reputation alert thresholds per ledger
+- [ ] E11-034 — Alert on a rate of change, not only on an absolute level
+- [ ] E11-035 — Detect a slow degradation before it crosses an absolute threshold
+- [ ] E11-036 — Implement anomaly detection on each series with a seasonality-aware baseline
+- [ ] E11-037 — Avoid alerting on the weekly business-day seasonality
+- [ ] E11-038 — Feed anomalies into the AI narration task for a plain-language summary
+- [ ] E11-039 — Never let the narration replace the underlying numbers in the UI
+- [ ] E11-040 — Implement per-tenant reputation accounting inside a shared pool
+- [ ] E11-041 — Attribute every complaint and bounce to the tenant that caused it
+- [ ] E11-042 — Surface a tenant's contribution to shared-pool damage
+- [ ] E11-043 — Implement the eviction trigger from shared to isolated pool
+- [ ] E11-044 — Notify the evicted tenant with the evidence, not a vague policy message
+- [ ] E11-045 — Implement a reputation recovery plan generator per subject
+- [ ] E11-046 — Rank recovery actions by expected impact and time to effect
+- [ ] E11-047 — Track whether a recovery plan actually worked and learn from it
+- [ ] E11-048 — Build the reputation comparison across peers in the fleet
+- [ ] E11-049 — Identify the best-performing domain and what it does differently
+- [ ] E11-050 — Build the reputation forecast: where this subject trends in seven days
+- [ ] E11-051 — Label the forecast as a projection with its confidence interval
+- [ ] E11-052 — Validate forecast accuracy against outcomes and publish the error internally
+- [ ] E11-053 — Retire the forecast if it does not beat persistence as a baseline
+- [ ] E11-054 — Implement reputation-aware campaign admission control
+- [ ] E11-055 — Refuse to start a large campaign on a degrading domain
+- [ ] E11-056 — Explain the refusal with the specific series and threshold
+- [ ] E11-057 — Offer the customer a smaller safe volume rather than a flat refusal
+- [ ] E11-058 — Implement the reputation budget concept: volume a subject can afford this week
+- [ ] E11-059 — Surface the budget to the operator as the primary capacity number
+- [ ] E11-060 — Reconcile the budget against actual sends and report the variance
+- [ ] E11-061 — Write the reputation model documentation with every formula stated
+- [ ] E11-062 — Publish a simplified version of the model in customer docs
+- [ ] E11-063 — Never publish a score without publishing how it is computed
+- [ ] E11-064 — Test decay with a synthetic series and assert the half-life is correct
+- [ ] E11-065 — Test the insufficient-data path with a brand-new subject
+- [ ] E11-066 — Test that a listing immediately depresses the IP ledger
+- [ ] E11-067 — Test that a complaint immediately depresses the mailbox and engagement ledgers
+- [ ] E11-068 — Test that placement improvement lifts the domain ledger
+- [ ] E11-069 — Test snapshot reproducibility by recomputing a historical day
+- [ ] E11-070 — Load-test scoring for 10,000 subjects in one pass
+- [ ] E11-071 — Benchmark read-time composite computation; target under 10ms
+- [ ] E11-072 — Cache the composite with invalidation on any input change
+- [ ] E11-073 — Add MCP tools so an agent can read and explain a reputation score
+- [ ] E11-074 — Add the reputation series to the weekly digest
+- [ ] E11-075 — Add reputation to the fleet overview as a single fleet-health number with decomposition
+- [ ] E11-076 — Refuse to display the fleet-health number without its decomposition available in one click
+- [ ] E11-077 — Add an operator override that pins a subject's usability regardless of score
+- [ ] E11-078 — Require a reason and an expiry on every override
+- [ ] E11-079 — Alert when an override is about to expire
+- [ ] E11-080 — Audit every override in the immutable log
+- [ ] E11-081 — Track how often overrides preceded an incident and report it
+- [ ] E11-082 — Weight the engagement ledger by reply, not by open, given MPP
+- [ ] E11-083 — Document why opens are excluded from reputation
+- [ ] E11-084 — Add a negative-engagement signal from delete-without-read where any provider exposes it
+- [ ] E11-085 — Keep the model simple enough that an operator can predict its behaviour
+- [ ] E11-086 — Review the weights quarterly against outcomes and record the decision
+- [ ] E11-087 — Version every weight change and keep old snapshots on old weights
+- [ ] E11-088 — Add a reputation regression test suite from recorded historical incidents
+- [ ] E11-089 — Assert the model would have alerted before each historical incident
+- [ ] E11-090 — Document the reputation subsystem in planning/specs/reputation/
+- [ ] E11-091 — Add reputation data to the tenant export
+- [ ] E11-092 — Exclude other tenants' data from any shared-pool reputation view
+- [ ] E11-093 — Add a fleet-wide reputation report for the monthly business review
+- [ ] E11-094 — Correlate reputation with revenue retention and record what the data says
+- [ ] E11-095 — Feed that correlation back into where engineering effort goes next
+
+---
+
+<!-- source: planning/backlog/12-verification.md · 0/95 -->
+# Epic 12 — Email Verification Engine
+
+Self-hosted, five stages, on a dedicated IP that never sends campaigns.
+
+- [ ] E12-001 — Create packages/verify with the five-stage pipeline
+- [ ] E12-002 — Implement RFC 5322 syntax validation plus practical rules
+- [ ] E12-003 — Reject addresses with characters no real mailbox uses
+- [ ] E12-004 — Normalise the address: lowercase domain, preserve local-part case, strip plus-tags optionally
+- [ ] E12-005 — Implement domain resolution with a shared DNS cache
+- [ ] E12-006 — Implement MX lookup with an A-record fallback per RFC
+- [ ] E12-007 — Detect parked domains from their nameservers and A records
+- [ ] E12-008 — Detect a null MX record and mark the address invalid
+- [ ] E12-009 — Maintain a disposable-domain list with an automated refresh
+- [ ] E12-010 — Detect disposable providers by MX pattern as well as by domain
+- [ ] E12-011 — Maintain the role-address local-part list
+- [ ] E12-012 — Flag role addresses without automatically invalidating them
+- [ ] E12-013 — Implement spam-trap heuristics: recycled domains, no web presence, honeypot patterns
+- [ ] E12-014 — Score trap risk rather than making a binary call
+- [ ] E12-015 — Block sending above the trap-risk threshold
+- [ ] E12-016 — Implement the SMTP probe from the dedicated verification IP only
+- [ ] E12-017 — Assert in code that the probe never runs from a campaign IP
+- [ ] E12-018 — Use a null MAIL FROM for the probe
+- [ ] E12-019 — Never issue DATA during a probe
+- [ ] E12-020 — Send RSET and QUIT cleanly after every probe
+- [ ] E12-021 — Respect per-destination probe concurrency limits
+- [ ] E12-022 — Back off aggressively when a destination greylists or throttles
+- [ ] E12-023 — Handle greylisting by retrying on the correct schedule rather than failing
+- [ ] E12-024 — Implement catch-all detection with a random local-part probe
+- [ ] E12-025 — Mark catch-all as deliverable-unknown, never as valid
+- [ ] E12-026 — Explain the catch-all limitation clearly in the UI
+- [ ] E12-027 — Cache the catch-all verdict per domain with a TTL
+- [ ] E12-028 — Skip the SMTP probe entirely for known catch-all domains
+- [ ] E12-029 — Skip the SMTP probe for providers that always accept, and say so
+- [ ] E12-030 — Record the verbatim SMTP response on every verification
+- [ ] E12-031 — Store results in VerificationResult with an explicit expiry
+- [ ] E12-032 — Re-verify automatically when a result expires and the lead is about to be sent to
+- [ ] E12-033 — Set a shorter TTL for RISKY results than for VALID
+- [ ] E12-034 — Never send to an address whose verification has expired
+- [ ] E12-035 — Implement bulk verification as a job with progress reporting
+- [ ] E12-036 — Report bulk progress live so a large list does not look stalled
+- [ ] E12-037 — Make bulk verification resumable after a crash
+- [ ] E12-038 — Deduplicate within a batch before probing
+- [ ] E12-039 — Deduplicate against existing results before probing
+- [ ] E12-040 — Meter verification usage for billing
+- [ ] E12-041 — Enforce the plan's verification quota
+- [ ] E12-042 — Build the verification report per list: counts by status with the reasons
+- [ ] E12-043 — Make the report downloadable as CSV with the per-row reason
+- [ ] E12-044 — Gate list activation on a maximum invalid share
+- [ ] E12-045 — Explain exactly which rows blocked activation
+- [ ] E12-046 — Offer a one-click removal of invalid rows
+- [ ] E12-047 — Never silently drop rows; always show what was removed
+- [ ] E12-048 — Implement the single-address verification API endpoint
+- [ ] E12-049 — Implement the bulk verification API endpoint with async job semantics
+- [ ] E12-050 — Add verification to the SDK
+- [ ] E12-051 — Add verification MCP tools
+- [ ] E12-052 — Add a verification widget to the lead detail view
+- [ ] E12-053 — Show the full verification evidence, not only the verdict
+- [ ] E12-054 — Track verification accuracy against actual bounce outcomes
+- [ ] E12-055 — Report the false-valid rate and treat it as the key quality metric
+- [ ] E12-056 — Tune the trap-risk threshold from measured outcomes
+- [ ] E12-057 — Alert when verification accuracy degrades
+- [ ] E12-058 — Compare our accuracy against the bounce rate of unverified sends
+- [ ] E12-059 — Publish the accuracy number in the docs and keep it current
+- [ ] E12-060 — Never claim an accuracy number we have not measured this quarter
+- [ ] E12-061 — Handle IPv6-only destinations correctly
+- [ ] E12-062 — Handle internationalised domain names correctly
+- [ ] E12-063 — Handle internationalised local parts or reject them explicitly
+- [ ] E12-064 — Handle very long addresses at the RFC limits
+- [ ] E12-065 — Fuzz the parser with malformed input and assert no crash
+- [ ] E12-066 — Test against a corpus of known-valid and known-invalid addresses
+- [ ] E12-067 — Test catch-all detection against a known catch-all domain
+- [ ] E12-068 — Test greylisting handling against a greylisting destination
+- [ ] E12-069 — Test that the verification IP is never used for a campaign send
+- [ ] E12-070 — Load-test 100,000 verifications and record throughput
+- [ ] E12-071 — Measure cost per thousand verifications on our own infrastructure
+- [ ] E12-072 — Compare that cost against commercial verification pricing for the marketing page
+- [ ] E12-073 — Monitor the verification IP for listings; probing can attract them
+- [ ] E12-074 — Rotate the verification IP if it becomes listed, without touching campaign IPs
+- [ ] E12-075 — Keep a second verification IP in reserve
+- [ ] E12-076 — Rate-limit verification per org to protect the shared verification IP
+- [ ] E12-077 — Detect and block abusive verification patterns, such as list-harvesting probes
+- [ ] E12-078 — Never let verification be used as an email-discovery service
+- [ ] E12-079 — Log every verification with the requesting org for abuse attribution
+- [ ] E12-080 — Add the verification subsystem to the security review
+- [ ] E12-081 — Document the engine in planning/specs/verification/
+- [ ] E12-082 — Publish the customer-facing explanation of statuses and what to do with each
+- [ ] E12-083 — Explain honestly why catch-all cannot be resolved
+- [ ] E12-084 — Explain honestly why a valid address can still bounce
+- [ ] E12-085 — Add verification results to the tenant export
+- [ ] E12-086 — Purge verification results for erased leads while keeping aggregate counts
+- [ ] E12-087 — Add a verification health tile to the operator dashboard
+- [ ] E12-088 — Alert when the probe success rate drops, indicating a network or listing problem
+- [ ] E12-089 — Add an automatic weekly re-verification of long-lived active lists
+- [ ] E12-090 — Bill re-verification transparently and show it on the usage page
+- [ ] E12-091 — Offer verification as a standalone product surface once the engine is proven
+- [ ] E12-092 — Price it from the measured cost, not from competitor anchoring
+- [ ] E12-093 — Add an API rate limit tier for standalone verification customers
+- [ ] E12-094 — Add a verification status webhook
+- [ ] E12-095 — Add verification to the migration importer so imported lists are checked on arrival
+
+---
+
+<!-- source: planning/backlog/13-leads.md · 0/115 -->
+# Epic 13 — Leads: Import, Normalise, Dedupe, Segment, Enrich
+
+- [ ] E13-001 — Create packages/leads with the import pipeline
+- [ ] E13-002 — Implement CSV import with delimiter and encoding detection
+- [ ] E13-003 — Handle UTF-8 BOM, Latin-1, and Windows-1252 without mangling names
+- [ ] E13-004 — Implement column mapping with a suggested mapping from the header row
+- [ ] E13-005 — Let the user correct the mapping before the import commits
+- [ ] E13-006 — Preview the first rows as they will be stored, before committing
+- [ ] E13-007 — Support custom fields mapped into Lead.customFields
+- [ ] E13-008 — Validate that every custom field referenced by a sequence exists on the list
+- [ ] E13-009 — Block a campaign whose template references a field the list does not have
+- [ ] E13-010 — Implement streaming import so a large file does not exhaust memory
+- [ ] E13-011 — Make import resumable and idempotent on retry
+- [ ] E13-012 — Report per-row errors with the row number and the specific problem
+- [ ] E13-013 — Produce a rejected-rows file the user can fix and re-upload
+- [ ] E13-014 — Normalise names: trim, collapse whitespace, fix all-caps, preserve real capitalisation
+- [ ] E13-015 — Never mangle a name we are unsure about; leave it as supplied
+- [ ] E13-016 — Normalise company names by stripping legal suffixes into a separate field
+- [ ] E13-017 — Derive companyDomain from an email address when absent
+- [ ] E13-018 — Never derive a company domain from a free-mail address
+- [ ] E13-019 — Normalise phone numbers to E.164 where a country is known
+- [ ] E13-020 — Normalise LinkedIn URLs to a canonical form
+- [ ] E13-021 — Implement exact deduplication on (orgId, email)
+- [ ] E13-022 — Implement fuzzy duplicate detection across name and company
+- [ ] E13-023 — Present fuzzy duplicates for review rather than merging automatically
+- [ ] E13-024 — Implement a merge that preserves the union of fields and the earliest consent record
+- [ ] E13-025 — Never lose a consent record or a suppression during a merge
+- [ ] E13-026 — Detect the same person at a different company and treat it as a new lead
+- [ ] E13-027 — Detect a role address masquerading as a person
+- [ ] E13-028 — Resolve the lead's country per COMPLIANCE §2 precedence order
+- [ ] E13-029 — Record countrySource and countryConfidence on every lead
+- [ ] E13-030 — Never let a weak signal loosen the jurisdiction; only tighten
+- [ ] E13-031 — Resolve the lead's timezone from the country and city where known
+- [ ] E13-032 — Fall back to the campaign's fixed timezone when the lead's is unknown
+- [ ] E13-033 — Surface how many leads lack a resolvable timezone before launch
+- [ ] E13-034 — Implement the list compliance gate before a list can reach READY
+- [ ] E13-035 — Require sourceType, sourceDetail, and an attestation on every list
+- [ ] E13-036 — Record the attesting user, timestamp, and IP
+- [ ] E13-037 — Generate the per-batch compliance report artifact and store it in R2
+- [ ] E13-038 — Make the compliance report downloadable for the customer's counsel
+- [ ] E13-039 — Show sendable, blocked, and needs-basis counts with the reasons
+- [ ] E13-040 — Block list activation while any row is unresolvable
+- [ ] E13-041 — Offer to remove or quarantine unresolvable rows
+- [ ] E13-042 — Implement segments as saved queries over leads and custom fields
+- [ ] E13-043 — Support boolean composition of segment conditions
+- [ ] E13-044 — Show the live count of a segment as it is built
+- [ ] E13-045 — Make segments dynamic so new imports flow into them
+- [ ] E13-046 — Support static snapshots of a segment for reproducible campaigns
+- [ ] E13-047 — Warn when a dynamic segment changes size after a campaign starts
+- [ ] E13-048 — Implement lead search across every field with sub-second response
+- [ ] E13-049 — Implement bulk lead actions: tag, suppress, delete, move, enrol
+- [ ] E13-050 — Confirm bulk actions with the exact count and an undo where possible
+- [ ] E13-051 — Never allow a bulk action to bypass the compliance gate
+- [ ] E13-052 — Implement lead import from the API with the same gates as the UI
+- [ ] E13-053 — Implement lead import from a CRM via a generic webhook receiver
+- [ ] E13-054 — Never let an API import skip the provenance requirement
+- [ ] E13-055 — Implement the enrichment seam with a provider interface
+- [ ] E13-056 — Implement enrichment from public company data we can fetch ourselves
+- [ ] E13-057 — Implement enrichment from the company website we are allowed to read
+- [ ] E13-058 — Respect robots.txt on any fetch we perform
+- [ ] E13-059 — Never scrape behind an authentication wall
+- [ ] E13-060 — Never scrape a source whose terms forbid it
+- [ ] E13-061 — Cache enrichment results with a TTL and a source record
+- [ ] E13-062 — Show the source of every enriched field in the UI
+- [ ] E13-063 — Let the user reject an enriched value and keep their own
+- [ ] E13-064 — Implement the AI ICP fit scoring task with a stated rubric
+- [ ] E13-065 — Show the fit reason, not only the score
+- [ ] E13-066 — Let the user correct a fit score and feed it back as an eval fixture
+- [ ] E13-067 — Never auto-remove a lead purely on a low AI fit score
+- [ ] E13-068 — Implement the personalisation-line generation task per lead
+- [ ] E13-069 — Fail the send rather than sending an unresolved personalisation token
+- [ ] E13-070 — Offer a fallback line when personalisation cannot be generated
+- [ ] E13-071 — Let the user review generated lines in bulk before launch
+- [ ] E13-072 — Flag generated lines that reference something we cannot verify
+- [ ] E13-073 — Never generate a claim about a lead that we cannot source
+- [ ] E13-074 — Implement lead status transitions driven by real events only
+- [ ] E13-075 — Implement the frozen flag for GDPR restriction and exclude frozen leads from routing
+- [ ] E13-076 — Implement lead erasure with suppression-hash preservation
+- [ ] E13-077 — Implement lead export per data-portability requirements
+- [ ] E13-078 — Build the lead detail view: fields, consent, verification, campaigns, threads, events
+- [ ] E13-079 — Make the lead timeline show every message sent and every event received
+- [ ] E13-080 — Link every timeline entry to its underlying evidence
+- [ ] E13-081 — Build the list view with import status, counts, and compliance state
+- [ ] E13-082 — Build the import wizard as a linear flow with no dead ends
+- [ ] E13-083 — Make every import step reversible before commit
+- [ ] E13-084 — Add an import history with the original file retained in R2
+- [ ] E13-085 — Support re-running an import after fixing the mapping
+- [ ] E13-086 — Add a lead-quality score combining verification, fit, and completeness
+- [ ] E13-087 — Show the expected campaign performance from the list's quality distribution
+- [ ] E13-088 — Warn before launching against a low-quality list
+- [ ] E13-089 — Add duplicate detection across lists within an org
+- [ ] E13-090 — Prevent enrolling one lead in two campaigns simultaneously by default
+- [ ] E13-091 — Make the multi-campaign policy configurable with a warning
+- [ ] E13-092 — Implement a company-level fan-out cap so one company is not saturated
+- [ ] E13-093 — Surface the company view: all leads at one company across all campaigns
+- [ ] E13-094 — Stop every lead at a company when one replies, when configured
+- [ ] E13-095 — Implement the do-not-contact list at the company-domain level
+- [ ] E13-096 — Import an existing customer list as automatic do-not-contact
+- [ ] E13-097 — Offer CRM sync of do-not-contact as a first-class integration
+- [ ] E13-098 — Load-test import at one million rows
+- [ ] E13-099 — Measure and report import throughput and time to first sendable lead
+- [ ] E13-100 — Load-test segment evaluation at ten million leads
+- [ ] E13-101 — Benchmark lead search at ten million leads
+- [ ] E13-102 — Test the compliance gate blocks a list with unresolvable jurisdictions
+- [ ] E13-103 — Test that erasure preserves suppression
+- [ ] E13-104 — Test that a merge preserves the earliest consent
+- [ ] E13-105 — Test that a frozen lead is never routed
+- [ ] E13-106 — Fuzz the CSV parser with malformed files
+- [ ] E13-107 — Test import of a file with mixed encodings
+- [ ] E13-108 — Document the leads subsystem in planning/specs/leads/
+- [ ] E13-109 — Publish the customer guide on list quality and provenance
+- [ ] E13-110 — Add lead MCP tools for agent-driven list operations
+- [ ] E13-111 — Add a data-quality dashboard across all lists in an org
+- [ ] E13-112 — Alert the customer when list quality is the binding constraint on results
+- [ ] E13-113 — Add the migration importer path from Instantly, Smartlead, and Lemlist exports
+- [ ] E13-114 — Preserve consent and suppression from a competitor export where present
+- [ ] E13-115 — Refuse to import a competitor list that carries no provenance at all
+
+---
+
+<!-- source: planning/backlog/14-compliance.md · 0/120 -->
+# Epic 14 — Policy Engine, Consent, Suppression, Trust
+
+`packages/policy` sits between the scheduler and the MTA and can block anything.
+Blocked is the default for whatever we cannot resolve.
+
+- [ ] E14-001 — Create packages/policy with the PolicyEngine entry point
+- [ ] E14-002 — Define the PolicyInput and PolicyResult types and freeze them
+- [ ] E14-003 — Implement JurisdictionPolicy lookup by country with a wildcard default
+- [ ] E14-004 — Implement policy versioning with effectiveFrom and effectiveTo
+- [ ] E14-005 — Always resolve the policy version in force at decision time, not the latest
+- [ ] E14-006 — Seed the US CAN-SPAM opt-out row with its citation
+- [ ] E14-007 — Seed the Canada CASL row as block-unless-basis with its citation
+- [ ] E14-008 — Seed the UK PECR corporate-subscriber row with its citation
+- [ ] E14-009 — Seed the Australia Spam Act inferred-consent row with its citation
+- [ ] E14-010 — Seed the Germany UWG row as block with its citation
+- [ ] E14-011 — Seed the France CNIL B2B row as allow-with-basis with its citation
+- [ ] E14-012 — Seed remaining EU member states as block pending review
+- [ ] E14-013 — Seed the wildcard default as block
+- [ ] E14-014 — Build the policy admin view so counsel can read every row without a deploy
+- [ ] E14-015 — Require a citation on every policy row
+- [ ] E14-016 — Audit every policy row change with actor, before, after, and reason
+- [ ] E14-017 — Never let a policy change apply retroactively to past decisions
+- [ ] E14-018 — Implement the jurisdiction resolver with the four-source precedence
+- [ ] E14-019 — Record the source and confidence on every resolution
+- [ ] E14-020 — Implement the asymmetry rule: weak signals tighten, never loosen
+- [ ] E14-021 — Return unresolved and block when no source is confident
+- [ ] E14-022 — Build the ccTLD-to-country map as data, not code
+- [ ] E14-023 — Build the MX-geo lookup with a self-hosted IP-to-country dataset
+- [ ] E14-024 — Refresh the IP-to-country dataset on a schedule
+- [ ] E14-025 — Implement the ConsentRecord model with basis, source, evidence, and attestation
+- [ ] E14-026 — Support multiple consent records per lead with the strongest basis winning
+- [ ] E14-027 — Implement consent expiry for time-boxed CASL implied consent
+- [ ] E14-028 — Exclude expired consent from the basis resolution
+- [ ] E14-029 — Implement consent revocation on unsubscribe or objection
+- [ ] E14-030 — Never resurrect a revoked consent, even from a re-import
+- [ ] E14-031 — Store consent evidence in R2 with a signed retrieval URL
+- [ ] E14-032 — Implement the Legitimate Interest Assessment form and store it as structured data
+- [ ] E14-033 — Require an LIA for any GDPR legitimate-interest basis
+- [ ] E14-034 — Build the consent view per lead showing every record and its evidence
+- [ ] E14-035 — Build the consent coverage report per list and per campaign
+- [ ] E14-036 — Implement the three-layer suppression check
+- [ ] E14-037 — Implement global suppression that no tenant can override
+- [ ] E14-038 — Implement org suppression across all workspaces
+- [ ] E14-039 — Implement domain and role suppression
+- [ ] E14-040 — Hash suppressed addresses so erasure can drop the plaintext
+- [ ] E14-041 — Mirror suppression to a Valkey set with a bloom prefilter
+- [ ] E14-042 — Fail closed on a Valkey miss by falling back to Postgres
+- [ ] E14-043 — Invalidate the Valkey entry synchronously on unsubscribe
+- [ ] E14-044 — Re-check suppression immediately before emit
+- [ ] E14-045 — Treat a send to a suppressed address as a Sev-1 incident
+- [ ] E14-046 — Add a continuous audit job scanning recent sends against suppression
+- [ ] E14-047 — Alert immediately on any audit finding
+- [ ] E14-048 — Implement RFC 8058 List-Unsubscribe and List-Unsubscribe-Post
+- [ ] E14-049 — Honour a one-click POST without confirmation, login, or interstitial
+- [ ] E14-050 — Implement the mailto unsubscribe path into the same suppression flow
+- [ ] E14-051 — Require a visible unsubscribe link in the body with accessible contrast
+- [ ] E14-052 — Refuse to compose a message whose unsubscribe link fails the contrast check
+- [ ] E14-053 — Make unsubscribe suppress, stop the sequence, and stop all campaigns in one transaction
+- [ ] E14-054 — Complete unsubscribe processing in under sixty seconds end to end
+- [ ] E14-055 — Show a plain confirmation page after an unsubscribe
+- [ ] E14-056 — Never ask a reason before honouring an unsubscribe
+- [ ] E14-057 — Offer an optional reason after the unsubscribe has already taken effect
+- [ ] E14-058 — Implement reply-based unsubscribe detection from the AI classifier
+- [ ] E14-059 — Suppress immediately on an unsubscribe classification without corroboration
+- [ ] E14-060 — Default an ambiguous reply to suppressing rather than continuing
+- [ ] E14-061 — Queue ambiguous cases for human review after suppressing
+- [ ] E14-062 — Implement the message validator for CAN-SPAM mandatory elements
+- [ ] E14-063 — Block on a missing postal address with a specific actionable error
+- [ ] E14-064 — Block on a missing or non-functional unsubscribe mechanism
+- [ ] E14-065 — Block on a deceptive subject heuristic such as RE: on a first touch
+- [ ] E14-066 — Block on a From display name that does not match the sending identity
+- [ ] E14-067 — Block on any attempt to set a From domain we have not verified
+- [ ] E14-068 — Block on CR or LF injection in any header field
+- [ ] E14-069 — Require ad identification where the jurisdiction demands it
+- [ ] E14-070 — Implement the prohibited-content screen at campaign creation
+- [ ] E14-071 — Keep the prohibited-category list as operator-editable versioned data
+- [ ] E14-072 — Run the AI compliance pre-flight as an advisory alongside the rules gate
+- [ ] E14-073 — Never let the AI advisory be the only thing blocking or allowing a send
+- [ ] E14-074 — Implement KYC before the first live send
+- [ ] E14-075 — Require legal name, registration, website, and verified postal address
+- [ ] E14-076 — Require DNS TXT verification of any customer sending domain
+- [ ] E14-077 — Require an accepted AUP with a recorded version and timestamp
+- [ ] E14-078 — Require a stated list source and retain it
+- [ ] E14-079 — Require a payment method on file before the first live send
+- [ ] E14-080 — Build the KYC review queue for platform operators
+- [ ] E14-081 — Implement the continuous abuse monitors on complaint and bounce rates
+- [ ] E14-082 — Implement the spam-trap trigger with no self-serve resume
+- [ ] E14-083 — Build the abuse case view with all the evidence in one place
+- [ ] E14-084 — Implement account suspension with a clear customer notice and an appeal path
+- [ ] E14-085 — Implement per-tenant reputation damage attribution
+- [ ] E14-086 — Implement the shared-to-isolated pool eviction with notice
+- [ ] E14-087 — Write every policy decision to the append-only PolicyDecision table
+- [ ] E14-088 — Include every input that produced the decision in the record
+- [ ] E14-089 — Make "prove you were allowed to send that" answerable in one query
+- [ ] E14-090 — Snapshot the audit log to R2 with a hash chain
+- [ ] E14-091 — Verify the hash chain on a schedule and alert on any break
+- [ ] E14-092 — Build the compliance evidence export for a customer's legal team
+- [ ] E14-093 — Implement the data subject rights endpoints for access, erasure, and portability
+- [ ] E14-094 — Meet the stated SLA on each right and report against it
+- [ ] E14-095 — Implement the restriction right as a lead freeze the router honours
+- [ ] E14-096 — Build the DSR queue with timers and escalation
+- [ ] E14-097 — Test that a blocked jurisdiction cannot be sent to under any configuration
+- [ ] E14-098 — Test that an expired consent blocks a CASL-jurisdiction send
+- [ ] E14-099 — Test that a revoked consent cannot be resurrected by re-import
+- [ ] E14-100 — Test that unsubscribe propagates across every campaign in the org
+- [ ] E14-101 — Test that the emit path fails closed when Valkey is unavailable
+- [ ] E14-102 — Test that a message missing a postal address cannot be composed
+- [ ] E14-103 — Test that RE: on a first touch is rejected
+- [ ] E14-104 — Test that an unverified From domain is rejected
+- [ ] E14-105 — Fuzz the header builder with injection payloads
+- [ ] E14-106 — Add a CI test asserting no send path bypasses the policy gate
+- [ ] E14-107 — Add a CI test asserting PolicyDecision is written for every send
+- [ ] E14-108 — Document the policy engine in planning/specs/policy/
+- [ ] E14-109 — Publish the compliance posture page for prospects and their counsel
+- [ ] E14-110 — Publish the AUP, the privacy policy, and the DPA
+- [ ] E14-111 — Publish the subprocessor list and keep it current
+- [ ] E14-112 — Publish the data retention schedule
+- [ ] E14-113 — Add a compliance FAQ answering the questions enterprise legal actually asks
+- [ ] E14-114 — Add the compliance evidence artifact to the sales motion as a differentiator
+- [ ] E14-115 — Have counsel review the policy table and record the review date
+- [ ] E14-116 — Schedule an annual policy review and put it on the calendar
+- [ ] E14-117 — Add a jurisdiction coverage map to the UI so customers see where they can send
+- [ ] E14-118 — Show the customer the blocked count and reason before they launch, not after
+- [ ] E14-119 — Never present a compliance block as a technical error
+- [ ] E14-120 — Give every compliance block a plain-language explanation and a route to resolution
+
+---
+
+<!-- source: planning/backlog/15-campaigns.md · 0/125 -->
+# Epic 15 — Campaigns & the Sequence Engine
+
+- [ ] E15-001 — Create packages/sequence with the durable per-enrolment state machine
+- [ ] E15-002 — Define the legal state transitions and reject anything else
+- [ ] E15-003 — Implement enrolment: lead plus campaign creates a CampaignLead
+- [ ] E15-004 — Run the compliance gate at enrolment as well as at send
+- [ ] E15-005 — Mark an enrolment BLOCKED_BY_POLICY with the reason rather than silently skipping
+- [ ] E15-006 — Implement step materialisation into SendIntent with a computed dueAt
+- [ ] E15-007 — Compute dueAt from the previous step, the delay, the window, and the timezone
+- [ ] E15-008 — Never materialise more than the next step per enrolment
+- [ ] E15-009 — Implement step conditions: no reply, opened, clicked, custom field match
+- [ ] E15-010 — Evaluate conditions at materialisation, not at creation
+- [ ] E15-011 — Implement variant assignment deterministically from hash(leadId, stepId)
+- [ ] E15-012 — Keep variant assignment stable across re-runs
+- [ ] E15-013 — Implement weighted variant selection
+- [ ] E15-014 — Track per-variant sent, replied, and bounced counters
+- [ ] E15-015 — Compute variant significance and refuse to declare a winner too early
+- [ ] E15-016 — Show the confidence interval on every variant comparison
+- [ ] E15-017 — Never auto-promote a variant on an underpowered sample
+- [ ] E15-018 — Implement reply detection stopping the enrolment immediately
+- [ ] E15-019 — Propagate a reply as a domain event stopping every campaign for that person
+- [ ] E15-020 — Implement the company-level stop when configured
+- [ ] E15-021 — Implement bounce handling: suppress the address and stop the enrolment
+- [ ] E15-022 — Implement hard-bounce clustering triggering a domain-level pause
+- [ ] E15-023 — Implement unsubscribe stopping everything for that person
+- [ ] E15-024 — Implement manual stop with a reason
+- [ ] E15-025 — Implement campaign pause propagating to every pending intent within seconds
+- [ ] E15-026 — Implement campaign resume without re-sending anything already sent
+- [ ] E15-027 — Implement the auto-pause circuit breakers on bounce and complaint rates
+- [ ] E15-028 — Record autoPauseReason and surface it prominently
+- [ ] E15-029 — Require an operator action to resume an auto-paused campaign
+- [ ] E15-030 — Implement campaign completion when every enrolment reaches a terminal state
+- [ ] E15-031 — Build the campaign creation flow as a linear wizard with no dead ends
+- [ ] E15-032 — Gate campaign creation on the org having capacity and a verified domain
+- [ ] E15-033 — Explain exactly what is missing when the gate blocks
+- [ ] E15-034 — Build the sequence editor with plain-text-first composition
+- [ ] E15-035 — Warn on heavy HTML, many links, and image-only bodies with the reason
+- [ ] E15-036 — Show the live spam-signal score as the user types
+- [ ] E15-037 — Show the rendered message exactly as it will send, including the footer
+- [ ] E15-038 — Preview against a real lead's data, not placeholder text
+- [ ] E15-039 — Show which personalisation tokens will fail to resolve, before launch
+- [ ] E15-040 — Block launch while any required token is unresolvable for any enrolled lead
+- [ ] E15-041 — Implement spintax with a preview of several rendered variations
+- [ ] E15-042 — Validate spintax syntax and show the error position
+- [ ] E15-043 — Implement the variable palette from the list's actual fields
+- [ ] E15-044 — Implement fallback values for optional tokens
+- [ ] E15-045 — Refuse a fallback that produces an obviously templated sentence
+- [ ] E15-046 — Implement the AI copy generation task from ICP, offer, and tone
+- [ ] E15-047 — Present generated copy as a draft the user must accept
+- [ ] E15-048 — Never send AI-generated copy that a human has not seen
+- [ ] E15-049 — Implement the AI subject-variant task with a risk score per variant
+- [ ] E15-050 — Show why a subject scored risky, in specific terms
+- [ ] E15-051 — Implement the AI sequence-optimisation task producing reviewable proposals
+- [ ] E15-052 — Never auto-apply an optimisation proposal
+- [ ] E15-053 — Track whether accepted proposals actually improved outcomes
+- [ ] E15-054 — Build the campaign schedule editor: window, days, timezone mode, daily cap
+- [ ] E15-055 — Show the projected send curve for the configured schedule
+- [ ] E15-056 — Show the projected completion date before launch
+- [ ] E15-057 — Explain the binding constraint when the projection is slower than the user expects
+- [ ] E15-058 — Offer the specific action that would speed it up
+- [ ] E15-059 — Implement the holiday calendar per country and honour it
+- [ ] E15-060 — Let the customer add their own blackout dates
+- [ ] E15-061 — Implement the pre-launch checklist covering compliance, capacity, content, and placement
+- [ ] E15-062 — Make every checklist item link to the thing that fixes it
+- [ ] E15-063 — Block launch on any hard checklist failure
+- [ ] E15-064 — Allow launch with warnings, but record that the user accepted them
+- [ ] E15-065 — Implement a soft launch: send to a small sample and hold for review
+- [ ] E15-066 — Run a placement test on the soft-launch sample automatically
+- [ ] E15-067 — Show soft-launch results before the full send proceeds
+- [ ] E15-068 — Require explicit confirmation to proceed from soft launch to full send
+- [ ] E15-069 — Build the campaign detail view: funnel, timeline, variants, enrolments, issues
+- [ ] E15-070 — Lead with replies, not with opens
+- [ ] E15-071 — Show delivered from the maillog with its source labelled
+- [ ] E15-072 — Show the bounce breakdown by class with verbatim responses available
+- [ ] E15-073 — Show which mailboxes carried the campaign and how each performed
+- [ ] E15-074 — Show the per-ESP performance breakdown
+- [ ] E15-075 — Build the enrolment list with per-lead state and next due time
+- [ ] E15-076 — Let an operator inspect exactly why one lead has not been contacted yet
+- [ ] E15-077 — Build the campaign issues panel listing every blocked and deferred reason
+- [ ] E15-078 — Rank issues by how many leads each affects
+- [ ] E15-079 — Make each issue actionable from the panel
+- [ ] E15-080 — Implement campaign duplication preserving content and resetting outcomes
+- [ ] E15-081 — Implement campaign templates saved at the org level
+- [ ] E15-082 — Implement campaign archiving that preserves the full record
+- [ ] E15-083 — Never delete campaign history; archive it
+- [ ] E15-084 — Implement the usermails handoff on a positive reply or explicit opt-in
+- [ ] E15-085 — Build the HandoffEvent dispatcher with retry and dead-lettering
+- [ ] E15-086 — Include the consent evidence in the handoff payload
+- [ ] E15-087 — Show handoff status on the lead timeline
+- [ ] E15-088 — Make the handoff target configurable so it is not hard-wired to usermails
+- [ ] E15-089 — Implement CRM push on a positive reply via a generic webhook
+- [ ] E15-090 — Implement multi-channel step seams without building the channels yet
+- [ ] E15-091 — Document explicitly that LinkedIn and SMS are out of scope for v1
+- [ ] E15-092 — Implement campaign-level A/Z testing across whole sequences, not only steps
+- [ ] E15-093 — Implement the reply-rate goal and progress against it
+- [ ] E15-094 — Alert the customer when a campaign is materially underperforming its cohort
+- [ ] E15-095 — Give a specific diagnosis rather than a generic underperformance notice
+- [ ] E15-096 — Load-test enrolment at 100,000 leads in one campaign
+- [ ] E15-097 — Load-test materialisation across 50 concurrent campaigns
+- [ ] E15-098 — Test that a paused campaign stops within the stated seconds
+- [ ] E15-099 — Test that a reply stops every campaign for that person
+- [ ] E15-100 — Test that variant assignment is stable across re-runs
+- [ ] E15-101 — Test that a blocked jurisdiction produces BLOCKED_BY_POLICY, not a silent skip
+- [ ] E15-102 — Test the soft-launch gate blocks a full send until confirmed
+- [ ] E15-103 — Test the auto-pause breaker with injected bounces
+- [ ] E15-104 — Test timezone handling across a daylight-saving boundary
+- [ ] E15-105 — Test the holiday calendar against a real national holiday
+- [ ] E15-106 — Fuzz the template renderer with adversarial variable content
+- [ ] E15-107 — Assert the renderer cannot be used to inject headers
+- [ ] E15-108 — Document the sequence engine in planning/specs/sequence/
+- [ ] E15-109 — Publish the customer guide on writing cold sequences that get replies
+- [ ] E15-110 — Publish the guide on why plain text outperforms designed HTML here
+- [ ] E15-111 — Add campaign MCP tools for agent-driven campaign operations
+- [ ] E15-112 — Add a campaign comparison view across the org
+- [ ] E15-113 — Add a benchmark view comparing a campaign to anonymised platform medians
+- [ ] E15-114 — Never expose another tenant's data through the benchmark
+- [ ] E15-115 — Compute benchmarks only above a minimum cohort size
+- [ ] E15-116 — Add a campaign cost view: infrastructure, verification, and AI cost per reply
+- [ ] E15-117 — Make cost per positive reply the headline commercial metric
+- [ ] E15-118 — Track it over time and show the customer their own trend
+- [ ] E15-119 — Alert when cost per positive reply degrades materially
+- [ ] E15-120 — Add the diagnosis for a degrading cost per reply, ranked by contribution
+- [ ] E15-121 — Implement campaign-level suppression of specific companies
+- [ ] E15-122 — Implement campaign scheduling far in advance with a pre-launch re-check
+- [ ] E15-123 — Re-run the full pre-launch checklist at the moment a scheduled campaign starts
+- [ ] E15-124 — Refuse to start a scheduled campaign whose gates no longer pass
+- [ ] E15-125 — Notify the owner with the specific failed gate when a scheduled start is refused
+
+---
+
+<!-- source: planning/backlog/16-inbox.md · 0/105 -->
+# Epic 16 — Unified Inbox & Reply Handling
+
+Replies are the product's success metric. Inbound is not an afterthought.
+
+- [ ] E16-001 — Create packages/inbox with MIME parsing and threading
+- [ ] E16-002 — Parse inbound MIME into text, HTML, and attachment parts
+- [ ] E16-003 — Prefer the text part; render HTML sanitised when text is absent
+- [ ] E16-004 — Strip quoted history for display while retaining the full body
+- [ ] E16-005 — Detect and collapse signature blocks
+- [ ] E16-006 — Handle every common quoting style across mail clients
+- [ ] E16-007 — Thread on In-Reply-To and References first
+- [ ] E16-008 — Fall back to subject-plus-participants matching with a recorded confidence
+- [ ] E16-009 — Never merge two threads on a weak match
+- [ ] E16-010 — Link the thread to the lead, campaign, and mailbox
+- [ ] E16-011 — Store the full MIME to R2 and reference it from the message
+- [ ] E16-012 — Sanitise HTML before rendering; strip scripts, iframes, and remote-loading tags
+- [ ] E16-013 — Block remote image loading by default and offer a per-message reveal
+- [ ] E16-014 — Quarantine executable and archive attachments
+- [ ] E16-015 — Scan attachments and mark anything suspicious
+- [ ] E16-016 — Never auto-open or auto-render an attachment
+- [ ] E16-017 — Show inbound Authentication-Results so the operator sees whether the sender was authentic
+- [ ] E16-018 — Warn on a reply that fails DMARC alignment for its claimed domain
+- [ ] E16-019 — Implement the AI reply classification task with the eight-value enum
+- [ ] E16-020 — Show the classification with its confidence
+- [ ] E16-021 — Let a human correct the classification in one click
+- [ ] E16-022 — Write the correction to intentCorrectedTo and feed it to the eval fixture set
+- [ ] E16-023 — Act immediately on an unsubscribe classification without corroboration
+- [ ] E16-024 — Require corroboration or human confirmation for any other state-changing classification
+- [ ] E16-025 — Treat inbound content as untrusted data in every AI prompt
+- [ ] E16-026 — Constrain classification output to the enum so injection cannot escape the schema
+- [ ] E16-027 — Give the classifier no tool access and no write authority
+- [ ] E16-028 — Detect out-of-office replies and reschedule the sequence rather than stopping it
+- [ ] E16-029 — Parse the return date from an out-of-office where stated
+- [ ] E16-030 — Resume the sequence after the stated return date plus a buffer
+- [ ] E16-031 — Detect auto-replies and do not count them as engagement
+- [ ] E16-032 — Detect referral replies and surface the referred contact for review
+- [ ] E16-033 — Never auto-enrol a referred contact without a compliance pass
+- [ ] E16-034 — Build the unified inbox view across every mailbox in the workspace
+- [ ] E16-035 — Default the view to interested replies first
+- [ ] E16-036 — Provide filters by classification, campaign, mailbox, and assignment
+- [ ] E16-037 — Provide full-text search across every thread
+- [ ] E16-038 — Show the full lead context alongside the thread
+- [ ] E16-039 — Show which campaign and step produced the original message
+- [ ] E16-040 — Show the send evidence: route, delivery, and timestamps
+- [ ] E16-041 — Implement reply composition sending from the same mailbox that received
+- [ ] E16-042 — Never send a reply from a different identity than the thread expects
+- [ ] E16-043 — Preserve threading headers on the outbound reply
+- [ ] E16-044 — Route replies through the same policy gate as campaign sends
+- [ ] E16-045 — Exempt one-to-one replies from campaign pacing but not from suppression
+- [ ] E16-046 — Implement reply templates and snippets at the org level
+- [ ] E16-047 — Implement an AI reply-draft suggestion the human must accept
+- [ ] E16-048 — Never auto-send an AI-drafted reply
+- [ ] E16-049 — Implement thread assignment to a team member
+- [ ] E16-050 — Implement thread states: open, snoozed, closed, archived
+- [ ] E16-051 — Implement snooze with a wake time and a reminder
+- [ ] E16-052 — Implement an unassigned queue with an age-based alert
+- [ ] E16-053 — Alert when an interested reply has gone unanswered past the SLA
+- [ ] E16-054 — Track time to first response as a customer-facing metric
+- [ ] E16-055 — Show the response-time distribution per team member
+- [ ] E16-056 — Implement real-time inbox updates over SSE
+- [ ] E16-057 — Show a new-reply notification without a full page refresh
+- [ ] E16-058 — Implement optimistic state changes with rollback on failure
+- [ ] E16-059 — Implement keyboard navigation across the whole inbox
+- [ ] E16-060 — Implement bulk actions across selected threads
+- [ ] E16-061 — Implement a read and unread state per user, not per org
+- [ ] E16-062 — Implement mentions and internal notes on a thread
+- [ ] E16-063 — Never let an internal note leak into an outbound message
+- [ ] E16-064 — Test that internal notes are excluded from every send path
+- [ ] E16-065 — Implement the positive-reply handoff to usermails or a CRM
+- [ ] E16-066 — Show handoff status inline on the thread
+- [ ] E16-067 — Implement a manual handoff trigger for a human-identified opportunity
+- [ ] E16-068 — Implement lead-status updates driven from the thread
+- [ ] E16-069 — Implement the meeting-booked outcome and track it as the terminal success
+- [ ] E16-070 — Report cost per meeting booked alongside cost per positive reply
+- [ ] E16-071 — Implement inbox export for a specific thread or the whole workspace
+- [ ] E16-072 — Implement inbox retention and purge per the retention schedule
+- [ ] E16-073 — Purge threads for erased leads while retaining aggregate counts
+- [ ] E16-074 — Test threading against a corpus of real reply formats
+- [ ] E16-075 — Test quoted-history stripping across five mail clients
+- [ ] E16-076 — Test classification accuracy against the labelled fixture set
+- [ ] E16-077 — Enforce the accuracy gate in CI at 92% overall and 80% per class
+- [ ] E16-078 — Test prompt-injection resistance with adversarial reply bodies
+- [ ] E16-079 — Assert an injected instruction cannot produce an out-of-schema value
+- [ ] E16-080 — Test that a malformed MIME message does not crash the ingest worker
+- [ ] E16-081 — Test that a very large attachment is truncated with a record, not dropped silently
+- [ ] E16-082 — Load-test the inbox at 100,000 threads
+- [ ] E16-083 — Benchmark thread search at that volume
+- [ ] E16-084 — Measure and alert on inbound processing lag
+- [ ] E16-085 — Never lose an inbound message; acknowledge only after durable storage
+- [ ] E16-086 — Test inbound durability by killing the worker mid-ingest
+- [ ] E16-087 — Document the inbox subsystem in planning/specs/inbox/
+- [ ] E16-088 — Publish the customer guide on handling cold replies well
+- [ ] E16-089 — Add inbox MCP tools so an agent can triage replies
+- [ ] E16-090 — Never let an MCP agent send a reply without human confirmation
+- [ ] E16-091 — Add an inbox digest email summarising what needs attention
+- [ ] E16-092 — Make the digest actionable with direct links to each thread
+- [ ] E16-093 — Add mobile-responsive inbox layout per app-feel standards
+- [ ] E16-094 — Add an inbox empty state that explains what will appear here and when
+- [ ] E16-095 — Add a per-mailbox inbox view for operators diagnosing a specific mailbox
+- [ ] E16-096 — Show non-campaign mail arriving at a mailbox so nothing is invisible
+- [ ] E16-097 — Alert on unexpected inbound volume to a mailbox; it may be a backscatter attack
+- [ ] E16-098 — Implement backscatter detection and suppression at the node
+- [ ] E16-099 — Test the backscatter path with a synthetic bounce storm
+- [ ] E16-100 — Add the inbox to the tenant export
+- [ ] E16-101 — Add per-user inbox preferences that persist across sessions
+- [ ] E16-102 — Add a saved-view feature for common triage queries
+- [ ] E16-103 — Add reply-rate reporting sliced by mailbox, persona, and domain
+- [ ] E16-104 — Correlate persona characteristics with reply rate and report what the data says
+- [ ] E16-105 — Feed that correlation into persona creation guidance
+
+---
+
+<!-- source: planning/backlog/17-ai.md · 0/130 -->
+# Epic 17 — AI Gateway on OpenRouter
+
+One entry point, versioned prompts, validated output, metered cost, CI evals.
+
+- [ ] E17-001 — Create packages/ai with the single ai.run entry point
+- [ ] E17-002 — Implement the OpenRouter client with timeout, retry, and cancellation
+- [ ] E17-003 — Never call an inference API from a route handler; enqueue instead
+- [ ] E17-004 — Add a CI rule failing any AI import outside a worker or the ai package
+- [ ] E17-005 — Implement AiTaskConfig lookup with model, temperature, tokens, and timeout
+- [ ] E17-006 — Implement the fallback chain when the primary model errors or times out
+- [ ] E17-007 — Let an operator re-route a task to a different model without a deploy
+- [ ] E17-008 — Handle model deprecation as a config change with an alert
+- [ ] E17-009 — Implement prompt loading from versioned files under packages/ai/prompts
+- [ ] E17-010 — Refuse to run a task whose promptVersion file is missing
+- [ ] E17-011 — Record promptVersion, model, tokens, cost, and latency on every call
+- [ ] E17-012 — Implement Zod output schemas for all eleven tasks
+- [ ] E17-013 — Retry once with a repair prompt on a schema failure
+- [ ] E17-014 — Fall back deterministically after a second schema failure
+- [ ] E17-015 — Never return unvalidated model output to a caller
+- [ ] E17-016 — Mark a degraded result explicitly so the caller can decide
+- [ ] E17-017 — Implement per-org monthly token budgets by plan
+- [ ] E17-018 — Implement per-task-class sub-budgets
+- [ ] E17-019 — Estimate cost before the call and refuse when it would breach the budget
+- [ ] E17-020 — Enqueue a refused call for later rather than failing the user's action
+- [ ] E17-021 — Implement the platform-wide hard monthly ceiling
+- [ ] E17-022 — Implement degraded mode per task and document each fallback
+- [ ] E17-023 — Never let an AI outage stop sending
+- [ ] E17-024 — Test the whole send path with the AI gateway disabled
+- [ ] E17-025 — Implement response caching keyed on task, prompt version, model, and normalised input
+- [ ] E17-026 — Store large outputs in R2 with the key in Valkey
+- [ ] E17-027 — Set per-task cache TTLs
+- [ ] E17-028 — Report cache hit rate per task
+- [ ] E17-029 — Target above 40% hit rate on classify-class tasks within 30 days
+- [ ] E17-030 — Implement input normalisation so trivially different inputs share a cache entry
+- [ ] E17-031 — Never cache across orgs when the input contains tenant data
+- [ ] E17-032 — Implement PII minimisation per task with a documented field allowlist
+- [ ] E17-033 — Log the category of data sent, never the data itself
+- [ ] E17-034 — Implement the per-org AI opt-out
+- [ ] E17-035 — Disable AI features visibly on opt-out rather than degrading silently
+- [ ] E17-036 — Implement task 1 copy.sequence with its prompt, schema, and fallback
+- [ ] E17-037 — Implement task 2 copy.subjects with variant generation and risk scoring
+- [ ] E17-038 — Implement task 3 risk.content as advisory only
+- [ ] E17-039 — Implement task 4 personalize.line with a strict no-fabrication instruction
+- [ ] E17-040 — Implement task 5 classify.reply with the eight-value enum
+- [ ] E17-041 — Implement task 6 classify.bounce running only on UNKNOWN responses
+- [ ] E17-042 — Make task 6 output a proposed BounceRule row, not a direct classification
+- [ ] E17-043 — Implement task 7 advise.deliverability with a ranked action list
+- [ ] E17-044 — Ground task 7 strictly in the supplied measurements
+- [ ] E17-045 — Refuse task 7 output that references a metric not in the input
+- [ ] E17-046 — Implement task 8 optimize.sequence producing reviewable proposals
+- [ ] E17-047 — Implement task 9 score.lead with a stated rubric and a reason
+- [ ] E17-048 — Implement task 10 check.compliance as advisory alongside the rules gate
+- [ ] E17-049 — Implement task 11 narrate.anomaly over the infra event series
+- [ ] E17-050 — Implement the embedding task for lead dedupe and reply clustering
+- [ ] E17-051 — Store embeddings in the existing pgvector instance
+- [ ] E17-052 — Implement similar-reply clustering to surface recurring objections
+- [ ] E17-053 — Surface the top objections per campaign as a coaching signal
+- [ ] E17-054 — Implement content-fingerprint neighbour search for placement prediction
+- [ ] E17-055 — Build the eval harness with fixtures per task
+- [ ] E17-056 — Implement labelled-fixture scoring for classification tasks
+- [ ] E17-057 — Report a confusion matrix per classification task
+- [ ] E17-058 — Gate CI at 92% accuracy with no class below 80% recall
+- [ ] E17-059 — Implement rubric scoring by a judge model for generation tasks
+- [ ] E17-060 — Add hard assertions to generation evals: no banned phrases, has CTA, under length
+- [ ] E17-061 — Add an assertion that generated copy contains no unverifiable claim about the recipient
+- [ ] E17-062 — Implement root-cause assertions for reasoning-task fixtures
+- [ ] E17-063 — Fail the build on any eval regression
+- [ ] E17-064 — Grow the fixture set from production low-confidence and corrected cases
+- [ ] E17-065 — Build the labelling queue for operators to grade production cases
+- [ ] E17-066 — Add a weekly eval run reported to the team regardless of code changes
+- [ ] E17-067 — Track model drift by re-running evals against the same model over time
+- [ ] E17-068 — Alert on drift and re-route the task if it degrades
+- [ ] E17-069 — Implement the prompt-injection posture: delimiters plus explicit data framing
+- [ ] E17-070 — Add an injection test suite per task fed with adversarial inputs
+- [ ] E17-071 — Assert no task can be made to produce an out-of-schema value
+- [ ] E17-072 — Assert no task has tool access, database write access, or send authority
+- [ ] E17-073 — Document the blast radius of a successful injection per task
+- [ ] E17-074 — Write every call to ClickHouse ai_calls for aggregation
+- [ ] E17-075 — Build the AI cockpit panel: cost, accuracy, cache rate, latency, budget burn-down
+- [ ] E17-076 — Show the current model routing table in the cockpit
+- [ ] E17-077 — Show per-task accuracy measured against human corrections
+- [ ] E17-078 — Show cost per thousand sends and alert above the target
+- [ ] E17-079 — Target inference cost below forty cents per thousand sends
+- [ ] E17-080 — Replace any task that cannot meet its cost target with rules
+- [ ] E17-081 — Build the per-org AI usage view for the customer
+- [ ] E17-082 — Show the customer which features consumed their AI allowance
+- [ ] E17-083 — Implement the AI kill switch per task and platform-wide
+- [ ] E17-084 — Test that every task degrades correctly when killed
+- [ ] E17-085 — Implement structured streaming for long generation tasks in the UI
+- [ ] E17-086 — Cancel an in-flight generation when the user navigates away
+- [ ] E17-087 — Never bill for a cancelled generation the user did not receive
+- [ ] E17-088 — Implement request deduplication for identical concurrent calls
+- [ ] E17-089 — Implement a per-org concurrency cap on AI calls
+- [ ] E17-090 — Implement queue prioritisation: interactive tasks ahead of batch tasks
+- [ ] E17-091 — Measure and report p95 latency per task
+- [ ] E17-092 — Alert on a latency regression
+- [ ] E17-093 — Benchmark each task against a cheaper model quarterly
+- [ ] E17-094 — Downgrade any task where the cheaper model matches on evals
+- [ ] E17-095 — Record every routing decision change as a versioned config commit
+- [ ] E17-096 — Document the AI subsystem in planning/specs/ai/
+- [ ] E17-097 — Publish the customer-facing statement on how their data is used with inference
+- [ ] E17-098 — Publish the AI opt-out mechanism and what it disables
+- [ ] E17-099 — Add OpenRouter as a named subprocessor in the subprocessor list
+- [ ] E17-100 — Add an AI incident runbook for a provider outage
+- [ ] E17-101 — Add an AI incident runbook for a cost spike
+- [ ] E17-102 — Add spend anomaly detection on the AI ledger
+- [ ] E17-103 — Cap spend per org per day as a second safety net beyond the monthly budget
+- [ ] E17-104 — Implement a local-model fallback seam for the classification tasks
+- [ ] E17-105 — Evaluate whether a self-hosted classifier beats the hosted cost for reply classification
+- [ ] E17-106 — Record that evaluation as an ADR either way
+- [ ] E17-107 — Never add a second inference vendor without an ADR justifying it
+- [ ] E17-108 — Add AI MCP tools so an agent can inspect task configuration and costs
+- [ ] E17-109 — Never let an MCP agent change a prompt or a model routing without human approval
+- [ ] E17-110 — Add a prompt review process requiring a second reviewer on send-path-adjacent tasks
+- [ ] E17-111 — Keep every prompt in the repo; never store a prompt only in the database
+- [ ] E17-112 — Add a prompt diff view showing what changed between versions
+- [ ] E17-113 — Correlate prompt versions with outcome metrics
+- [ ] E17-114 — Roll back a prompt version in one action when outcomes degrade
+- [ ] E17-115 — Test rollback end to end
+- [ ] E17-116 — Add a deterministic seed where the model supports it, for reproducible evals
+- [ ] E17-117 — Record the exact provider response id for every call for support escalation
+- [ ] E17-118 — Add an AI section to the security review covering data flow and retention
+- [ ] E17-119 — Confirm and document OpenRouter's data retention posture
+- [ ] E17-120 — Choose models whose providers do not train on our inputs, and document the choice
+- [ ] E17-121 — Re-verify that choice quarterly
+- [ ] E17-122 — Add an enterprise option that restricts inference to a named model set
+- [ ] E17-123 — Add per-org model pinning for customers with a compliance requirement
+- [ ] E17-124 — Test that a pinned org never routes to an unpinned model
+- [ ] E17-125 — Add an AI feature flag per task per org
+- [ ] E17-126 — Default every AI feature on for new orgs except where consent is required
+- [ ] E17-127 — Never enable an AI feature that sends customer data to inference without notice
+- [ ] E17-128 — Add the AI cost line to the per-campaign cost view
+- [ ] E17-129 — Attribute AI cost to the campaign that caused it
+- [ ] E17-130 — Show AI cost per positive reply as the honest efficiency measure
+
+---
+
+<!-- source: planning/backlog/18-frontend.md · 0/185 -->
+# Epic 18 — Frontend: The Four Cockpits
+
+Next.js 15 App Router per gm-stack, held to app-feel standards.
+Infrastructure and Deliverability are the differentiated surfaces and get the design investment.
+The campaign builder should be plain and fast, not clever.
+
+## Foundation
+- [ ] E18-001 — Strip the inherited usermails marketing pages from apps/web
+- [ ] E18-002 — Establish the EMS design tokens: colour, type scale, spacing, radius, elevation
+- [ ] E18-003 — Define the light and dark palettes on :root with a documented contrast floor
+- [ ] E18-004 — Build the layout shell: sidebar, top bar, workspace switcher, command palette
+- [ ] E18-005 — Implement the command palette with fuzzy search across every entity
+- [ ] E18-006 — Implement global keyboard shortcuts with a discoverable help sheet
+- [ ] E18-007 — Establish the data layer: cached, deduped, no fetch-on-mount waterfalls
+- [ ] E18-008 — Forbid per-row fetching in any list; batch at the route
+- [ ] E18-009 — Add a lint rule catching fetch-on-mount in a component
+- [ ] E18-010 — Implement optimistic mutations with rollback across every write surface
+- [ ] E18-011 — Implement honest loading states: skeletons matching the real layout, no spinners over content
+- [ ] E18-012 — Implement empty states that explain what will appear and how to make it appear
+- [ ] E18-013 — Implement error states with the actual error and a route to resolution
+- [ ] E18-014 — Never dead-end a navigation; every screen has a way forward
+- [ ] E18-015 — Implement the SSE client for realtime updates with reconnection
+- [ ] E18-016 — Implement stale-while-revalidate on every list
+- [ ] E18-017 — Implement route-level prefetch on hover for the common paths
+- [ ] E18-018 — Measure and budget first contentful paint per route
+- [ ] E18-019 — Measure and budget interaction-to-next-paint per route
+- [ ] E18-020 — Fail CI on a performance budget regression
+- [ ] E18-021 — Implement responsive layouts down to mobile for the inbox and campaign views
+- [ ] E18-022 — Implement full keyboard navigation and visible focus rings
+- [ ] E18-023 — Meet WCAG AA contrast on every token pair
+- [ ] E18-024 — Add screen-reader labels on every icon-only control
+- [ ] E18-025 — Add an automated accessibility check to CI
+- [ ] E18-026 — Implement the toast and notification system with a persistent activity feed
+- [ ] E18-027 — Never show a toast as the only record of an important event
+- [ ] E18-028 — Implement the confirmation pattern for destructive actions showing the exact impact
+- [ ] E18-029 — Require typing the resource name for irreversible fleet actions
+- [ ] E18-030 — Implement undo where the action is reversible
+
+## Infrastructure cockpit
+- [ ] E18-031 — Build the fleet overview: nodes, IPs, domains, mailboxes, headroom, health on one screen
+- [ ] E18-032 — Make fleet overview the operator landing page
+- [ ] E18-033 — Build the node list with capacity utilisation
+- [ ] E18-034 — Build the node detail with status, IPs, queue, health, and provisioning transcript
+- [ ] E18-035 — Build the IP list with listing status across every DNSBL
+- [ ] E18-036 — Build the IP detail with the reputation series and recent transactions
+- [ ] E18-037 — Build the domain list sortable by health, age, and capacity
+- [ ] E18-038 — Build the domain detail with auth status, warmup, caps, and reputation
+- [ ] E18-039 — Build the DNS desired-versus-live diff view with a one-click repair
+- [ ] E18-040 — Build the mailbox list with warmup progress and headroom
+- [ ] E18-041 — Build the mailbox detail with the warmup curve and recent sends
+- [ ] E18-042 — Build the persona editor with postal-address validation
+- [ ] E18-043 — Build the warmup calendar across the whole fleet
+- [ ] E18-044 — Build the capacity planner with the current fleet plugged in
+- [ ] E18-045 — Build the fleet event feed in real time
+- [ ] E18-046 — Build the provisioning flow with a live progress stream
+- [ ] E18-047 — Build the bulk domain purchase flow behind an approval and a spend cap
+- [ ] E18-048 — Build the bulk mailbox creation flow
+- [ ] E18-049 — Build the drain, pause, quarantine, and retire actions with impact preview
+- [ ] E18-050 — Build the global kill switch with two-person confirmation to lift
+- [ ] E18-051 — Build fleet search across every identifier
+- [ ] E18-052 — Build saved views and tagging across fleet resources
+- [ ] E18-053 — Build the fleet onboarding checklist for a new org
+- [ ] E18-054 — Build the node comparison view
+
+## Deliverability cockpit
+- [ ] E18-055 — Build the cockpit information architecture leading with placement
+- [ ] E18-056 — Build the placement tile per provider with folder breakdown and sample size
+- [ ] E18-057 — Build the delivered, deferred, and bounced tiles with sources labelled
+- [ ] E18-058 — Build the per-ESP breakdown as the primary decomposition
+- [ ] E18-059 — Build the five reputation series on one annotated timeline
+- [ ] E18-060 — Make timeline annotations clickable through to the evidence
+- [ ] E18-061 — Build the listings panel, unmissable when anything is listed
+- [ ] E18-062 — Build the DMARC alignment view with sources and disposition
+- [ ] E18-063 — Build the TLS health view
+- [ ] E18-064 — Build the bounce explorer with verbatim responses
+- [ ] E18-065 — Build the reclassification action feeding a rule proposal
+- [ ] E18-066 — Build the placement test runner with live seed results
+- [ ] E18-067 — Build the placement comparison across domains and across content
+- [ ] E18-068 — Build the reputation delta view ranking contributing factors
+- [ ] E18-069 — Build the remediation history view
+- [ ] E18-070 — Build the AI deliverability advisor panel grounded in the shown metrics
+- [ ] E18-071 — Show the underlying numbers alongside every narration
+- [ ] E18-072 — Show window, sample size, and source on every metric
+- [ ] E18-073 — Add a confidence indicator on small samples
+- [ ] E18-074 — Build the message journey view: intent, route, submit, log lines, events
+- [ ] E18-075 — Make the journey view permanently linkable for support
+- [ ] E18-076 — Build the live transaction stream with filters and response search
+- [ ] E18-077 — Build the weekly digest preview in-app
+
+## Campaign cockpit
+- [ ] E18-078 — Build the campaign list with status, progress, and health
+- [ ] E18-079 — Build the campaign creation wizard as a linear flow
+- [ ] E18-080 — Build the sequence editor, plain-text-first
+- [ ] E18-081 — Show the live spam-signal score as the user types
+- [ ] E18-082 — Show the exact rendered message including the footer
+- [ ] E18-083 — Preview against a real lead's data
+- [ ] E18-084 — Show unresolvable personalisation tokens before launch
+- [ ] E18-085 — Build the spintax editor with rendered variations
+- [ ] E18-086 — Build the variable palette from the list's real fields
+- [ ] E18-087 — Build the AI copy panel presenting drafts for acceptance
+- [ ] E18-088 — Build the subject-variant panel with per-variant risk
+- [ ] E18-089 — Build the schedule editor with the projected send curve
+- [ ] E18-090 — Show the projected completion date and the binding constraint
+- [ ] E18-091 — Build the what-if tool for added capacity
+- [ ] E18-092 — Build the pre-launch checklist with every item linked to its fix
+- [ ] E18-093 — Build the soft-launch flow with results before full send
+- [ ] E18-094 — Build the campaign detail leading with replies
+- [ ] E18-095 — Build the funnel with every number sourced
+- [ ] E18-096 — Build the variant comparison with confidence intervals
+- [ ] E18-097 — Build the per-mailbox and per-ESP performance breakdown
+- [ ] E18-098 — Build the enrolment list with per-lead state and next due time
+- [ ] E18-099 — Build the per-lead "why has this not sent yet" explainer
+- [ ] E18-100 — Build the issues panel ranked by leads affected
+- [ ] E18-101 — Build the campaign cost view with cost per positive reply
+- [ ] E18-102 — Build the benchmark comparison against anonymised platform medians
+- [ ] E18-103 — Build the campaign duplication and template flows
+
+## Lead surfaces
+- [ ] E18-104 — Build the import wizard with mapping, preview, and reversibility
+- [ ] E18-105 — Build the compliance gate screen showing sendable, blocked, and why
+- [ ] E18-106 — Build the downloadable compliance report action
+- [ ] E18-107 — Build the list view with import status and compliance state
+- [ ] E18-108 — Build the lead detail with fields, consent, verification, campaigns, and threads
+- [ ] E18-109 — Build the lead timeline linking every entry to its evidence
+- [ ] E18-110 — Build the segment builder with a live count
+- [ ] E18-111 — Build lead search with sub-second response
+- [ ] E18-112 — Build bulk lead actions with exact counts and undo
+- [ ] E18-113 — Build the duplicate review and merge screen
+- [ ] E18-114 — Build the company view across all leads at one company
+- [ ] E18-115 — Build the do-not-contact management screen
+- [ ] E18-116 — Build the enrichment review screen showing every source
+
+## Inbox
+- [ ] E18-117 — Build the unified inbox defaulting to interested first
+- [ ] E18-118 — Build the thread view with lead context alongside
+- [ ] E18-119 — Build the classification chip with a one-click correction
+- [ ] E18-120 — Build the reply composer sending from the receiving mailbox
+- [ ] E18-121 — Build the AI reply-draft panel requiring acceptance
+- [ ] E18-122 — Build assignment, snooze, close, and archive controls
+- [ ] E18-123 — Build the unassigned queue with an SLA timer
+- [ ] E18-124 — Build internal notes and mentions
+- [ ] E18-125 — Build realtime new-reply updates over SSE
+- [ ] E18-126 — Build inbox keyboard navigation and bulk actions
+- [ ] E18-127 — Build inbox search across every thread
+- [ ] E18-128 — Build the mobile inbox layout
+- [ ] E18-129 — Build the handoff action with inline status
+- [ ] E18-130 — Build the meeting-booked outcome control
+
+## Admin, settings, and platform
+- [ ] E18-131 — Build the workspace switcher with keyboard access
+- [ ] E18-132 — Build team management with roles and invites
+- [ ] E18-133 — Build API key management with scoping
+- [ ] E18-134 — Build webhook endpoint management with delivery history
+- [ ] E18-135 — Build the billing and usage screen
+- [ ] E18-136 — Build the plan comparison and upgrade flow
+- [ ] E18-137 — Build the AI usage and opt-out screen
+- [ ] E18-138 — Build the org profile with the postal address used in footers
+- [ ] E18-139 — Build the KYC submission flow
+- [ ] E18-140 — Build the audit log viewer
+- [ ] E18-141 — Build the data export and erasure request screens
+- [ ] E18-142 — Build the notification preferences screen
+- [ ] E18-143 — Build the security screen with sessions and TOTP
+- [ ] E18-144 — Build the platform admin console for operators
+- [ ] E18-145 — Build the KYC review queue in the admin console
+- [ ] E18-146 — Build the abuse case view in the admin console
+- [ ] E18-147 — Build the policy table admin view for counsel
+- [ ] E18-148 — Build the bounce rule admin with proposal approval
+- [ ] E18-149 — Build the AI task configuration admin
+- [ ] E18-150 — Build the impersonation flow gated behind TOTP and fully audited
+
+## Marketing site
+- [ ] E18-151 — Build the homepage leading with the owned-infrastructure claim
+- [ ] E18-152 — Build the deliverability page with our own live measured numbers
+- [ ] E18-153 — Never publish a number on the marketing site we did not measure this week
+- [ ] E18-154 — Build the methodology page every published number links to
+- [ ] E18-155 — Build the comparison page against Instantly, Smartlead, and Lemlist on structure not adjectives
+- [ ] E18-156 — Build the pricing page with the real plan limits
+- [ ] E18-157 — Build the compliance posture page for prospects' counsel
+- [ ] E18-158 — Build the security page with the actual controls
+- [ ] E18-159 — Build the docs site covering every subsystem
+- [ ] E18-160 — Build the changelog generated from releases
+- [ ] E18-161 — Build the status page fed by real health checks
+- [ ] E18-162 — Build the blog with the inherited CMS retargeted
+- [ ] E18-163 — Add structured data and sitemap generation
+- [ ] E18-164 — Add OG images generated per page
+- [ ] E18-165 — Meet the performance budget on every marketing route
+- [ ] E18-166 — Build the signup flow with the KYC gate placed honestly
+- [ ] E18-167 — Build the onboarding sequence explaining the warmup wait on day one
+- [ ] E18-168 — Show a countdown to first safe send with the reason for the wait
+- [ ] E18-169 — Never let onboarding imply sending can start today
+- [ ] E18-170 — Build the demo mode with fabricated data clearly labelled as such
+- [ ] E18-171 — Add a self-serve trial that provisions a real warmed shared mailbox
+- [ ] E18-172 — Never give a trial account access to a dedicated IP
+- [ ] E18-173 — Build the white-label tenant surface reusing the inherited subdomain proxy
+- [ ] E18-174 — Build the reseller sub-tenant switcher
+- [ ] E18-175 — Build the customisable branding screen
+- [ ] E18-176 — Test the white-label surface end to end on a real subdomain
+- [ ] E18-177 — Add the design-system documentation page for internal use
+- [ ] E18-178 — Add visual regression tests on the ten most important screens
+- [ ] E18-179 — Add an interaction test suite covering the critical flows
+- [ ] E18-180 — Run the whole frontend against a slow-network profile and fix what breaks
+- [ ] E18-181 — Run the whole frontend against a screen reader and fix what breaks
+- [ ] E18-182 — Audit every screen against the app-feel checklist and record the result
+- [ ] E18-183 — Remove every screen that exists but does nothing useful
+- [ ] E18-184 — Verify no screen displays a number without a traceable source
+- [ ] E18-185 — Add a design review gate before any new cockpit screen ships
+
+---
+
+<!-- source: planning/backlog/19-billing.md · 0/105 -->
+# Epic 19 — Billing, Plans & Self-Serve SaaS
+
+Stripe is the one unavoidable third party, isolated behind a BillingProvider seam.
+
+- [ ] E19-001 — Create packages/billing with the BillingProvider interface
+- [ ] E19-002 — Define the interface: customer, subscription, usage, invoice, portal, webhook
+- [ ] E19-003 — Implement the Stripe adapter behind the interface
+- [ ] E19-004 — Assert in code that no Stripe symbol is imported outside packages/billing
+- [ ] E19-005 — Add a CI rule enforcing that assertion
+- [ ] E19-006 — Design the plan matrix: mailboxes, domains, sends, verifications, AI tokens, seats
+- [ ] E19-007 — Define what each plan honestly includes; never list a feature we have not shipped
+- [ ] E19-008 — Gate dedicated IPs and dedicated domains to the plans that actually get them
+- [ ] E19-009 — Never claim a dedicated IP on a shared-pool plan
+- [ ] E19-010 — Implement plan definitions as versioned code with a migration path
+- [ ] E19-011 — Implement quota enforcement at the point of consumption, not at billing time
+- [ ] E19-012 — Enforce the mailbox quota at mailbox creation
+- [ ] E19-013 — Enforce the domain quota at domain purchase
+- [ ] E19-014 — Enforce the send quota in the router as a hard filter
+- [ ] E19-015 — Enforce the verification quota in the verify engine
+- [ ] E19-016 — Enforce the AI token budget in the AI gateway
+- [ ] E19-017 — Enforce the seat quota at invitation
+- [ ] E19-018 — Show remaining quota in the UI before the user hits the limit
+- [ ] E19-019 — Warn at 80% of any quota, not only at 100%
+- [ ] E19-020 — Never hard-stop a running campaign mid-flight on a quota boundary without notice
+- [ ] E19-021 — Implement metered usage recording per send, verification, and AI call
+- [ ] E19-022 — Record usage idempotently so a retry does not double-bill
+- [ ] E19-023 — Exclude peer warmup and placement probes from billable sends
+- [ ] E19-024 — Test that exclusion explicitly
+- [ ] E19-025 — Implement the usage aggregation job with a reconciliation against raw events
+- [ ] E19-026 — Alert on any drift between aggregated and raw usage
+- [ ] E19-027 — Implement overage pricing per metered dimension
+- [ ] E19-028 — Show projected overage before the billing period closes
+- [ ] E19-029 — Let the customer set a spend cap that pauses rather than surprises
+- [ ] E19-030 — Implement subscription creation, upgrade, downgrade, and cancellation
+- [ ] E19-031 — Handle downgrade when current usage exceeds the lower plan's quota
+- [ ] E19-032 — Never silently delete resources on a downgrade; require an explicit choice
+- [ ] E19-033 — Implement the Stripe webhook receiver with signature verification
+- [ ] E19-034 — Make webhook handling idempotent on the event id
+- [ ] E19-035 — Handle payment failure with a dunning sequence and a grace period
+- [ ] E19-036 — Suspend sending after the grace period, not immediately
+- [ ] E19-037 — Never lose data on suspension; only stop sending
+- [ ] E19-038 — Implement reactivation restoring the previous state
+- [ ] E19-039 — Implement the customer portal link for payment method and invoices
+- [ ] E19-040 — Never handle a card number in our own UI
+- [ ] E19-041 — Implement tax handling via the processor's tax service
+- [ ] E19-042 — Implement invoice generation with the line items a customer can verify
+- [ ] E19-043 — Show the usage detail behind every invoice line
+- [ ] E19-044 — Make usage detail downloadable as CSV
+- [ ] E19-045 — Build the usage page showing every metered dimension over time
+- [ ] E19-046 — Show cost per positive reply as the headline efficiency metric
+- [ ] E19-047 — Show infrastructure, verification, and AI cost separately
+- [ ] E19-048 — Build the plan comparison and upgrade flow
+- [ ] E19-049 — Show exactly what changes on upgrade, including capacity
+- [ ] E19-050 — Implement annual billing with the discount stated plainly
+- [ ] E19-051 — Implement the trial with a real warmed shared mailbox
+- [ ] E19-052 — Never provision a dedicated resource for a trial
+- [ ] E19-053 — Implement trial expiry with a clear path to conversion
+- [ ] E19-054 — Implement the KYC gate before the first live send on any plan
+- [ ] E19-055 — Never let a payment method alone substitute for KYC
+- [ ] E19-056 — Implement the reseller billing split using the inherited Stripe Connect foundation
+- [ ] E19-057 — Implement per-reseller pricing markup
+- [ ] E19-058 — Implement sub-tenant usage attribution up to the reseller
+- [ ] E19-059 — Build the reseller billing dashboard
+- [ ] E19-060 — Implement refunds and credits with an audit record
+- [ ] E19-061 — Require a reason on every manual credit
+- [ ] E19-062 — Build the internal revenue dashboard: MRR, churn, expansion, cohort retention
+- [ ] E19-063 — Build the internal unit-economics dashboard: cost per send, gross margin per plan
+- [ ] E19-064 — Feed real infrastructure invoices into the cost model
+- [ ] E19-065 — Alert when gross margin on any plan falls below target
+- [ ] E19-066 — Recompute plan pricing from measured cost, not competitor anchoring
+- [ ] E19-067 — Record every pricing change as an ADR
+- [ ] E19-068 — Grandfather existing customers on a pricing change and say so
+- [ ] E19-069 — Implement the dunning email sequence through usermails, not through EMS
+- [ ] E19-070 — Document why transactional billing mail must not go through the cold-outreach fleet
+- [ ] E19-071 — Implement account deletion with a data export offered first
+- [ ] E19-072 — Implement resource reclamation on deletion: drain mailboxes, release domains
+- [ ] E19-073 — Never release a domain that still has in-flight sequences
+- [ ] E19-074 — Implement the win-back offer path on cancellation
+- [ ] E19-075 — Ask for and record the cancellation reason
+- [ ] E19-076 — Report cancellation reasons monthly and act on the top one
+- [ ] E19-077 — Test quota enforcement at every consumption point
+- [ ] E19-078 — Test that usage recording is idempotent under retry
+- [ ] E19-079 — Test the webhook receiver against replayed Stripe events
+- [ ] E19-080 — Test the dunning and suspension timeline end to end
+- [ ] E19-081 — Test the downgrade path with usage over the lower quota
+- [ ] E19-082 — Test that peer warmup never appears on an invoice
+- [ ] E19-083 — Test reseller usage attribution across three levels
+- [ ] E19-084 — Load-test usage aggregation at ten million events per period
+- [ ] E19-085 — Document the billing subsystem in planning/specs/billing/
+- [ ] E19-086 — Publish the pricing page with the real limits
+- [ ] E19-087 — Publish the fair-use policy
+- [ ] E19-088 — Publish the refund policy
+- [ ] E19-089 — Add Stripe to the subprocessor list
+- [ ] E19-090 — Add a billing incident runbook for a processor outage
+- [ ] E19-091 — Ensure a processor outage never stops sending for a paid customer
+- [ ] E19-092 — Test that path explicitly
+- [ ] E19-093 — Add a manual invoicing path for enterprise customers
+- [ ] E19-094 — Add a purchase-order and net-terms flow for enterprise
+- [ ] E19-095 — Add a second BillingProvider adapter stub to prove the seam holds
+- [ ] E19-096 — Add usage alerts the customer can configure
+- [ ] E19-097 — Add a monthly usage summary email
+- [ ] E19-098 — Show the customer their own cost trend over time
+- [ ] E19-099 — Never present a cost number we cannot reconcile to an invoice line
+- [ ] E19-100 — Add billing MCP tools for internal reporting only
+- [ ] E19-101 — Never expose a billing mutation through MCP
+- [ ] E19-102 — Add an internal tool to simulate a customer's bill before a pricing change
+- [ ] E19-103 — Run that simulation before every pricing change and record the result
+- [ ] E19-104 — Add a plan-fit recommender suggesting the plan that matches actual usage
+- [ ] E19-105 — Recommend a downgrade when the data supports it
+
+---
+
+<!-- source: planning/backlog/20-api-sdk.md · 0/95 -->
+# Epic 20 — Public API, SDK, Webhooks & MCP
+
+- [ ] E20-001 — Design the EMS REST surface and freeze the resource naming
+- [ ] E20-002 — Version the API from day one under /v1
+- [ ] E20-003 — Implement API key authentication with scoped permissions
+- [ ] E20-004 — Scope keys per workspace, never per org by default
+- [ ] E20-005 — Implement key rotation with an overlap window
+- [ ] E20-006 — Show the key only once at creation and store a hash
+- [ ] E20-007 — Implement per-key rate limiting with clear headers
+- [ ] E20-008 — Implement idempotency keys on every mutating endpoint
+- [ ] E20-009 — Return consistent error shapes with a machine-readable code
+- [ ] E20-010 — Never leak internal identifiers or stack traces in an error
+- [ ] E20-011 — Implement cursor pagination on every list endpoint
+- [ ] E20-012 — Implement filtering and sorting consistently across resources
+- [ ] E20-013 — Implement leads CRUD and bulk import endpoints
+- [ ] E20-014 — Enforce the provenance requirement on API imports
+- [ ] E20-015 — Implement lists CRUD and the compliance report endpoint
+- [ ] E20-016 — Implement campaigns CRUD, launch, pause, and resume
+- [ ] E20-017 — Implement sequence steps and variants CRUD
+- [ ] E20-018 — Implement enrolment and un-enrolment endpoints
+- [ ] E20-019 — Implement verification single and bulk endpoints
+- [ ] E20-020 — Implement suppression list read and write endpoints
+- [ ] E20-021 — Implement the unsubscribe endpoint honouring RFC 8058 POST
+- [ ] E20-022 — Implement fleet read endpoints for nodes, IPs, domains, and mailboxes
+- [ ] E20-023 — Gate fleet write endpoints behind an operator scope
+- [ ] E20-024 — Implement deliverability read endpoints for placement, reputation, and listings
+- [ ] E20-025 — Implement the message journey endpoint
+- [ ] E20-026 — Implement inbox thread read and reply endpoints
+- [ ] E20-027 — Implement the policy decision lookup endpoint for compliance evidence
+- [ ] E20-028 — Implement the usage endpoint
+- [ ] E20-029 — Implement the export and erasure request endpoints
+- [ ] E20-030 — Publish an OpenAPI specification generated from the route definitions
+- [ ] E20-031 — Fail CI when the spec drifts from the implementation
+- [ ] E20-032 — Publish an interactive API reference built from the spec
+- [ ] E20-033 — Add a copy-paste example in curl and TypeScript for every endpoint
+- [ ] E20-034 — Add a Postman or equivalent collection generated from the spec
+- [ ] E20-035 — Reshape @ems/sdk for the EMS surface
+- [ ] E20-036 — Implement typed methods for every endpoint
+- [ ] E20-037 — Implement automatic retry with backoff on transient errors
+- [ ] E20-038 — Implement idempotency key generation in the SDK
+- [ ] E20-039 — Implement pagination helpers and async iterators
+- [ ] E20-040 — Implement webhook signature verification in the SDK
+- [ ] E20-041 — Ship the SDK with zero runtime dependencies
+- [ ] E20-042 — Test the SDK against a live staging environment in CI
+- [ ] E20-043 — Publish the SDK to npm under the decided name
+- [ ] E20-044 — Never document an SDK method that is not published
+- [ ] E20-045 — Version the SDK independently of the API with a compatibility matrix
+- [ ] E20-046 — Define the webhook event catalogue and version it
+- [ ] E20-047 — Implement webhook signing with the inherited HMAC scheme
+- [ ] E20-048 — Implement webhook delivery with retry, backoff, and dead-lettering
+- [ ] E20-049 — Implement delivery history with the request and response visible
+- [ ] E20-050 — Implement manual redelivery of a specific event
+- [ ] E20-051 — Implement endpoint health and automatic disabling after sustained failure
+- [ ] E20-052 — Notify the customer before disabling an endpoint
+- [ ] E20-053 — Implement SSRF protection on every webhook target using the inherited guard
+- [ ] E20-054 — Test SSRF protection against the standard bypass corpus
+- [ ] E20-055 — Encrypt webhook secrets at rest
+- [ ] E20-056 — Emit the campaign lifecycle events
+- [ ] E20-057 — Emit the message lifecycle events sourced from the maillog
+- [ ] E20-058 — Emit the reply and classification events
+- [ ] E20-059 — Emit the suppression and unsubscribe events
+- [ ] E20-060 — Emit the fleet health and remediation events
+- [ ] E20-061 — Emit the policy block events so a customer can react
+- [ ] E20-062 — Never emit an event we cannot source from a measurement
+- [ ] E20-063 — Retarget packages/mcp for the EMS domain
+- [ ] E20-064 — Implement MCP tools for fleet inspection
+- [ ] E20-065 — Implement MCP tools for deliverability questions
+- [ ] E20-066 — Implement MCP tools for campaign inspection
+- [ ] E20-067 — Implement MCP tools for lead and list inspection
+- [ ] E20-068 — Implement MCP tools for inbox triage
+- [ ] E20-069 — Implement MCP tools for placement tests
+- [ ] E20-070 — Require human confirmation for every state-changing MCP tool
+- [ ] E20-071 — Never expose a send, a billing mutation, or a prompt change through MCP
+- [ ] E20-072 — Scope MCP access to a single workspace per session
+- [ ] E20-073 — Audit every MCP tool call
+- [ ] E20-074 — Publish the MCP server and document its tools
+- [ ] E20-075 — Test the MCP server against a real agent session
+- [ ] E20-076 — Retarget packages/migrate for outreach-platform imports
+- [ ] E20-077 — Implement the Instantly export importer
+- [ ] E20-078 — Implement the Smartlead export importer
+- [ ] E20-079 — Implement the Lemlist export importer
+- [ ] E20-080 — Implement the Apollo sequence export importer
+- [ ] E20-081 — Preserve suppression and consent from every importer where present
+- [ ] E20-082 — Refuse an import carrying no provenance at all
+- [ ] E20-083 — Produce a migration report showing exactly what came across and what did not
+- [ ] E20-084 — Never claim a migration is complete when fields were dropped
+- [ ] E20-085 — Test each importer against a real export file
+- [ ] E20-086 — Document the migration path per source platform
+- [ ] E20-087 — Add API integration tests covering every endpoint
+- [ ] E20-088 — Add contract tests asserting the OpenAPI spec matches responses
+- [ ] E20-089 — Add rate-limit tests
+- [ ] E20-090 — Add authentication and authorisation tests per scope
+- [ ] E20-091 — Add a cross-tenant access test asserting isolation on every endpoint
+- [ ] E20-092 — Load-test the API at the target request rate
+- [ ] E20-093 — Measure and publish API latency percentiles
+- [ ] E20-094 — Add an API status section to the status page
+- [ ] E20-095 — Document the API deprecation policy and honour it
+
+---
+
+<!-- source: planning/backlog/21-security.md · 0/100 -->
+# Epic 21 — Security, Privacy & Audit
+
+- [ ] E21-001 — Threat-model the whole platform and write it down
+- [ ] E21-002 — Identify the crown jewels: DKIM keys, seed credentials, lead data, policy decisions
+- [ ] E21-003 — Document the trust boundaries: app, workers, nodes, seedbox, inference
+- [ ] E21-004 — Implement one secrets module with typed access and no ad-hoc env reads
+- [ ] E21-005 — Encrypt DKIM private keys at rest with AES-256-GCM
+- [ ] E21-006 — Decrypt DKIM keys only in the sender worker and the provisioning path
+- [ ] E21-007 — Never log a decrypted key, a token, or a password, at any level
+- [ ] E21-008 — Add a log scrubber that redacts secret-shaped strings as a second line of defence
+- [ ] E21-009 — Encrypt seed account credentials and restrict decryption to the seedbox
+- [ ] E21-010 — Encrypt OAuth tokens at rest as inherited
+- [ ] E21-011 — Encrypt webhook secrets at rest as inherited
+- [ ] E21-012 — Encrypt registrar and DNS API tokens at rest
+- [ ] E21-013 — Write the rotation runbook for every credential class
+- [ ] E21-014 — Automate rotation where the provider supports it
+- [ ] E21-015 — Alert on any credential older than its rotation window
+- [ ] E21-016 — Implement mTLS or Ed25519 signing between fleet-agent and API
+- [ ] E21-017 — Reject every unsigned node report
+- [ ] E21-018 — Implement nonce and timestamp replay protection on node requests
+- [ ] E21-019 — Restrict node SSH to key-only on a non-standard port with an allowlist
+- [ ] E21-020 — Implement least-privilege database roles for API, workers, and reporting
+- [ ] E21-021 — Deny DROP and TRUNCATE to the application roles
+- [ ] E21-022 — Implement the mandatory orgId predicate helper for tenant queries
+- [ ] E21-023 — Fail CI when a tenant model is queried without it
+- [ ] E21-024 — Add cross-tenant access tests on every endpoint and every worker path
+- [ ] E21-025 — Keep the inherited RBAC and extend it for the operator role
+- [ ] E21-026 — Separate the platform operator role from the tenant owner role
+- [ ] E21-027 — Require TOTP for every platform admin action
+- [ ] E21-028 — Require TOTP for impersonation and audit every impersonation
+- [ ] E21-029 — Offer customer 2FA and make it mandatory on higher plans
+- [ ] E21-030 — Implement session management with revocation and device listing
+- [ ] E21-031 — Implement token versioning so a password change invalidates sessions
+- [ ] E21-032 — Keep the inherited security headers and extend the CSP for new surfaces
+- [ ] E21-033 — Self-host every font and asset; no third-party origin in the CSP
+- [ ] E21-034 — Keep the inherited SSRF guard and apply it to every new outbound fetch
+- [ ] E21-035 — Apply the SSRF guard to enrichment fetches and webhook targets
+- [ ] E21-036 — Test SSRF protection against the standard bypass corpus
+- [ ] E21-037 — Reject CR and LF in every header-bound field
+- [ ] E21-038 — Fuzz the MIME builder with injection payloads
+- [ ] E21-039 — Sanitise inbound HTML before rendering, stripping scripts and remote loads
+- [ ] E21-040 — Quarantine executable and archive attachments
+- [ ] E21-041 — Implement upload validation by content type and magic bytes, not by extension
+- [ ] E21-042 — Serve user-uploaded content from an isolated origin
+- [ ] E21-043 — Implement rate limiting on every unauthenticated endpoint
+- [ ] E21-044 — Implement account lockout and progressive delay on failed authentication
+- [ ] E21-045 — Implement email-ownership verification before privileged actions
+- [ ] E21-046 — Implement constant-time comparison for every shared secret
+- [ ] E21-047 — Implement CSRF protection on every cookie-authenticated mutation
+- [ ] E21-048 — Implement a host-header allowlist that fails closed
+- [ ] E21-049 — Implement the append-only audit log with actor, action, target, and payload
+- [ ] E21-050 — Snapshot the audit log to R2 with a hash chain
+- [ ] E21-051 — Verify the hash chain on a schedule and alert on a break
+- [ ] E21-052 — Audit every fleet mutation, policy change, and credential access
+- [ ] E21-053 — Audit every data export and erasure
+- [ ] E21-054 — Build the audit log viewer with search and export
+- [ ] E21-055 — Retain audit records per the documented retention schedule
+- [ ] E21-056 — Implement the data retention schedule as scheduled jobs, not as policy prose
+- [ ] E21-057 — Implement the erasure job across Postgres, ClickHouse, and R2
+- [ ] E21-058 — Verify erasure preserves the suppression hash
+- [ ] E21-059 — Implement the export job producing a single signed archive
+- [ ] E21-060 — Meet and report against the stated DSR SLAs
+- [ ] E21-061 — Implement the restriction flag the router honours
+- [ ] E21-062 — Publish the privacy policy, the DPA, and the subprocessor list
+- [ ] E21-063 — Keep the subprocessor list current automatically where possible
+- [ ] E21-064 — Publish the security page describing the controls we actually have
+- [ ] E21-065 — Never claim a certification we do not hold
+- [ ] E21-066 — Build the SOC-2-shaped evidence set without claiming certification
+- [ ] E21-067 — Implement access reviews on a schedule with a record
+- [ ] E21-068 — Implement an onboarding and offboarding checklist for platform access
+- [ ] E21-069 — Implement dependency scanning in CI with a policy on severity
+- [ ] E21-070 — Implement container image scanning in CI
+- [ ] E21-071 — Implement secret scanning on every commit and in history
+- [ ] E21-072 — Implement static analysis with the rules that matter, not the whole catalogue
+- [ ] E21-073 — Run a dependency review before adding any new package
+- [ ] E21-074 — Keep the third-party surface minimal and justify every addition in an ADR
+- [ ] E21-075 — Implement a vulnerability disclosure policy and a security contact
+- [ ] E21-076 — Implement an incident response plan with severity definitions
+- [ ] E21-077 — Define the breach notification process and the timelines
+- [ ] E21-078 — Run a tabletop exercise on a simulated breach
+- [ ] E21-079 — Run an internal white-box review of the send path
+- [ ] E21-080 — Run an internal review of the multi-tenancy boundary
+- [ ] E21-081 — Run an internal review of the node trust boundary
+- [ ] E21-082 — Commission an external penetration test before public launch
+- [ ] E21-083 — Track and fix every finding with an owner and a date
+- [ ] E21-084 — Re-test every fix
+- [ ] E21-085 — Publish a summary of the test having been done, without the findings
+- [ ] E21-086 — Implement backup encryption and test a restore from encrypted backup
+- [ ] E21-087 — Test disaster recovery for the whole platform, not only the database
+- [ ] E21-088 — Document and measure the recovery time and recovery point objectives
+- [ ] E21-089 — Implement anomaly detection on authentication and privileged actions
+- [ ] E21-090 — Alert on impossible-travel and unusual privileged activity
+- [ ] E21-091 — Implement egress restriction on the application hosts
+- [ ] E21-092 — Restrict which hosts may reach the inference provider
+- [ ] E21-093 — Restrict which hosts may reach the registrar and DNS APIs
+- [ ] E21-094 — Verify no host can reach both seed credentials and campaign sending
+- [ ] E21-095 — Add a security section to every new-subsystem spec template
+- [ ] E21-096 — Require a security note on every PR touching the send path or the policy gate
+- [ ] E21-097 — Add abuse-case tests alongside the use-case tests
+- [ ] E21-098 — Test that a tenant cannot read another tenant's fleet, leads, or inbox
+- [ ] E21-099 — Test that a tenant cannot override global suppression
+- [ ] E21-100 — Test that an operator action without TOTP is refused
+
+---
+
+<!-- source: planning/backlog/22-testing-ci.md · 0/105 -->
+# Epic 22 — Testing, CI & Quality Gates
+
+- [ ] E22-001 — Define the test taxonomy: unit, integration, contract, e2e, load, abuse
+- [ ] E22-002 — Establish the rule that every send-path change needs an integration test
+- [ ] E22-003 — Run every test against a real ephemeral Postgres, never a mock
+- [ ] E22-004 — Run every test against a real ephemeral Valkey
+- [ ] E22-005 — Run ClickHouse-dependent tests against a real ephemeral instance
+- [ ] E22-006 — Build the fixture factory package for every core entity
+- [ ] E22-007 — Build a fake SMTP sink that records the exact message received
+- [ ] E22-008 — Build a fake maillog emitter replaying recorded Postfix lines
+- [ ] E22-009 — Build a DNS simulator so CI never touches a live zone
+- [ ] E22-010 — Build an inference stub returning fixture responses deterministically
+- [ ] E22-011 — Build a registrar stub
+- [ ] E22-012 — Build a billing stub implementing the BillingProvider interface
+- [ ] E22-013 — Make every external dependency stubbable without changing production code
+- [ ] E22-014 — Write the send-path integration test covering all ten stages
+- [ ] E22-015 — Write the test asserting no path to the MTA skips the policy gate
+- [ ] E22-016 — Write the test asserting PolicyDecision is written for every send
+- [ ] E22-017 — Write the test asserting suppression is re-checked before emit
+- [ ] E22-018 — Write the test asserting the emit path fails closed on a store error
+- [ ] E22-019 — Write the test asserting cap buckets cannot be overspent under concurrency
+- [ ] E22-020 — Write the test asserting Message-ID uniqueness under concurrency
+- [ ] E22-021 — Write the test asserting an intent processed twice sends once
+- [ ] E22-022 — Write the cross-tenant isolation test suite
+- [ ] E22-023 — Write the compliance test suite from planning/COMPLIANCE.md
+- [ ] E22-024 — Write the deliverability test suite from the bounce corpus
+- [ ] E22-025 — Write the router property tests over randomised fleet states
+- [ ] E22-026 — Write the warmup tests including hold and rollback
+- [ ] E22-027 — Write the verification tests against a known-address corpus
+- [ ] E22-028 — Write the sequence engine tests including timezone and holiday edges
+- [ ] E22-029 — Write the inbox threading tests against a real reply corpus
+- [ ] E22-030 — Write the AI eval suite per task with CI gates
+- [ ] E22-031 — Write the prompt-injection test suite
+- [ ] E22-032 — Write the billing tests including idempotency and reconciliation
+- [ ] E22-033 — Write the API contract tests against the OpenAPI spec
+- [ ] E22-034 — Write the SDK tests against a live staging environment
+- [ ] E22-035 — Write the frontend interaction tests for the critical flows
+- [ ] E22-036 — Write the visual regression tests for the ten most important screens
+- [ ] E22-037 — Write the accessibility tests
+- [ ] E22-038 — Write the performance budget tests per route
+- [ ] E22-039 — Write the load tests for the scheduler, the router, and the ingest pipeline
+- [ ] E22-040 — Write the chaos tests for node loss, store loss, and provider outage
+- [ ] E22-041 — Write the abuse-case tests alongside the use cases
+- [ ] E22-042 — Establish coverage targets per package, weighted toward the send path
+- [ ] E22-043 — Never chase a global coverage number at the expense of meaningful tests
+- [ ] E22-044 — Make the test suite run in under ten minutes on CI
+- [ ] E22-045 — Parallelise the suite across workers with database isolation
+- [ ] E22-046 — Make every test independently runnable and order-independent
+- [ ] E22-047 — Eliminate every flaky test rather than retrying it
+- [ ] E22-048 — Track flake rate and treat a flaky test as a bug
+- [ ] E22-049 — Build the CI pipeline: typecheck, lint, schema, unit, integration, contract
+- [ ] E22-050 — Add the e2e job against an ephemeral full stack
+- [ ] E22-051 — Add the AI eval job
+- [ ] E22-052 — Add the security scanning jobs
+- [ ] E22-053 — Add the performance budget job
+- [ ] E22-054 — Add the migration safety job
+- [ ] E22-055 — Add the OpenAPI drift job
+- [ ] E22-056 — Add the dependency-direction lint job
+- [ ] E22-057 — Add the tenant-scope lint job
+- [ ] E22-058 — Add the no-Stripe-outside-billing lint job
+- [ ] E22-059 — Add the no-AI-outside-workers lint job
+- [ ] E22-060 — Add the no-SMTP-outside-sender lint job
+- [ ] E22-061 — Make every gate blocking on the default branch
+- [ ] E22-062 — Enable branch protection requiring the gates and a review
+- [ ] E22-063 — Require a second reviewer on send-path, policy, and prompt changes
+- [ ] E22-064 — Add the PR template asking which invariant the change touches
+- [ ] E22-065 — Add a changelog fragment requirement on user-visible changes
+- [ ] E22-066 — Build the staging environment mirroring production topology
+- [ ] E22-067 — Include a staging blast node in the staging environment
+- [ ] E22-068 — Never point staging at production data
+- [ ] E22-069 — Seed staging with realistic synthetic data at production scale
+- [ ] E22-070 — Run the full e2e suite against staging on every merge
+- [ ] E22-071 — Run a nightly long-running soak test against staging
+- [ ] E22-072 — Run a weekly full disaster-recovery drill against staging
+- [ ] E22-073 — Implement preview environments per pull request where cost allows
+- [ ] E22-074 — Never let a preview environment send real mail
+- [ ] E22-075 — Add a hard guard: non-production environments cannot reach a campaign IP
+- [ ] E22-076 — Test that guard explicitly
+- [ ] E22-077 — Implement feature flags for risky changes
+- [ ] E22-078 — Implement per-org flag targeting for gradual rollout
+- [ ] E22-079 — Implement a kill switch for every flagged feature
+- [ ] E22-080 — Remove a flag once the feature is fully rolled out
+- [ ] E22-081 — Track flag age and alert on stale flags
+- [ ] E22-082 — Implement canary deploys with automatic rollback on health regression
+- [ ] E22-083 — Define the health signals that trigger a rollback
+- [ ] E22-084 — Test the rollback path deliberately
+- [ ] E22-085 — Implement deployment gating on the migration safety check
+- [ ] E22-086 — Implement a post-deploy smoke suite that runs automatically
+- [ ] E22-087 — Alert on any post-deploy smoke failure and roll back
+- [ ] E22-088 — Track deployment frequency, lead time, change failure rate, and restore time
+- [ ] E22-089 — Report those four metrics monthly and act on the worst one
+- [ ] E22-090 — Build the local development experience so a new engineer ships on day one
+- [ ] E22-091 — Document every command in one place and keep it current
+- [ ] E22-092 — Add a doctor script diagnosing a broken local environment
+- [ ] E22-093 — Add a reset script returning local state to a known baseline
+- [ ] E22-094 — Add a test-data generator producing a realistic org in one command
+- [ ] E22-095 — Time the setup from clone to running and keep it under fifteen minutes
+- [ ] E22-096 — Add a regression test for every production bug before fixing it
+- [ ] E22-097 — Build the incident-to-test pipeline so no incident recurs untested
+- [ ] E22-098 — Review the test suite quarterly and delete tests that assert nothing
+- [ ] E22-099 — Keep the test suite honest: a passing suite must mean the product works
+- [ ] E22-100 — Document the testing strategy in planning/specs/testing/
+- [ ] E22-101 — Add a mutation-testing pass on the policy and router packages
+- [ ] E22-102 — Act on surviving mutants in those packages
+- [ ] E22-103 — Add a fuzz corpus for the parsers and keep it in the repo
+- [ ] E22-104 — Run continuous fuzzing on the MIME and maillog parsers
+- [ ] E22-105 — Triage every fuzz crash as a bug, not as noise
+
+---
+
+<!-- source: planning/backlog/23-observability-ops.md · 0/90 -->
+# Epic 23 — Observability, Deployment & Operations
+
+- [ ] E23-001 — Define the service-level indicators for send, ingest, API, and cockpit
+- [ ] E23-002 — Define the service-level objectives and get them agreed before launch
+- [ ] E23-003 — Instrument structured logging with a consistent field schema
+- [ ] E23-004 — Include a correlation id on every log line across the whole request path
+- [ ] E23-005 — Propagate the correlation id from API through queue to worker to node
+- [ ] E23-006 — Never log lead PII at info level
+- [ ] E23-007 — Implement log sampling on high-volume paths with full capture on error
+- [ ] E23-008 — Ship logs to a self-hosted store with a retention policy
+- [ ] E23-009 — Implement metrics for every queue: depth, age, throughput, failure rate
+- [ ] E23-010 — Implement metrics for the router: decisions by outcome and by reason
+- [ ] E23-011 — Implement metrics for the send path: submit rate, delivery rate, defer rate
+- [ ] E23-012 — Implement metrics for ingest lag on maillog, inbound, and events
+- [ ] E23-013 — Implement metrics for the API: rate, latency percentiles, error rate
+- [ ] E23-014 — Implement metrics for the AI gateway: cost, latency, cache, schema failures
+- [ ] E23-015 — Implement business metrics: sends, replies, meetings, cost per reply
+- [ ] E23-016 — Build the internal operations dashboard from those metrics
+- [ ] E23-017 — Build the on-call view showing only what is currently broken
+- [ ] E23-018 — Define the alerting policy: what pages, what emails, what only logs
+- [ ] E23-019 — Never page on something with no runbook
+- [ ] E23-020 — Write a runbook for every paging alert
+- [ ] E23-021 — Link the runbook directly from the alert
+- [ ] E23-022 — Implement alert deduplication and grouping
+- [ ] E23-023 — Implement alert suppression during planned maintenance
+- [ ] E23-024 — Track alert volume and treat a noisy alert as a bug
+- [ ] E23-025 — Implement synthetic canary sends from every active node
+- [ ] E23-026 — Implement a synthetic API probe from outside the network
+- [ ] E23-027 — Implement a synthetic cockpit load probe
+- [ ] E23-028 — Build the public status page fed by real health checks
+- [ ] E23-029 — Never show green on the status page while a canary is failing
+- [ ] E23-030 — Implement incident creation, timeline, and public updates
+- [ ] E23-031 — Implement the severity definitions and the escalation path
+- [ ] E23-032 — Implement the post-incident review template
+- [ ] E23-033 — Require a post-incident review for every Sev-1 and Sev-2
+- [ ] E23-034 — Require a regression test as an output of every review
+- [ ] E23-035 — Track action items from reviews to completion
+- [ ] E23-036 — Configure the hostssh deploy remote for EMS
+- [ ] E23-037 — Build the single image covering api, web, and workers
+- [ ] E23-038 — Configure the sibling deploys with their own env files
+- [ ] E23-039 — Configure the dmarc-ingest and seedbox standalone deploys
+- [ ] E23-040 — Run migrations on boot with the forward-only discipline
+- [ ] E23-041 — Implement blue-green for the API
+- [ ] E23-042 — Implement a graceful worker shutdown that finishes in-flight work
+- [ ] E23-043 — Implement queue draining on deploy so nothing is lost
+- [ ] E23-044 — Verify a deploy with the post-deploy smoke suite before shifting traffic
+- [ ] E23-045 — Implement one-command rollback
+- [ ] E23-046 — Test rollback deliberately on staging every month
+- [ ] E23-047 — Configure Cloudflare DNS for electronicmailservices.com
+- [ ] E23-048 — Configure app.electronicmailservices.com to the hub
+- [ ] E23-049 — Configure TLS with Full strict and an origin certificate
+- [ ] E23-050 — Verify no EMS hostname resolves to a blast node except the PTR records
+- [ ] E23-051 — Configure the aggregate-report domain DNS and MX
+- [ ] E23-052 — Extend the restic to R2 backup to every EMS store
+- [ ] E23-053 — Verify backups by restoring on a schedule, not by checking they exist
+- [ ] E23-054 — Alert on a backup that did not run or did not verify
+- [ ] E23-055 — Document the recovery time and recovery point objectives per store
+- [ ] E23-056 — Write the runbook for a full platform outage
+- [ ] E23-057 — Write the runbook for a data store outage
+- [ ] E23-058 — Write the runbook for a queue backlog
+- [ ] E23-059 — Write the runbook for an ingest lag spike
+- [ ] E23-060 — Write the runbook for a node loss
+- [ ] E23-061 — Write the runbook for a blacklist listing
+- [ ] E23-062 — Write the runbook for a compliance incident
+- [ ] E23-063 — Write the runbook for an abuse incident
+- [ ] E23-064 — Write the runbook for a credential compromise
+- [ ] E23-065 — Write the runbook for an inference provider outage
+- [ ] E23-066 — Write the runbook for a payment processor outage
+- [ ] E23-067 — Index every runbook from one page and keep the index current
+- [ ] E23-068 — Test each runbook by having someone else follow it
+- [ ] E23-069 — Implement the maintenance window process with customer notice
+- [ ] E23-070 — Never take a maintenance window that stops sending without notice
+- [ ] E23-071 — Implement capacity monitoring across every store and queue
+- [ ] E23-072 — Alert before a resource is exhausted, not when it is
+- [ ] E23-073 — Implement cost monitoring per component
+- [ ] E23-074 — Alert on a cost anomaly per component
+- [ ] E23-075 — Report cost per thousand sends monthly against the target
+- [ ] E23-076 — Report gross margin per plan monthly
+- [ ] E23-077 — Implement the operator daily checklist as a dashboard, not a document
+- [ ] E23-078 — Measure operator time spent per week and drive it down
+- [ ] E23-079 — Automate the top three recurring operator tasks each quarter
+- [ ] E23-080 — Track the fleet-per-operator ratio as the scalability metric
+- [ ] E23-081 — Implement scheduled reporting to the team on the key metrics
+- [ ] E23-082 — Implement the weekly customer deliverability digest job
+- [ ] E23-083 — Implement the monthly business review data pack
+- [ ] E23-084 — Implement the quarterly model, weight, and policy review as calendared work
+- [ ] E23-085 — Document the whole operations model in planning/specs/operations/
+- [ ] E23-086 — Onboard a second operator and time how long it takes them to be effective
+- [ ] E23-087 — Fix whatever slowed them down
+- [ ] E23-088 — Verify the platform can be operated without the person who built it
+- [ ] E23-089 — Write the bus-factor document listing every single point of human failure
+- [ ] E23-090 — Close the top three single points of human failure
+
+---
+
+<!-- source: planning/backlog/24-launch.md · 0/100 -->
+# Epic 24 — Docs, Positioning & Launch
+
+- [ ] E24-001 — Write the product one-liner and test it on five people outside the project
+- [ ] E24-002 — Write the positioning statement against Instantly, Smartlead, and Lemlist
+- [ ] E24-003 — Lead positioning with owned infrastructure, not with feature count
+- [ ] E24-004 — Write the honest comparison table on structure, not adjectives
+- [ ] E24-005 — Never claim a competitor lacks something without verifying it this quarter
+- [ ] E24-006 — Write the "what delivered actually means" explainer
+- [ ] E24-007 — Write the "why your sent count is a lie" explainer
+- [ ] E24-008 — Write the "why we refuse warmup pools" explainer
+- [ ] E24-009 — Write the "why open rates are fiction" explainer
+- [ ] E24-010 — Write the "cold email and the law" guide with the jurisdiction map
+- [ ] E24-011 — Have counsel review the legal guide before publishing
+- [ ] E24-012 — Write the compliance posture page for prospects' legal teams
+- [ ] E24-013 — Write the security page describing the controls we have
+- [ ] E24-014 — Publish the AUP, privacy policy, terms, DPA, and subprocessor list
+- [ ] E24-015 — Publish the data retention schedule
+- [ ] E24-016 — Write the getting-started guide from signup to first safe send
+- [ ] E24-017 — Set the warmup expectation on the first screen of onboarding
+- [ ] E24-018 — Write the domain and mailbox strategy guide
+- [ ] E24-019 — Write the list quality and provenance guide
+- [ ] E24-020 — Write the sequence writing guide
+- [ ] E24-021 — Write the reply handling guide
+- [ ] E24-022 — Write the deliverability troubleshooting guide
+- [ ] E24-023 — Write the migration guides per source platform
+- [ ] E24-024 — Write the API reference from the OpenAPI spec
+- [ ] E24-025 — Write the SDK quickstart
+- [ ] E24-026 — Write the webhook guide with signature verification examples
+- [ ] E24-027 — Write the MCP guide
+- [ ] E24-028 — Write the glossary covering every term the product uses
+- [ ] E24-029 — Make every docs page link to the product surface it describes
+- [ ] E24-030 — Add search across the docs
+- [ ] E24-031 — Add a docs feedback control and act on what comes in
+- [ ] E24-032 — Keep the docs in the repo so they version with the code
+- [ ] E24-033 — Fail CI when a documented endpoint no longer exists
+- [ ] E24-034 — Publish the changelog generated from releases
+- [ ] E24-035 — Publish the roadmap at the level we are willing to be held to
+- [ ] E24-036 — Never publish a roadmap item we have not decided to build
+- [ ] E24-037 — Build the pricing page with the real plan limits
+- [ ] E24-038 — Build the signup flow with the KYC gate placed honestly
+- [ ] E24-039 — Build the trial with a real warmed shared mailbox
+- [ ] E24-040 — Build the demo mode with clearly labelled fabricated data
+- [ ] E24-041 — Build the sales one-pager from the compliance and infrastructure differentiators
+- [ ] E24-042 — Build the security questionnaire answer set
+- [ ] E24-043 — Build the enterprise procurement pack
+- [ ] E24-044 — Define the ideal customer profile from the first ten conversations
+- [ ] E24-045 — Run ten customer discovery conversations before public launch
+- [ ] E24-046 — Record what they actually asked for versus what we assumed
+- [ ] E24-047 — Change the plan where the conversations contradict it
+- [ ] E24-048 — Recruit five design partners on the agency side
+- [ ] E24-049 — Run the platform for Girard Media's own outreach first
+- [ ] E24-050 — Fix everything that dogfooding exposes before onboarding a design partner
+- [ ] E24-051 — Publish our own measured placement numbers on the marketing site
+- [ ] E24-052 — Automate the update so a stale number cannot persist
+- [ ] E24-053 — Add the methodology page every published number links to
+- [ ] E24-054 — Define the launch readiness checklist covering every gate
+- [ ] E24-055 — Require the external penetration test as a launch gate
+- [ ] E24-056 — Require the compliance review as a launch gate
+- [ ] E24-057 — Require the disaster recovery drill as a launch gate
+- [ ] E24-058 — Require the SLO agreement as a launch gate
+- [ ] E24-059 — Require the runbook index as a launch gate
+- [ ] E24-060 — Require the honesty audit as a launch gate
+- [ ] E24-061 — Run the honesty audit: every claim on every surface traced to a measurement
+- [ ] E24-062 — Remove or qualify every claim that fails the audit
+- [ ] E24-063 — Write the "what we do not ship" section and publish it
+- [ ] E24-064 — Publish the refused-capabilities list from planning/COMPLIANCE.md §9
+- [ ] E24-065 — Treat the refused list as positioning, not as an apology
+- [ ] E24-066 — Define the launch sequence: design partners, waitlist, public
+- [ ] E24-067 — Build the waitlist with an honest expectation of timing
+- [ ] E24-068 — Build the onboarding email sequence and send it through usermails
+- [ ] E24-069 — Never send product transactional mail through the cold-outreach fleet
+- [ ] E24-070 — Build the in-app onboarding checklist tied to real state
+- [ ] E24-071 — Measure activation as first safe send, not as signup
+- [ ] E24-072 — Measure time to first positive reply as the north-star onboarding metric
+- [ ] E24-073 — Instrument the funnel from signup to first reply
+- [ ] E24-074 — Find and fix the largest drop-off before scaling acquisition
+- [ ] E24-075 — Build the support surface with a real response commitment
+- [ ] E24-076 — Staff support against the commitment before launch, not after
+- [ ] E24-077 — Build the internal support tooling: impersonation, message journey, policy lookup
+- [ ] E24-078 — Make every support question answerable from the product, not from a database console
+- [ ] E24-079 — Track the top ten support questions and remove each cause
+- [ ] E24-080 — Build the customer health score from real usage and outcomes
+- [ ] E24-081 — Alert internally when a customer's results degrade before they notice
+- [ ] E24-082 — Reach out proactively with the diagnosis, not with a check-in
+- [ ] E24-083 — Define the expansion motion from measured capacity constraints
+- [ ] E24-084 — Define the churn signals and the intervention for each
+- [ ] E24-085 — Write the launch announcement grounded in what the product actually does
+- [ ] E24-086 — Prepare the founder narrative on why owning the infrastructure matters
+- [ ] E24-087 — Prepare the technical deep-dive post on the maillog truth architecture
+- [ ] E24-088 — Prepare the technical deep-dive post on the five reputation ledgers
+- [ ] E24-089 — Prepare the technical deep-dive post on the policy engine
+- [ ] E24-090 — Publish the deep-dives as the primary demand generation, not as ads
+- [ ] E24-091 — Instrument attribution honestly and accept that some of it is unknowable
+- [ ] E24-092 — Set the ninety-day post-launch targets and the review date
+- [ ] E24-093 — Hold the ninety-day review and write down what was wrong in this plan
+- [ ] E24-094 — Feed those corrections back into planning/ and into the Bootspring notes
+- [ ] E24-095 — Decide at the review whether the product deserves more investment, on the data
+- [ ] E24-096 — Keep the refusal list intact under commercial pressure
+- [ ] E24-097 — Re-verify the legal jurisdiction table annually
+- [ ] E24-098 — Re-verify the published numbers weekly, automatically
+- [ ] E24-099 — Re-verify the competitor comparison quarterly
+- [ ] E24-100 — Retire any claim we can no longer substantiate, the same week we notice

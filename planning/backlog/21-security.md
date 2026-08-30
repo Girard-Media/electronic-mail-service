@@ -1,0 +1,102 @@
+# Epic 21 — Security, Privacy & Audit
+
+- [ ] E21-001 — Threat-model the whole platform and write it down
+- [ ] E21-002 — Identify the crown jewels: DKIM keys, seed credentials, lead data, policy decisions
+- [ ] E21-003 — Document the trust boundaries: app, workers, nodes, seedbox, inference
+- [ ] E21-004 — Implement one secrets module with typed access and no ad-hoc env reads
+- [ ] E21-005 — Encrypt DKIM private keys at rest with AES-256-GCM
+- [ ] E21-006 — Decrypt DKIM keys only in the sender worker and the provisioning path
+- [ ] E21-007 — Never log a decrypted key, a token, or a password, at any level
+- [ ] E21-008 — Add a log scrubber that redacts secret-shaped strings as a second line of defence
+- [ ] E21-009 — Encrypt seed account credentials and restrict decryption to the seedbox
+- [ ] E21-010 — Encrypt OAuth tokens at rest as inherited
+- [ ] E21-011 — Encrypt webhook secrets at rest as inherited
+- [ ] E21-012 — Encrypt registrar and DNS API tokens at rest
+- [ ] E21-013 — Write the rotation runbook for every credential class
+- [ ] E21-014 — Automate rotation where the provider supports it
+- [ ] E21-015 — Alert on any credential older than its rotation window
+- [ ] E21-016 — Implement mTLS or Ed25519 signing between fleet-agent and API
+- [ ] E21-017 — Reject every unsigned node report
+- [ ] E21-018 — Implement nonce and timestamp replay protection on node requests
+- [ ] E21-019 — Restrict node SSH to key-only on a non-standard port with an allowlist
+- [ ] E21-020 — Implement least-privilege database roles for API, workers, and reporting
+- [ ] E21-021 — Deny DROP and TRUNCATE to the application roles
+- [ ] E21-022 — Implement the mandatory orgId predicate helper for tenant queries
+- [ ] E21-023 — Fail CI when a tenant model is queried without it
+- [ ] E21-024 — Add cross-tenant access tests on every endpoint and every worker path
+- [ ] E21-025 — Keep the inherited RBAC and extend it for the operator role
+- [ ] E21-026 — Separate the platform operator role from the tenant owner role
+- [ ] E21-027 — Require TOTP for every platform admin action
+- [ ] E21-028 — Require TOTP for impersonation and audit every impersonation
+- [ ] E21-029 — Offer customer 2FA and make it mandatory on higher plans
+- [ ] E21-030 — Implement session management with revocation and device listing
+- [ ] E21-031 — Implement token versioning so a password change invalidates sessions
+- [ ] E21-032 — Keep the inherited security headers and extend the CSP for new surfaces
+- [ ] E21-033 — Self-host every font and asset; no third-party origin in the CSP
+- [ ] E21-034 — Keep the inherited SSRF guard and apply it to every new outbound fetch
+- [ ] E21-035 — Apply the SSRF guard to enrichment fetches and webhook targets
+- [ ] E21-036 — Test SSRF protection against the standard bypass corpus
+- [ ] E21-037 — Reject CR and LF in every header-bound field
+- [ ] E21-038 — Fuzz the MIME builder with injection payloads
+- [ ] E21-039 — Sanitise inbound HTML before rendering, stripping scripts and remote loads
+- [ ] E21-040 — Quarantine executable and archive attachments
+- [ ] E21-041 — Implement upload validation by content type and magic bytes, not by extension
+- [ ] E21-042 — Serve user-uploaded content from an isolated origin
+- [ ] E21-043 — Implement rate limiting on every unauthenticated endpoint
+- [ ] E21-044 — Implement account lockout and progressive delay on failed authentication
+- [ ] E21-045 — Implement email-ownership verification before privileged actions
+- [ ] E21-046 — Implement constant-time comparison for every shared secret
+- [ ] E21-047 — Implement CSRF protection on every cookie-authenticated mutation
+- [ ] E21-048 — Implement a host-header allowlist that fails closed
+- [ ] E21-049 — Implement the append-only audit log with actor, action, target, and payload
+- [ ] E21-050 — Snapshot the audit log to R2 with a hash chain
+- [ ] E21-051 — Verify the hash chain on a schedule and alert on a break
+- [ ] E21-052 — Audit every fleet mutation, policy change, and credential access
+- [ ] E21-053 — Audit every data export and erasure
+- [ ] E21-054 — Build the audit log viewer with search and export
+- [ ] E21-055 — Retain audit records per the documented retention schedule
+- [ ] E21-056 — Implement the data retention schedule as scheduled jobs, not as policy prose
+- [ ] E21-057 — Implement the erasure job across Postgres, ClickHouse, and R2
+- [ ] E21-058 — Verify erasure preserves the suppression hash
+- [ ] E21-059 — Implement the export job producing a single signed archive
+- [ ] E21-060 — Meet and report against the stated DSR SLAs
+- [ ] E21-061 — Implement the restriction flag the router honours
+- [ ] E21-062 — Publish the privacy policy, the DPA, and the subprocessor list
+- [ ] E21-063 — Keep the subprocessor list current automatically where possible
+- [ ] E21-064 — Publish the security page describing the controls we actually have
+- [ ] E21-065 — Never claim a certification we do not hold
+- [ ] E21-066 — Build the SOC-2-shaped evidence set without claiming certification
+- [ ] E21-067 — Implement access reviews on a schedule with a record
+- [ ] E21-068 — Implement an onboarding and offboarding checklist for platform access
+- [ ] E21-069 — Implement dependency scanning in CI with a policy on severity
+- [ ] E21-070 — Implement container image scanning in CI
+- [ ] E21-071 — Implement secret scanning on every commit and in history
+- [ ] E21-072 — Implement static analysis with the rules that matter, not the whole catalogue
+- [ ] E21-073 — Run a dependency review before adding any new package
+- [ ] E21-074 — Keep the third-party surface minimal and justify every addition in an ADR
+- [ ] E21-075 — Implement a vulnerability disclosure policy and a security contact
+- [ ] E21-076 — Implement an incident response plan with severity definitions
+- [ ] E21-077 — Define the breach notification process and the timelines
+- [ ] E21-078 — Run a tabletop exercise on a simulated breach
+- [ ] E21-079 — Run an internal white-box review of the send path
+- [ ] E21-080 — Run an internal review of the multi-tenancy boundary
+- [ ] E21-081 — Run an internal review of the node trust boundary
+- [ ] E21-082 — Commission an external penetration test before public launch
+- [ ] E21-083 — Track and fix every finding with an owner and a date
+- [ ] E21-084 — Re-test every fix
+- [ ] E21-085 — Publish a summary of the test having been done, without the findings
+- [ ] E21-086 — Implement backup encryption and test a restore from encrypted backup
+- [ ] E21-087 — Test disaster recovery for the whole platform, not only the database
+- [ ] E21-088 — Document and measure the recovery time and recovery point objectives
+- [ ] E21-089 — Implement anomaly detection on authentication and privileged actions
+- [ ] E21-090 — Alert on impossible-travel and unusual privileged activity
+- [ ] E21-091 — Implement egress restriction on the application hosts
+- [ ] E21-092 — Restrict which hosts may reach the inference provider
+- [ ] E21-093 — Restrict which hosts may reach the registrar and DNS APIs
+- [ ] E21-094 — Verify no host can reach both seed credentials and campaign sending
+- [ ] E21-095 — Add a security section to every new-subsystem spec template
+- [ ] E21-096 — Require a security note on every PR touching the send path or the policy gate
+- [ ] E21-097 — Add abuse-case tests alongside the use-case tests
+- [ ] E21-098 — Test that a tenant cannot read another tenant's fleet, leads, or inbox
+- [ ] E21-099 — Test that a tenant cannot override global suppression
+- [ ] E21-100 — Test that an operator action without TOTP is refused

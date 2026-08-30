@@ -1,0 +1,92 @@
+# Epic 23 — Observability, Deployment & Operations
+
+- [ ] E23-001 — Define the service-level indicators for send, ingest, API, and cockpit
+- [ ] E23-002 — Define the service-level objectives and get them agreed before launch
+- [ ] E23-003 — Instrument structured logging with a consistent field schema
+- [ ] E23-004 — Include a correlation id on every log line across the whole request path
+- [ ] E23-005 — Propagate the correlation id from API through queue to worker to node
+- [ ] E23-006 — Never log lead PII at info level
+- [ ] E23-007 — Implement log sampling on high-volume paths with full capture on error
+- [ ] E23-008 — Ship logs to a self-hosted store with a retention policy
+- [ ] E23-009 — Implement metrics for every queue: depth, age, throughput, failure rate
+- [ ] E23-010 — Implement metrics for the router: decisions by outcome and by reason
+- [ ] E23-011 — Implement metrics for the send path: submit rate, delivery rate, defer rate
+- [ ] E23-012 — Implement metrics for ingest lag on maillog, inbound, and events
+- [ ] E23-013 — Implement metrics for the API: rate, latency percentiles, error rate
+- [ ] E23-014 — Implement metrics for the AI gateway: cost, latency, cache, schema failures
+- [ ] E23-015 — Implement business metrics: sends, replies, meetings, cost per reply
+- [ ] E23-016 — Build the internal operations dashboard from those metrics
+- [ ] E23-017 — Build the on-call view showing only what is currently broken
+- [ ] E23-018 — Define the alerting policy: what pages, what emails, what only logs
+- [ ] E23-019 — Never page on something with no runbook
+- [ ] E23-020 — Write a runbook for every paging alert
+- [ ] E23-021 — Link the runbook directly from the alert
+- [ ] E23-022 — Implement alert deduplication and grouping
+- [ ] E23-023 — Implement alert suppression during planned maintenance
+- [ ] E23-024 — Track alert volume and treat a noisy alert as a bug
+- [ ] E23-025 — Implement synthetic canary sends from every active node
+- [ ] E23-026 — Implement a synthetic API probe from outside the network
+- [ ] E23-027 — Implement a synthetic cockpit load probe
+- [ ] E23-028 — Build the public status page fed by real health checks
+- [ ] E23-029 — Never show green on the status page while a canary is failing
+- [ ] E23-030 — Implement incident creation, timeline, and public updates
+- [ ] E23-031 — Implement the severity definitions and the escalation path
+- [ ] E23-032 — Implement the post-incident review template
+- [ ] E23-033 — Require a post-incident review for every Sev-1 and Sev-2
+- [ ] E23-034 — Require a regression test as an output of every review
+- [ ] E23-035 — Track action items from reviews to completion
+- [ ] E23-036 — Configure the hostssh deploy remote for EMS
+- [ ] E23-037 — Build the single image covering api, web, and workers
+- [ ] E23-038 — Configure the sibling deploys with their own env files
+- [ ] E23-039 — Configure the dmarc-ingest and seedbox standalone deploys
+- [ ] E23-040 — Run migrations on boot with the forward-only discipline
+- [ ] E23-041 — Implement blue-green for the API
+- [ ] E23-042 — Implement a graceful worker shutdown that finishes in-flight work
+- [ ] E23-043 — Implement queue draining on deploy so nothing is lost
+- [ ] E23-044 — Verify a deploy with the post-deploy smoke suite before shifting traffic
+- [ ] E23-045 — Implement one-command rollback
+- [ ] E23-046 — Test rollback deliberately on staging every month
+- [ ] E23-047 — Configure Cloudflare DNS for electronicmailservices.com
+- [ ] E23-048 — Configure app.electronicmailservices.com to the hub
+- [ ] E23-049 — Configure TLS with Full strict and an origin certificate
+- [ ] E23-050 — Verify no EMS hostname resolves to a blast node except the PTR records
+- [ ] E23-051 — Configure the aggregate-report domain DNS and MX
+- [ ] E23-052 — Extend the restic to R2 backup to every EMS store
+- [ ] E23-053 — Verify backups by restoring on a schedule, not by checking they exist
+- [ ] E23-054 — Alert on a backup that did not run or did not verify
+- [ ] E23-055 — Document the recovery time and recovery point objectives per store
+- [ ] E23-056 — Write the runbook for a full platform outage
+- [ ] E23-057 — Write the runbook for a data store outage
+- [ ] E23-058 — Write the runbook for a queue backlog
+- [ ] E23-059 — Write the runbook for an ingest lag spike
+- [ ] E23-060 — Write the runbook for a node loss
+- [ ] E23-061 — Write the runbook for a blacklist listing
+- [ ] E23-062 — Write the runbook for a compliance incident
+- [ ] E23-063 — Write the runbook for an abuse incident
+- [ ] E23-064 — Write the runbook for a credential compromise
+- [ ] E23-065 — Write the runbook for an inference provider outage
+- [ ] E23-066 — Write the runbook for a payment processor outage
+- [ ] E23-067 — Index every runbook from one page and keep the index current
+- [ ] E23-068 — Test each runbook by having someone else follow it
+- [ ] E23-069 — Implement the maintenance window process with customer notice
+- [ ] E23-070 — Never take a maintenance window that stops sending without notice
+- [ ] E23-071 — Implement capacity monitoring across every store and queue
+- [ ] E23-072 — Alert before a resource is exhausted, not when it is
+- [ ] E23-073 — Implement cost monitoring per component
+- [ ] E23-074 — Alert on a cost anomaly per component
+- [ ] E23-075 — Report cost per thousand sends monthly against the target
+- [ ] E23-076 — Report gross margin per plan monthly
+- [ ] E23-077 — Implement the operator daily checklist as a dashboard, not a document
+- [ ] E23-078 — Measure operator time spent per week and drive it down
+- [ ] E23-079 — Automate the top three recurring operator tasks each quarter
+- [ ] E23-080 — Track the fleet-per-operator ratio as the scalability metric
+- [ ] E23-081 — Implement scheduled reporting to the team on the key metrics
+- [ ] E23-082 — Implement the weekly customer deliverability digest job
+- [ ] E23-083 — Implement the monthly business review data pack
+- [ ] E23-084 — Implement the quarterly model, weight, and policy review as calendared work
+- [ ] E23-085 — Document the whole operations model in planning/specs/operations/
+- [ ] E23-086 — Onboard a second operator and time how long it takes them to be effective
+- [ ] E23-087 — Fix whatever slowed them down
+- [ ] E23-088 — Verify the platform can be operated without the person who built it
+- [ ] E23-089 — Write the bus-factor document listing every single point of human failure
+- [ ] E23-090 — Close the top three single points of human failure

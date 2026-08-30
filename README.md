@@ -1,36 +1,50 @@
-# ems
+# Electronic Mail Services
 
-Developer-first, white-label application email. Resend-compatible API on a mail server we operate. Transactional today; lifecycle later on the same event stream.
+Cold B2B outreach infrastructure we own end to end — our metal, our IPs, our MTA, our mail
+log. `delivered` means the receiving MX returned `250`, read out of our own Postfix log,
+not a vendor's optimistic counter.
 
-**Status:** live for the Girard Media fleet (`RESEND_BASE_URL` + a ems key). Public enterprise launch is the remaining honesty + crash-structure work in `planning/LAUNCH_AUDIT_2026-08-23.md`.
+**Status:** Phase 0. Hard-forked from [usermails](../usermails) on 2026-08-30; schema
+extended for the cold-outreach domain; nothing deployed yet. See `planning/ROADMAP.md`
+for the gates.
 
-## What ships
+## What is planned to ship
 
-- Public API: `POST /emails`, batch, get, cancel, domains, keys, verify, hosted `/inboxes`
-- Dashboard: `https://app.electronicmailservices.com/dashboard` (Hono SPA)
-- Marketing + docs: `https://electronicmailservices.com`
-- Own Postfix MTA — `delivered` comes from the mail log, not a vendor “sent” count
-- White-label tenancy from the schema (org → project)
+- Fleet control plane: blast nodes, IPs, sending domains, mailboxes, personas — provisioned and monitored automatically
+- Warmup engine: per-mailbox ramp curves with hold/rollback, plus our own peer warmup network
+- Router: constrained selection of (node, IP, domain, mailbox) per message, with four token buckets and adaptive per-ESP pacing
+- Deliverability: maillog truth, bounce taxonomy, DNSBL, DMARC RUA, TLS-RPT, seed-based inbox placement testing
+- Five independent reputation ledgers (IP, domain, mailbox, content, engagement) with different half-lives
+- Policy engine: jurisdiction resolution, consent ledger, three-layer suppression — a hard gate in the send path
+- Sequences, leads, self-hosted verification, unified inbox with AI reply classification
+- Eleven AI tasks on OpenRouter behind one metered, evaluated gateway
 
-Not shipped (do not claim): dedicated IPs, warmup, SSO, Stripe checkout, npm `ems` package, connected Gmail/Outlook in production.
+## What we will not ship
+
+Header forgery · domain spoofing · `RE:` on a first touch · filter-evasion tricks · hidden
+unsubscribes · cross-customer fake-engagement warmup pools · lists with no provenance ·
+opt-in lifecycle marketing (that is `usermails`).
 
 ## Stack
 
-pnpm monorepo. Next.js 15 (marketing) · Hono (API + dashboard) · Postgres 18 + Prisma · Redis/Valkey + BullMQ · own MTA behind `MailProvider`. Deploy: `git push hostssh main`.
+pnpm monorepo. Hono API · Next.js 15 web · BullMQ workers · Postgres 18 + ClickHouse +
+Valkey + R2 · Prisma · own Postfix/OpenDKIM/rspamd blast nodes · OpenRouter for inference.
+Deploy: `git push hostssh main`.
 
-Clean-room only vs usesend (AGPLv3). Base lineage: freeresend (MIT). See `.bootspring/context/DECISIONS.md`.
+Clean-room only vs usesend (AGPLv3). Base lineage: freeresend (MIT).
 
 ## Commands
 
 ```bash
 pnpm install
-pnpm infra:up          # local postgres + redis
+pnpm infra:up
 pnpm db:generate && pnpm db:migrate
-pnpm dev:api           # :8787
-pnpm dev:workers
+pnpm dev:api && pnpm dev:workers
 pnpm typecheck && pnpm test
+pnpm todo:compile
 ```
 
 ## Docs
 
-Canonical: [electronicmailservices.com/docs](https://electronicmailservices.com/docs). Planning: `planning/TODO.md`, `planning/LAUNCH_AUDIT_2026-08-23.md`.
+Planning: [`planning/INDEX.md`](planning/INDEX.md). Build queue: [`planning/TODO.md`](planning/TODO.md) — 2,500 tasks.
+Agent context: [`CLAUDE.md`](CLAUDE.md).

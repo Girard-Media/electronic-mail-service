@@ -37,18 +37,18 @@ enum PlatformRole {
 }
 
 model PlatformAdmin {
-  id          String       @id @default(cuid())
-  userId      String       @unique
-  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
-  role        PlatformRole @default(admin)
+  id            String       @id @default(cuid())
+  userId        String       @unique
+  user          User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role          PlatformRole @default(admin)
   // Granular capabilities for sub-admins; superadmin implicitly has all.
-  scopes      String[]
-  createdById String?
+  scopes        String[]
+  createdById   String?
   // Encrypted TOTP seed. totpEnabledAt is set only after a valid confirm.
   totpSecret    String?
   totpEnabledAt DateTime?
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
 }
 
 model PlatformAuditLog {
@@ -91,32 +91,46 @@ enum Role {
 }
 
 model Organization {
-  id           String         @id @default(cuid())
-  name         String
-  slug         String         @unique
-  plan         String         @default("free")
+  id                     String           @id @default(cuid())
+  name                   String
+  slug                   String           @unique
+  plan                   String           @default("free")
   // White-label foundations (FR-080)
   // Tenant subdomain for the white-label surface (tenant.electronicmailservices.com). Null = no
   // subdomain yet. Reserved/invalid labels are rejected at assignment + by proxy.ts.
-  subdomain    String?        @unique
-  customDomain String?        @unique
-  logoUrl      String?
-  primaryColor String?
-  poweredBy    Boolean        @default(true)
+  subdomain              String?          @unique
+  customDomain           String?          @unique
+  logoUrl                String?
+  primaryColor           String?
+  poweredBy              Boolean          @default(true)
   // Stripe Connect (Standard) account id — set when an agency connects its own
   // Stripe to charge clients. Null = payments not connected. See packages/core/billing.ts.
   stripeConnectAccountId String?
   // Reseller sub-tenancy (FR-081): a sub-tenant org points at its parent
-  parentOrgId  String?
-  parentOrg    Organization?  @relation("OrgHierarchy", fields: [parentOrgId], references: [id])
-  subTenants   Organization[] @relation("OrgHierarchy")
-  memberships  Membership[]
-  invites      Invite[]
-  projects     Project[]
-  usageRecords UsageRecord[]
-  auditLogs    OrgAuditLog[]
-  createdAt    DateTime       @default(now())
-  updatedAt    DateTime       @updatedAt
+  parentOrgId            String?
+  parentOrg              Organization?    @relation("OrgHierarchy", fields: [parentOrgId], references: [id])
+  subTenants             Organization[]   @relation("OrgHierarchy")
+  memberships            Membership[]
+  invites                Invite[]
+  projects               Project[]
+  usageRecords           UsageRecord[]
+  auditLogs              OrgAuditLog[]
+  // ---- EMS cold-outreach domain ----
+  blastNodes             BlastNode[]
+  fleetDomains           FleetDomain[]
+  fleetMailboxes         FleetMailbox[]
+  leads                  Lead[]
+  leadLists              LeadList[]
+  campaigns              Campaign[]
+  consentRecords         ConsentRecord[]
+  policyDecisions        PolicyDecision[]
+  inboxThreads           InboxThread[]
+  aiCalls                AiCall[]
+  sendIntents            SendIntent[]
+  personas               Persona[]
+  handoffEvents          HandoffEvent[]
+  createdAt              DateTime         @default(now())
+  updatedAt              DateTime         @updatedAt
 
   @@index([parentOrgId])
 }
@@ -151,24 +165,24 @@ model Invite {
 }
 
 model Project {
-  id        String       @id @default(cuid())
-  orgId     String
-  org       Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
-  name      String
-  slug      String
+  id                String             @id @default(cuid())
+  orgId             String
+  org               Organization       @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  name              String
+  slug              String
   // Optional per-project managed-DNS API token (encrypted at rest) for BYO-DNS
   // one-click publishing to a customer's own zone.
-  dnsToken  String?
-  domains   Domain[]
-  apiKeys   ApiKey[]
-  emails    Email[]
-  suppressions Suppression[]
-  webhooks  WebhookEndpoint[]
+  dnsToken          String?
+  domains           Domain[]
+  apiKeys           ApiKey[]
+  emails            Email[]
+  suppressions      Suppression[]
+  webhooks          WebhookEndpoint[]
   connectedAccounts ConnectedAccount[]
-  mailboxes Mailbox[]
-  emailTemplates EmailTemplate[]
-  createdAt DateTime     @default(now())
-  updatedAt DateTime     @updatedAt
+  mailboxes         Mailbox[]
+  emailTemplates    EmailTemplate[]
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
 
   @@unique([orgId, slug])
 }
@@ -222,28 +236,28 @@ enum DomainStatus {
 }
 
 model Domain {
-  id              String       @id @default(cuid())
-  projectId       String
-  project         Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  name            String
-  region          String       @default("primary")
-  status          DomainStatus @default(pending)
-  dkimSelector    String?
-  dkimPublicKey   String?
+  id             String       @id @default(cuid())
+  projectId      String
+  project        Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  name           String
+  region         String       @default("primary")
+  status         DomainStatus @default(pending)
+  dkimSelector   String?
+  dkimPublicKey  String?
   // Stored encrypted at rest (NFR-004)
-  dkimPrivateKey  String?
-  trackingDomain  String?
+  dkimPrivateKey String?
+  trackingDomain String?
   // Open/click tracking is opt-in per domain (default off) so transactional mail
   // is never silently pixel-tracked. The worker injects/rewrites only when set.
-  openTracking    Boolean      @default(false)
-  clickTracking   Boolean      @default(false)
+  openTracking   Boolean      @default(false)
+  clickTracking  Boolean      @default(false)
   // Derived SPF/DKIM/DMARC/MAIL FROM records presented to the user
-  dnsRecords      Json?
-  verifiedAt      DateTime?
-  emails          Email[]
-  mailboxes       Mailbox[]
-  createdAt       DateTime     @default(now())
-  updatedAt       DateTime     @updatedAt
+  dnsRecords     Json?
+  verifiedAt     DateTime?
+  emails         Email[]
+  mailboxes      Mailbox[]
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
 
   @@unique([projectId, name])
   @@index([name])
@@ -260,19 +274,19 @@ enum ApiKeyPermission {
 }
 
 model ApiKey {
-  id          String    @id @default(cuid())
-  projectId   String
-  project     Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  name        String
+  id           String           @id @default(cuid())
+  projectId    String
+  project      Project          @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  name         String
   // Public prefix shown in UI; full secret shown once, only the hash is stored.
-  prefix      String    @unique
-  hashedKey   String
+  prefix       String           @unique
+  hashedKey    String
   // Existing keys predate scoping, so they default to full_access to stay working.
-  permission  ApiKeyPermission @default(full_access)
-  rateLimitRps Int      @default(10)
-  lastUsedAt  DateTime?
-  revokedAt   DateTime?
-  createdAt   DateTime  @default(now())
+  permission   ApiKeyPermission @default(full_access)
+  rateLimitRps Int              @default(10)
+  lastUsedAt   DateTime?
+  revokedAt    DateTime?
+  createdAt    DateTime         @default(now())
 
   @@index([projectId])
 }
@@ -291,36 +305,36 @@ enum EmailStatus {
 }
 
 model Email {
-  id               String        @id @default(cuid())
-  projectId        String
-  project          Project       @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  domainId         String?
+  id                 String            @id @default(cuid())
+  projectId          String
+  project            Project           @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  domainId           String?
   // SetNull: deleting a sending domain detaches the email (preserving the send
   // log) instead of blocking the delete. Matches migration 0006.
-  domain           Domain?       @relation(fields: [domainId], references: [id], onDelete: SetNull)
+  domain             Domain?           @relation(fields: [domainId], references: [id], onDelete: SetNull)
   // Set when the From matches a connected mailbox; routedVia records the path taken.
   connectedAccountId String?
   connectedAccount   ConnectedAccount? @relation(fields: [connectedAccountId], references: [id])
   routedVia          SendProvider      @default(mta)
-  from             String
-  to               String[]
-  cc               String[]
-  bcc              String[]
-  replyTo          String[]
-  subject          String
-  html             String?
-  text             String?
-  headers          Json?
-  tags             Json?
+  from               String
+  to                 String[]
+  cc                 String[]
+  bcc                String[]
+  replyTo            String[]
+  subject            String
+  html               String?
+  text               String?
+  headers            Json?
+  tags               Json?
   // [{ filename, content?(base64), path?, content_type? }] — passed to the provider at send.
-  attachments      Json?
-  status           EmailStatus   @default(queued)
-  providerMessageId String?
-  idempotencyKey   String?
-  scheduledAt      DateTime?
-  sentAt           DateTime?
-  events           EmailEvent[]
-  createdAt        DateTime      @default(now())
+  attachments        Json?
+  status             EmailStatus       @default(queued)
+  providerMessageId  String?
+  idempotencyKey     String?
+  scheduledAt        DateTime?
+  sentAt             DateTime?
+  events             EmailEvent[]
+  createdAt          DateTime          @default(now())
 
   @@unique([projectId, idempotencyKey])
   @@index([projectId, status, createdAt])
@@ -430,17 +444,17 @@ model UsageRecord {
 // ---------- Email templates (block-based builder) ----------
 
 model EmailTemplate {
-  id         String   @id @default(cuid())
+  id         String    @id @default(cuid())
   projectId  String
-  project    Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  project    Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
   name       String
-  subject    String   @default("")
+  subject    String    @default("")
   // { blocks: EmailBlock[], settings?: EmailSettings } — see packages/core/email-template.ts
   content    Json
-  usageCount Int      @default(0)
+  usageCount Int       @default(0)
   lastUsedAt DateTime?
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
 
   @@index([projectId, updatedAt])
 }
@@ -463,7 +477,7 @@ model Mailbox {
   // (instant, no customer DNS; catch-all is impossible without a Domain row).
   domainId     String?
   domain       Domain?       @relation(fields: [domainId], references: [id], onDelete: Cascade)
-  address      String        // full address, lowercased (e.g. hi@acme.com)
+  address      String // full address, lowercased (e.g. hi@acme.com)
   displayName  String?
   // For IMAP / SMTP-submission / webmail auth (argon2, like User). Null until set.
   passwordHash String?
@@ -491,7 +505,7 @@ model MailForward {
   id          String    @id @default(cuid())
   mailboxId   String
   mailbox     Mailbox   @relation(fields: [mailboxId], references: [id], onDelete: Cascade)
-  destination String    // lowercased email
+  destination String // lowercased email
   verifiedAt  DateTime?
   verifyToken String?   @unique
   createdAt   DateTime  @default(now())
@@ -504,18 +518,18 @@ model Message {
   id         String   @id @default(cuid())
   mailboxId  String
   mailbox    Mailbox  @relation(fields: [mailboxId], references: [id], onDelete: Cascade)
-  messageId  String?  // RFC822 Message-ID
+  messageId  String? // RFC822 Message-ID
   inReplyTo  String?
   threadId   String?
   fromAddr   String
   toAddrs    String[]
   subject    String?
-  snippet    String?  // first ~200 chars for list views
+  snippet    String? // first ~200 chars for list views
   // P1 stores the parsed body in Postgres so read works without object storage.
   // rawKey (full RFC822 in R2) is added later for IMAP fidelity.
   text       String?
   html       String?
-  rawKey     String?  // object-storage key for the raw RFC822 (P3)
+  rawKey     String? // object-storage key for the raw RFC822 (P3)
   sizeBytes  Int      @default(0)
   seen       Boolean  @default(false)
   flagged    Boolean  @default(false)
@@ -531,29 +545,985 @@ model Message {
 // pipeline (bootspring SEO skills) fills this table; Next renders + SSGs it on-demand
 // (top-N prebuilt, the long tail via ISR). See planning/NEXTJS_FRONTEND.md Phase 2.
 model Blog {
-  id          String    @id @default(cuid())
-  slug        String    @unique
-  title       String
-  excerpt     String? // short summary for cards + meta description fallback
-  bodyMd      String // markdown source of truth (rendered to HTML at request/build time)
-  bodyHtml    String? // optional pre-rendered HTML (pipeline may fill; preferred if present)
-  status      String    @default("draft") // draft | published
-  publishedAt DateTime?
+  id             String    @id @default(cuid())
+  slug           String    @unique
+  title          String
+  excerpt        String? // short summary for cards + meta description fallback
+  bodyMd         String // markdown source of truth (rendered to HTML at request/build time)
+  bodyHtml       String? // optional pre-rendered HTML (pipeline may fill; preferred if present)
+  status         String    @default("draft") // draft | published
+  publishedAt    DateTime?
   // SEO
   seoTitle       String?
   seoDescription String?
   canonicalUrl   String? // override canonical (e.g. syndicated content); else self-canonical
   coverImageUrl  String?
-  noindex        Boolean @default(false) // manual quality override (thin content auto-noindexed too)
+  noindex        Boolean   @default(false) // manual quality override (thin content auto-noindexed too)
   // Taxonomy + quality signals (hub-spoke linking + thin-content gate)
-  category   String?
-  tags       String[] @default([])
-  authorName String?
-  wordCount  Int      @default(0)
-  readingMin Int      @default(0)
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  category       String?
+  tags           String[]  @default([])
+  authorName     String?
+  wordCount      Int       @default(0)
+  readingMin     Int       @default(0)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
 
   @@index([status, publishedAt])
   @@index([category, status])
+}
+
+// ============================================================================
+// EMS — COLD OUTREACH DOMAIN
+// Contract: planning/ARCHITECTURE.md. Everything below is additive to the
+// inherited usermails control plane; nothing above was repurposed.
+// ============================================================================
+
+// ---------- Fleet: nodes, IPs, domains, mailboxes ----------
+
+enum NodeStatus {
+  PROVISIONING
+  VERIFYING
+  ACTIVE
+  DRAINING
+  QUARANTINED
+  RETIRED
+}
+
+enum NodeRole {
+  CAMPAIGN
+  VERIFY
+  WARMUP
+  INBOUND
+}
+
+model BlastNode {
+  id           String         @id @default(cuid())
+  orgId        String?
+  org          Organization?  @relation(fields: [orgId], references: [id], onDelete: SetNull)
+  name         String         @unique
+  hostname     String         @unique // PTR target, e.g. mta01.example.com
+  privateIp    String?
+  provider     String         @default("hostinger")
+  region       String?
+  role         NodeRole       @default(CAMPAIGN)
+  status       NodeStatus     @default(PROVISIONING)
+  // Capacity + health, reported by fleet-agent (signed)
+  maxHourly    Int            @default(500)
+  agentVersion String?
+  lastSeenAt   DateTime?
+  healthJson   Json?
+  // 90-verify.sh gate — a node is not routable until all pass
+  relayTestOk  Boolean        @default(false)
+  dkimTestOk   Boolean        @default(false)
+  egress25Ok   Boolean        @default(false)
+  verifiedAt   DateTime?
+  drainedAt    DateTime?
+  notes        String?
+  ips          SendingIp[]
+  mailboxes    FleetMailbox[]
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+
+  @@index([status, role])
+  @@index([orgId])
+}
+
+enum IpStatus {
+  NEW
+  WARMING
+  ACTIVE
+  THROTTLED
+  QUARANTINED
+  RETIRED
+}
+
+model SendingIp {
+  id               String           @id @default(cuid())
+  nodeId           String
+  node             BlastNode        @relation(fields: [nodeId], references: [id], onDelete: Cascade)
+  address          String           @unique
+  ptr              String?
+  ptrConfirmed     Boolean          @default(false) // forward-confirmed reverse DNS
+  status           IpStatus         @default(NEW)
+  // Pool assignment lets us segment traffic classes on one node
+  pool             String           @default("default")
+  warmupDay        Int              @default(0)
+  hourlyCap        Int              @default(50)
+  // Pre-purchase diligence snapshot
+  diligenceJson    Json?
+  firstSendAt      DateTime?
+  quarantinedAt    DateTime?
+  quarantineReason String?
+  domains          FleetDomain[]
+  blacklists       BlacklistCheck[]
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+
+  @@index([status, pool])
+  @@index([nodeId])
+}
+
+enum FleetDomainStatus {
+  REGISTERED // bought, DNS not complete
+  DNS_PENDING
+  AGING // DNS complete, serving the aging minimum
+  WARMING
+  ACTIVE
+  PAUSED
+  RETIRING
+  RETIRED
+  BURNED // reputation unrecoverable; never reuse
+}
+
+enum DmarcPolicy {
+  none
+  quarantine
+  reject
+}
+
+model FleetDomain {
+  id             String            @id @default(cuid())
+  orgId          String?
+  org            Organization?     @relation(fields: [orgId], references: [id], onDelete: SetNull)
+  ipId           String?
+  ip             SendingIp?        @relation(fields: [ipId], references: [id], onDelete: SetNull)
+  name           String            @unique
+  status         FleetDomainStatus @default(REGISTERED)
+  // Provenance + service life
+  registrar      String?
+  registeredAt   DateTime?
+  expiresAt      DateTime?
+  ageReadyAt     DateTime? // registeredAt + minimum aging window; router refuses before this
+  retireAfter    DateTime?
+  // Authentication
+  dkimSelector   String            @default("ems")
+  dkimPublicKey  String?
+  dkimPrivateEnc String? // encrypted at rest; materialized to the node only
+  spfOk          Boolean           @default(false)
+  dkimOk         Boolean           @default(false)
+  dmarcOk        Boolean           @default(false)
+  dmarcPolicy    DmarcPolicy       @default(none)
+  tlsRptOk       Boolean           @default(false)
+  mxOk           Boolean           @default(false)
+  lastDnsCheckAt DateTime?
+  dnsIssues      String[]          @default([])
+  // Presence — receivers check that the domain is a real business
+  siteUrl        String?
+  siteLiveOk     Boolean           @default(false)
+  postalAddress  String?
+  // Capacity
+  dailyCap       Int               @default(100)
+  mailboxes      FleetMailbox[]
+  blacklists     BlacklistCheck[]
+  dmarcReports   DmarcReport[]
+  placementTests PlacementTest[]
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+
+  @@index([status])
+  @@index([orgId])
+  @@index([ipId])
+}
+
+enum FleetMailboxStatus {
+  CREATED
+  WARMING
+  ACTIVE
+  PAUSED
+  DRAINING
+  RETIRED
+  BURNED
+}
+
+// The human identity a mailbox presents. Real name, real title, real address.
+model Persona {
+  id            String         @id @default(cuid())
+  orgId         String
+  org           Organization   @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  firstName     String
+  lastName      String
+  title         String?
+  companyName   String
+  postalAddress String // CAN-SPAM mandatory element
+  signatureHtml String?
+  signatureText String?
+  linkedinUrl   String?
+  mailboxes     FleetMailbox[]
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  @@index([orgId])
+}
+
+model FleetMailbox {
+  id           String             @id @default(cuid())
+  orgId        String?
+  org          Organization?      @relation(fields: [orgId], references: [id], onDelete: SetNull)
+  domainId     String
+  domain       FleetDomain        @relation(fields: [domainId], references: [id], onDelete: Cascade)
+  nodeId       String
+  node         BlastNode          @relation(fields: [nodeId], references: [id], onDelete: Restrict)
+  personaId    String?
+  persona      Persona?           @relation(fields: [personaId], references: [id], onDelete: SetNull)
+  localPart    String
+  address      String             @unique
+  displayName  String
+  status       FleetMailboxStatus @default(CREATED)
+  // Warmup + caps
+  warmupPlanId String?
+  warmupPlan   WarmupPlan?        @relation(fields: [warmupPlanId], references: [id], onDelete: SetNull)
+  warmupDay    Int                @default(0)
+  warmupHoldAt DateTime? // set when health regressed; ramp paused
+  dailyCap     Int                @default(5)
+  hardCap      Int                @default(50)
+  hourlyCap    Int                @default(3)
+  // Peer warmup participation (our own fleet only — see ARCHITECTURE §6)
+  peerWarmup   Boolean            @default(true)
+  // Rolling health, recomputed by the reputation worker
+  healthScore  Float              @default(0.5)
+  sent7d       Int                @default(0)
+  bounced7d    Int                @default(0)
+  deferred7d   Int                @default(0)
+  complaints7d Int                @default(0)
+  replies7d    Int                @default(0)
+  lastSendAt   DateTime?
+  drainedAt    DateTime?
+  sendIntents  SendIntent[]
+  inboxThreads InboxThread[]
+  createdAt    DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
+
+  @@index([status, healthScore])
+  @@index([domainId])
+  @@index([nodeId])
+  @@index([orgId])
+}
+
+// A named ramp curve. Editable per plan and per domain age.
+model WarmupPlan {
+  id               String         @id @default(cuid())
+  name             String         @unique
+  startPerDay      Int            @default(5)
+  incrementWeek    Int            @default(5)
+  plateau          Int            @default(40)
+  minDomainAgeDays Int            @default(14)
+  // Auto-hold thresholds — ramp pauses instead of pushing through damage
+  maxBounceRate    Float          @default(0.03)
+  maxDeferRate     Float          @default(0.10)
+  maxComplaintRate Float          @default(0.001)
+  weekdayOnly      Boolean        @default(true)
+  jitterPct        Float          @default(0.25)
+  mailboxes        FleetMailbox[]
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+}
+
+// ---------- Reputation & deliverability evidence ----------
+
+enum ReputationSubject {
+  IP
+  DOMAIN
+  MAILBOX
+  CONTENT
+  ENGAGEMENT
+}
+
+// Nightly decayed snapshots so historical charts are reproducible.
+model ReputationSnapshot {
+  id        String            @id @default(cuid())
+  subject   ReputationSubject
+  subjectId String
+  score     Float
+  // The decomposition — we never show a score we cannot explain
+  factors   Json
+  windowEnd DateTime
+  createdAt DateTime          @default(now())
+
+  @@unique([subject, subjectId, windowEnd])
+  @@index([subject, subjectId, windowEnd])
+}
+
+model BlacklistCheck {
+  id         String       @id @default(cuid())
+  ipId       String?
+  ip         SendingIp?   @relation(fields: [ipId], references: [id], onDelete: Cascade)
+  domainId   String?
+  domain     FleetDomain? @relation(fields: [domainId], references: [id], onDelete: Cascade)
+  provider   String // zen.spamhaus.org, bl.spamcop.net, ...
+  listed     Boolean
+  responseIp String? // the 127.0.0.x answer carries the reason
+  reason     String?
+  delistUrl  String?
+  checkedAt  DateTime     @default(now())
+  clearedAt  DateTime?
+
+  @@index([ipId, provider, checkedAt])
+  @@index([domainId, provider, checkedAt])
+  @@index([listed, checkedAt])
+}
+
+// Deterministic bounce classification. AI only proposes new rows (see AI.md §3).
+enum BounceClass {
+  HARD
+  SOFT
+  BLOCK_REPUTATION
+  BLOCK_CONTENT
+  BLOCK_RATE
+  MAILBOX_FULL
+  POLICY
+  AUTH
+  UNKNOWN
+}
+
+model BounceRule {
+  id           String      @id @default(cuid())
+  espFamily    String // google | microsoft | yahoo | proofpoint | mimecast | barracuda | generic
+  smtpCode     Int?
+  enhancedCode String?
+  matchSubstr  String?
+  classify     BounceClass
+  suppress     Boolean     @default(false)
+  backoffMin   Int?
+  priority     Int         @default(100)
+  notes        String?
+  // Rows proposed by the AI fallback land here for operator approval
+  approved     Boolean     @default(true)
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  @@index([espFamily, smtpCode, priority])
+}
+
+model DmarcReport {
+  id           String       @id @default(cuid())
+  domainId     String?
+  domain       FleetDomain? @relation(fields: [domainId], references: [id], onDelete: SetNull)
+  orgName      String // the reporting receiver
+  reportId     String
+  dateBegin    DateTime
+  dateEnd      DateTime
+  rawObjectKey String? // original XML in R2
+  totalCount   Int          @default(0)
+  passCount    Int          @default(0)
+  failCount    Int          @default(0)
+  rows         Json // per source-IP disposition/spf/dkim
+  createdAt    DateTime     @default(now())
+
+  @@unique([orgName, reportId])
+  @@index([domainId, dateBegin])
+}
+
+model TlsRptReport {
+  id             String   @id @default(cuid())
+  domainName     String
+  reportId       String
+  orgName        String
+  dateBegin      DateTime
+  dateEnd        DateTime
+  successCount   Int      @default(0)
+  failureCount   Int      @default(0)
+  failureDetails Json?
+  rawObjectKey   String?
+  createdAt      DateTime @default(now())
+
+  @@unique([orgName, reportId])
+  @@index([domainName, dateBegin])
+}
+
+// ---------- Inbox placement probing (the only true measure) ----------
+
+enum SeedProvider {
+  GMAIL
+  OUTLOOK
+  YAHOO
+  ZOHO
+  PROTON
+  ICLOUD
+  AOL
+  GMX
+  CORPORATE
+}
+
+model SeedAccount {
+  id          String            @id @default(cuid())
+  provider    SeedProvider
+  address     String            @unique
+  credsEnc    String? // encrypted; read only by apps/seedbox
+  active      Boolean           @default(true)
+  lastCheckAt DateTime?
+  results     PlacementResult[]
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  @@index([provider, active])
+}
+
+enum PlacementFolder {
+  PRIMARY
+  PROMOTIONS
+  UPDATES
+  SOCIAL
+  SPAM
+  MISSING
+  UNKNOWN
+}
+
+model PlacementTest {
+  id          String            @id @default(cuid())
+  domainId    String?
+  domain      FleetDomain?      @relation(fields: [domainId], references: [id], onDelete: SetNull)
+  campaignId  String?
+  campaign    Campaign?         @relation(fields: [campaignId], references: [id], onDelete: SetNull)
+  subject     String
+  bodyHash    String
+  startedAt   DateTime          @default(now())
+  completedAt DateTime?
+  results     PlacementResult[]
+
+  @@index([domainId, startedAt])
+  @@index([campaignId])
+}
+
+model PlacementResult {
+  id            String          @id @default(cuid())
+  testId        String
+  test          PlacementTest   @relation(fields: [testId], references: [id], onDelete: Cascade)
+  seedAccountId String
+  seedAccount   SeedAccount     @relation(fields: [seedAccountId], references: [id], onDelete: Cascade)
+  folder        PlacementFolder @default(UNKNOWN)
+  latencyMs     Int?
+  headersJson   Json? // Authentication-Results, spam headers, verbatim
+  observedAt    DateTime        @default(now())
+
+  @@unique([testId, seedAccountId])
+  @@index([folder, observedAt])
+}
+
+// ---------- Leads ----------
+
+enum LeadStatus {
+  NEW
+  VERIFIED
+  RISKY
+  INVALID
+  ENROLLED
+  CONTACTED
+  REPLIED
+  BOUNCED
+  UNSUBSCRIBED
+  SUPPRESSED
+  CONVERTED
+}
+
+model Lead {
+  id                String               @id @default(cuid())
+  orgId             String
+  org               Organization         @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  email             String
+  firstName         String?
+  lastName          String?
+  title             String?
+  companyName       String?
+  companyDomain     String?
+  linkedinUrl       String?
+  phone             String?
+  // Jurisdiction resolution (COMPLIANCE.md §2) — recorded, not guessed at send time
+  country           String?
+  countrySource     String? // declared | company | tld | mxgeo
+  countryConfidence Float?
+  timezone          String?
+  status            LeadStatus           @default(NEW)
+  // Verification cache
+  verifyResultId    String?
+  verifyResult      VerificationResult?  @relation(fields: [verifyResultId], references: [id], onDelete: SetNull)
+  // AI ICP fit
+  fitScore          Float?
+  fitReason         String?
+  customFields      Json?
+  // Freeze for GDPR Art.18 restriction — router excludes frozen leads
+  frozenAt          DateTime?
+  consents          ConsentRecord[]
+  memberships       LeadListMembership[]
+  enrollments       CampaignLead[]
+  intents           SendIntent[]
+  threads           InboxThread[]
+  createdAt         DateTime             @default(now())
+  updatedAt         DateTime             @updatedAt
+
+  @@unique([orgId, email])
+  @@index([orgId, status])
+  @@index([companyDomain])
+}
+
+enum LeadListStatus {
+  IMPORTING
+  NEEDS_REVIEW // compliance gate not satisfied — cannot be enrolled
+  READY
+  ARCHIVED
+}
+
+model LeadList {
+  id                  String               @id @default(cuid())
+  orgId               String
+  org                 Organization         @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  name                String
+  status              LeadListStatus       @default(IMPORTING)
+  // Provenance is mandatory — no list activates without a stated source
+  sourceType          String? // csv | api | crm | event | form | partner
+  sourceDetail        String?
+  attestedByUserId    String?
+  attestedAt          DateTime?
+  attestationIp       String?
+  // Per-batch compliance report artifact (downloadable for the customer's counsel)
+  complianceReportKey String?
+  totalCount          Int                  @default(0)
+  sendableCount       Int                  @default(0)
+  blockedCount        Int                  @default(0)
+  memberships         LeadListMembership[]
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+
+  @@index([orgId, status])
+}
+
+model LeadListMembership {
+  id      String   @id @default(cuid())
+  listId  String
+  list    LeadList @relation(fields: [listId], references: [id], onDelete: Cascade)
+  leadId  String
+  lead    Lead     @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  addedAt DateTime @default(now())
+
+  @@unique([listId, leadId])
+  @@index([leadId])
+}
+
+enum VerifyStatus {
+  VALID
+  INVALID
+  CATCH_ALL
+  ROLE
+  DISPOSABLE
+  TRAP_SUSPECT
+  UNKNOWN
+}
+
+model VerificationResult {
+  id           String       @id @default(cuid())
+  email        String       @unique
+  status       VerifyStatus
+  syntaxOk     Boolean      @default(false)
+  domainOk     Boolean      @default(false)
+  mxOk         Boolean      @default(false)
+  smtpOk       Boolean? // null = not probed
+  catchAll     Boolean      @default(false)
+  disposable   Boolean      @default(false)
+  role         Boolean      @default(false)
+  trapScore    Float        @default(0)
+  smtpResponse String?
+  checkedAt    DateTime     @default(now())
+  expiresAt    DateTime
+  leads        Lead[]
+
+  @@index([status, expiresAt])
+}
+
+// ---------- Consent & policy ----------
+
+enum ConsentBasis {
+  LEGITIMATE_INTEREST
+  IMPLIED_B2B
+  EXPRESS_OPT_IN
+  PUBLISHED_ADDRESS
+  EXISTING_RELATIONSHIP
+}
+
+model ConsentRecord {
+  id               String       @id @default(cuid())
+  orgId            String
+  org              Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  leadId           String
+  lead             Lead         @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  basis            ConsentBasis
+  source           String
+  evidenceKey      String? // R2 object
+  liaJson          Json? // Legitimate Interest Assessment
+  attestedByUserId String?
+  attestedAt       DateTime     @default(now())
+  attestationIp    String?
+  expiresAt        DateTime? // CASL implied consent is time-boxed
+  revokedAt        DateTime?
+
+  @@index([leadId, revokedAt])
+  @@index([orgId])
+}
+
+enum PolicyOutcome {
+  ALLOW
+  ALLOW_WITH_BASIS
+  BLOCK
+}
+
+// Config, not code. Reviewable by counsel without a deploy.
+model JurisdictionPolicy {
+  id            String         @id @default(cuid())
+  countryCode   String // ISO-3166-2, or "*" for the default
+  regime        String // opt-in | opt-out | mixed
+  outcome       PolicyOutcome
+  allowedBases  ConsentBasis[]
+  citation      String?
+  notes         String?
+  version       Int            @default(1)
+  effectiveFrom DateTime       @default(now())
+  effectiveTo   DateTime?
+
+  @@unique([countryCode, version])
+  @@index([countryCode, effectiveFrom])
+}
+
+// Append-only. "Prove you were allowed to send that" must be one query, a year later.
+model PolicyDecision {
+  id                     String        @id @default(cuid())
+  orgId                  String
+  org                    Organization  @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  intentId               String?
+  leadId                 String?
+  campaignId             String?
+  jurisdiction           String?
+  jurisdictionSource     String?
+  jurisdictionConfidence Float?
+  consentBasis           ConsentBasis?
+  consentRecordId        String?
+  suppressionChecks      Json?
+  contentScore           Float?
+  policyVersion          Int?
+  decision               PolicyOutcome
+  reasons                String[]      @default([])
+  actor                  String        @default("system")
+  createdAt              DateTime      @default(now())
+
+  @@index([orgId, createdAt])
+  @@index([intentId])
+  @@index([decision, createdAt])
+}
+
+// Platform-wide suppression. No tenant can override this.
+enum GlobalSuppressionReason {
+  COMPLAINT
+  SPAM_TRAP
+  ABUSE_REPORT
+  LEGAL_DEMAND
+  INTERNAL
+  GOV_MIL
+  COMPETITOR
+  HARD_BOUNCE
+}
+
+model GlobalSuppression {
+  id          String                  @id @default(cuid())
+  // Hashed so a GDPR erasure can drop the plaintext and keep the protection
+  addressHash String                  @unique
+  address     String?
+  domain      String?
+  reason      GlobalSuppressionReason
+  source      String?
+  createdAt   DateTime                @default(now())
+
+  @@index([domain])
+  @@index([reason, createdAt])
+}
+
+// ---------- Campaigns & sequences ----------
+
+enum CampaignStatus {
+  DRAFT
+  PENDING_REVIEW
+  SCHEDULED
+  RUNNING
+  PAUSED
+  AUTO_PAUSED // tripped a health circuit breaker
+  COMPLETED
+  ARCHIVED
+}
+
+model Campaign {
+  id               String          @id @default(cuid())
+  orgId            String
+  org              Organization    @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  projectId        String?
+  name             String
+  status           CampaignStatus  @default(DRAFT)
+  // Sending window, per-lead timezone resolved at schedule time
+  sendWindowStart  String          @default("09:00")
+  sendWindowEnd    String          @default("17:00")
+  sendDays         Int[]           @default([1, 2, 3, 4, 5])
+  respectHolidays  Boolean         @default(true)
+  timezoneMode     String          @default("lead") // lead | fixed
+  fixedTimezone    String?
+  dailyCap         Int             @default(200)
+  // Routing constraints
+  domainPool       String          @default("default")
+  trackOpens       Boolean         @default(false) // OFF by default — see VISION §2.3
+  trackClicks      Boolean         @default(false)
+  // Circuit breakers
+  maxBounceRate    Float           @default(0.05)
+  maxComplaintRate Float           @default(0.001)
+  autoPausedAt     DateTime?
+  autoPauseReason  String?
+  startedAt        DateTime?
+  completedAt      DateTime?
+  steps            SequenceStep[]
+  enrollments      CampaignLead[]
+  intents          SendIntent[]
+  placementTests   PlacementTest[]
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+
+  @@index([orgId, status])
+}
+
+model SequenceStep {
+  id           String        @id @default(cuid())
+  campaignId   String
+  campaign     Campaign      @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  position     Int
+  delayDays    Int           @default(0)
+  delayHours   Int           @default(0)
+  // Conditions gate whether the step fires (e.g. no_reply, opened, clicked)
+  conditions   Json?
+  // A first-touch step may never use RE:/FW: — enforced in composition
+  isFirstTouch Boolean       @default(false)
+  variants     StepVariant[]
+  intents      SendIntent[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  @@unique([campaignId, position])
+}
+
+model StepVariant {
+  id              String       @id @default(cuid())
+  stepId          String
+  step            SequenceStep @relation(fields: [stepId], references: [id], onDelete: Cascade)
+  label           String       @default("A")
+  subject         String
+  bodyText        String
+  bodyHtml        String?
+  weight          Int          @default(1)
+  // AI provenance, if generated
+  aiTaskId        String?
+  aiPromptVersion String?
+  // Deterministic outcome counters
+  sentCount       Int          @default(0)
+  replyCount      Int          @default(0)
+  bounceCount     Int          @default(0)
+  intents         SendIntent[]
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  @@unique([stepId, label])
+}
+
+enum EnrollmentState {
+  PENDING
+  ACTIVE
+  REPLIED
+  BOUNCED
+  UNSUBSCRIBED
+  COMPLETED
+  STOPPED
+  BLOCKED_BY_POLICY
+}
+
+model CampaignLead {
+  id            String          @id @default(cuid())
+  campaignId    String
+  campaign      Campaign        @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  leadId        String
+  lead          Lead            @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  state         EnrollmentState @default(PENDING)
+  currentStep   Int             @default(0)
+  nextDueAt     DateTime?
+  stoppedReason String?
+  enrolledAt    DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+
+  @@unique([campaignId, leadId])
+  @@index([state, nextDueAt])
+}
+
+// ---------- The send path ----------
+
+enum IntentState {
+  PENDING
+  BLOCKED
+  DEFERRED
+  ROUTED
+  SUBMITTED
+  DELIVERED
+  BOUNCED
+  FAILED
+  CANCELLED
+}
+
+model SendIntent {
+  id           String        @id @default(cuid())
+  orgId        String
+  org          Organization  @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  campaignId   String
+  campaign     Campaign      @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  stepId       String
+  step         SequenceStep  @relation(fields: [stepId], references: [id], onDelete: Cascade)
+  variantId    String?
+  variant      StepVariant?  @relation(fields: [variantId], references: [id], onDelete: SetNull)
+  leadId       String
+  lead         Lead          @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  state        IntentState   @default(PENDING)
+  dueAt        DateTime
+  // Router output (ARCHITECTURE §3.2)
+  mailboxId    String?
+  mailbox      FleetMailbox? @relation(fields: [mailboxId], references: [id], onDelete: SetNull)
+  routedAt     DateTime?
+  routeScore   Float?
+  routeTrace   Json? // why this mailbox — auditable a year later
+  deferUntil   DateTime?
+  deferReason  String?
+  deferCount   Int           @default(0)
+  // Emission
+  messageId    String?       @unique // our Message-ID — the join key for everything
+  submittedAt  DateTime?
+  smtpResponse String?
+  bounceClass  BounceClass?
+  attempts     Int           @default(0)
+  lastError    String?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  @@index([state, dueAt])
+  @@index([campaignId, state])
+  @@index([mailboxId, submittedAt])
+  @@index([orgId, createdAt])
+}
+
+// ---------- Unified inbox ----------
+
+enum ThreadState {
+  OPEN
+  SNOOZED
+  CLOSED
+  ARCHIVED
+}
+
+enum ReplyIntent {
+  INTERESTED
+  NOT_INTERESTED
+  OUT_OF_OFFICE
+  REFERRAL
+  UNSUBSCRIBE
+  AUTO_REPLY
+  BOUNCE
+  OTHER
+}
+
+model InboxThread {
+  id                String         @id @default(cuid())
+  orgId             String
+  org               Organization   @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  mailboxId         String
+  mailbox           FleetMailbox   @relation(fields: [mailboxId], references: [id], onDelete: Cascade)
+  leadId            String?
+  lead              Lead?          @relation(fields: [leadId], references: [id], onDelete: SetNull)
+  campaignId        String?
+  subject           String
+  state             ThreadState    @default(OPEN)
+  intent            ReplyIntent?
+  intentConfidence  Float?
+  // Set when a human corrects the AI — this row becomes an eval fixture
+  intentCorrectedTo ReplyIntent?
+  assignedToUserId  String?
+  snoozedUntil      DateTime?
+  lastMessageAt     DateTime       @default(now())
+  messages          InboxMessage[]
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+
+  @@index([orgId, state, lastMessageAt])
+  @@index([mailboxId])
+  @@index([intent])
+}
+
+model InboxMessage {
+  id           String      @id @default(cuid())
+  threadId     String
+  thread       InboxThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  direction    String // inbound | outbound
+  messageId    String?
+  inReplyTo    String?
+  fromAddress  String
+  toAddress    String
+  subject      String?
+  bodyText     String?
+  bodyHtml     String?
+  rawObjectKey String? // full MIME in R2
+  headersJson  Json?
+  receivedAt   DateTime    @default(now())
+
+  @@index([threadId, receivedAt])
+  @@index([messageId])
+}
+
+// Handoff to usermails once a lead opts in — EMS does not do lifecycle.
+model HandoffEvent {
+  id        String       @id @default(cuid())
+  orgId     String
+  org       Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  leadId    String
+  target    String       @default("usermails")
+  status    String       @default("pending") // pending | sent | failed
+  payload   Json?
+  response  Json?
+  attempts  Int          @default(0)
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+
+  @@index([orgId, status])
+}
+
+// ---------- AI gateway ----------
+
+model AiTaskConfig {
+  id            String   @id @default(cuid())
+  taskId        String   @unique // copy.sequence, classify.reply, ...
+  model         String
+  fallbackChain String[] @default([])
+  temperature   Float    @default(0.3)
+  maxTokens     Int      @default(1024)
+  timeoutMs     Int      @default(30000)
+  promptVersion String
+  enabled       Boolean  @default(true)
+  cacheTtlSec   Int      @default(86400)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model AiCall {
+  id            String        @id @default(cuid())
+  orgId         String?
+  org           Organization? @relation(fields: [orgId], references: [id], onDelete: SetNull)
+  taskId        String
+  promptVersion String
+  model         String
+  inputTokens   Int           @default(0)
+  outputTokens  Int           @default(0)
+  costUsd       Float         @default(0)
+  latencyMs     Int           @default(0)
+  cacheHit      Boolean       @default(false)
+  schemaValid   Boolean       @default(true)
+  confidence    Float?
+  degraded      Boolean       @default(false)
+  errorText     String?
+  createdAt     DateTime      @default(now())
+
+  @@index([taskId, createdAt])
+  @@index([orgId, createdAt])
 }

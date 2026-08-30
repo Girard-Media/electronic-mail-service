@@ -1,0 +1,102 @@
+# Epic 04 — IPs, DNS Automation & the Registrar Seam
+
+- [ ] E04-001 — Define the RegistrarProvider interface (search, purchase, renew, setNameservers, listDomains)
+- [ ] E04-002 — Implement the Cloudflare Registrar adapter
+- [ ] E04-003 — Implement a second adapter (Namecheap or Porkbun) to prove the seam
+- [ ] E04-004 — Add registrar credential storage with encryption and a rotation runbook
+- [ ] E04-005 — Add a registrar cost ledger so domain spend is attributable per org
+- [ ] E04-006 — Define the DnsProvider interface (upsertRecord, deleteRecord, listRecords, verifyPropagation)
+- [ ] E04-007 — Implement the Cloudflare DNS adapter using the scoped Zone:DNS:Edit token
+- [ ] E04-008 — Never use the platform DNS token for a customer-owned zone; enforce in code
+- [ ] E04-009 — Implement DNS record templating per FleetDomain from planning/INFRA.md §5
+- [ ] E04-010 — Generate the SPF record as a single hard-fail ip4 with no includes
+- [ ] E04-011 — Refuse to publish an SPF record with more than ten DNS lookups
+- [ ] E04-012 — Generate a 2048-bit DKIM keypair per domain and store the private key encrypted
+- [ ] E04-013 — Publish the DKIM public key TXT and verify it resolves before marking dkimOk
+- [ ] E04-014 — Implement quarterly DKIM selector rotation with an overlap window
+- [ ] E04-015 — Generate the DMARC record starting at p=none with rua and ruf
+- [ ] E04-016 — Automate the p=none → p=quarantine promotion after seven days of clean RUA
+- [ ] E04-017 — Automate the p=quarantine → p=reject promotion after fourteen days of full alignment
+- [ ] E04-018 — Set adkim=s and aspf=s from the first publish
+- [ ] E04-019 — Publish the TLS-RPT record pointing at the aggregate-report domain
+- [ ] E04-020 — Publish the MX record pointing at the node PTR hostname
+- [ ] E04-021 — Publish the bounce subdomain CNAME for VERP
+- [ ] E04-022 — Publish the A record for the domain's one-page site
+- [ ] E04-023 — Publish the mta01 A record matching the node IP
+- [ ] E04-024 — Implement DNS propagation verification against multiple public resolvers
+- [ ] E04-025 — Do not mark a domain DNS-complete until every record verifies from three resolvers
+- [ ] E04-026 — Implement a scheduled DNS drift check for every ACTIVE domain
+- [ ] E04-027 — Alert and auto-pause a domain whose SPF, DKIM, or DMARC record disappears
+- [ ] E04-028 — Record every DNS issue in FleetDomain.dnsIssues with a timestamp
+- [ ] E04-029 — Build the DNS record diff view: desired vs live, per domain
+- [ ] E04-030 — Add a one-click repair that republishes the desired record set
+- [ ] E04-031 — Rate-limit registrar and DNS API calls to stay inside provider quotas
+- [ ] E04-032 — Add exponential backoff and idempotency keys to every registrar call
+- [ ] E04-033 — Implement the aggregate-report domain setup (dmarc@ and tlsrpt@ mailboxes)
+- [ ] E04-034 — Route the aggregate-report domain MX to the ingest node, not a blast node
+- [ ] E04-035 — Build the SendingIp registry CRUD in packages/fleet
+- [ ] E04-036 — Implement the IP status state machine with legal transitions only
+- [ ] E04-037 — Refuse NEW → ACTIVE without a confirmed PTR and a clean diligence record
+- [ ] E04-038 — Implement IP warmup day tracking independent of mailbox warmup
+- [ ] E04-039 — Compute the IP hourly cap from warmup day and observed deferral rate
+- [ ] E04-040 — Implement IP quarantine on a Spamhaus SBL or CSS listing
+- [ ] E04-041 — Implement IP throttle on a sustained 4xx rate from any single ESP
+- [ ] E04-042 — Implement automatic un-throttle when the deferral rate recovers
+- [ ] E04-043 — Never auto-un-quarantine; require an operator action with a reason
+- [ ] E04-044 — Build the IP detail view: reputation series, listings, caps, domains, recent transactions
+- [ ] E04-045 — Build the IP list view with a listing-status column across all DNSBLs
+- [ ] E04-046 — Implement PTR verification as a scheduled job, not only at provision time
+- [ ] E04-047 — Alert if PTR ever stops forward-confirming
+- [ ] E04-048 — Add an IP allocation planner: which domains should live on which IP
+- [ ] E04-049 — Enforce a maximum number of domains per IP
+- [ ] E04-050 — Implement domain-to-IP reassignment with a drain and DNS update
+- [ ] E04-051 — Never reassign a domain to an IP with a worse reputation score without confirmation
+- [ ] E04-052 — Implement the pool concept: named IP groups with independent policy
+- [ ] E04-053 — Support a dedicated pool per org on higher plans
+- [ ] E04-054 — Support a shared pool with per-tenant complaint accounting
+- [ ] E04-055 — Implement tenant eviction from the shared pool to an isolated pool on damage
+- [ ] E04-056 — Build the pool management view with capacity and health per pool
+- [ ] E04-057 — Add a "burn" action that permanently retires an IP and blocks its reuse
+- [ ] E04-058 — Record the burn reason and keep the IP in the registry as a tombstone
+- [ ] E04-059 — Implement bulk domain purchase with a name-generation helper
+- [ ] E04-060 — Screen candidate domain names against a blocklist of penalised TLDs
+- [ ] E04-061 — Screen candidate domain names for prior use via passive DNS and archive lookups
+- [ ] E04-062 — Screen candidate domain names against DNSBL domain lists before purchase
+- [ ] E04-063 — Refuse to purchase a domain that appears on any blocklist
+- [ ] E04-064 — Refuse to purchase a domain that trademark-collides with a third party
+- [ ] E04-065 — Automate WHOIS privacy on every purchased domain
+- [ ] E04-066 — Automate domain auto-renewal and alert 60 days before expiry
+- [ ] E04-067 — Track domain cost and renewal date in the cost ledger
+- [ ] E04-068 — Generate the one-page site for each sending domain from a template
+- [ ] E04-069 — Include a real privacy page and postal address on each sending-domain site
+- [ ] E04-070 — Deploy sending-domain sites as static pages behind the existing edge
+- [ ] E04-071 — Verify the site is live before allowing the domain to leave AGING
+- [ ] E04-072 — Implement the aging clock: registeredAt plus the plan's minimum, exposed as ageReadyAt
+- [ ] E04-073 — Make the router refuse any domain before ageReadyAt, with a clear deferral reason
+- [ ] E04-074 — Build the domain-bench view: which warmed domains are available and idle
+- [ ] E04-075 — Alert when the warm bench falls below the configured minimum
+- [ ] E04-076 — Auto-order replacement domains when the bench runs low, behind an approval
+- [ ] E04-077 — Implement domain retirement scheduling based on service life and health trend
+- [ ] E04-078 — Implement the BURNED terminal state and block reuse forever
+- [ ] E04-079 — Export the full DNS record set for a domain for the customer's records
+- [ ] E04-080 — Support customer-owned sending domains with a DNS TXT ownership challenge
+- [ ] E04-081 — Never send from a customer domain before the ownership challenge passes
+- [ ] E04-082 — Give customer-owned domains the same aging and warmup gates as ours
+- [ ] E04-083 — Produce a copy-paste DNS instruction set for customer-managed zones
+- [ ] E04-084 — Verify customer-published records and show a precise diff on failure
+- [ ] E04-085 — Add a DNS health score per domain surfaced on the deliverability cockpit
+- [ ] E04-086 — Add MTA-STS policy publication as an option for customer domains
+- [ ] E04-087 — Add BIMI support gated on p=quarantine holding and a VMC being present
+- [ ] E04-088 — Write the runbook: SPF record broke and mail started failing
+- [ ] E04-089 — Write the runbook: DKIM key rotated and old signatures still in flight
+- [ ] E04-090 — Write the runbook: registrar API outage during a bulk purchase
+- [ ] E04-091 — Add a DNS change audit log with actor, before, after, and reason
+- [ ] E04-092 — Add a dry-run mode to every DNS write path
+- [ ] E04-093 — Add a DNS record simulator for tests so CI never touches a live zone
+- [ ] E04-094 — Test the full domain lifecycle end to end against the simulator
+- [ ] E04-095 — Test the DKIM rotation overlap window with a real sign-and-verify cycle
+- [ ] E04-096 — Measure and record time-to-DNS-ready for each new domain
+- [ ] E04-097 — Target under ten minutes from purchase to fully verified DNS
+- [ ] E04-098 — Add a cost-per-warm-domain metric to the business dashboard
+- [ ] E04-099 — Document the whole DNS automation in planning/specs/dns-automation/
+- [ ] E04-100 — Add a security review of the DNS token blast radius and least-privilege scoping

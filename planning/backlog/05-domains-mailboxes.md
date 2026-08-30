@@ -1,0 +1,92 @@
+# Epic 05 — Domain Fleet Lifecycle, Mailboxes & Personas
+
+- [ ] E05-001 — Build the FleetDomain registry CRUD in packages/fleet
+- [ ] E05-002 — Implement the FleetDomainStatus state machine with legal transitions only
+- [ ] E05-003 — Refuse REGISTERED → WARMING without spfOk, dkimOk, dmarcOk, mxOk, and siteLiveOk
+- [ ] E05-004 — Refuse WARMING → ACTIVE before the warmup plan completes
+- [ ] E05-005 — Implement domain PAUSED with a required reason and automatic router exclusion
+- [ ] E05-006 — Implement domain RETIRING: stop new enrolments, finish in-flight sequences
+- [ ] E05-007 — Implement domain BURNED as terminal with permanent reuse blocking
+- [ ] E05-008 — Compute domain daily cap as the sum of live mailbox caps times a safety factor
+- [ ] E05-009 — Never allow a domain cap to exceed the sum of its mailbox hard caps
+- [ ] E05-010 — Enforce a maximum of three mailboxes per domain by default, configurable per plan
+- [ ] E05-011 — Build the domain detail cockpit: auth status, warmup, caps, mailboxes, reputation, listings
+- [ ] E05-012 — Build the domain list view sortable by health, age, and capacity
+- [ ] E05-013 — Add a domain health timeline showing every status change with its cause
+- [ ] E05-014 — Add a domain comparison view for diagnosing divergent performance
+- [ ] E05-015 — Implement the Persona model CRUD with mandatory postal address
+- [ ] E05-016 — Refuse to create a persona without a postal address (CAN-SPAM element)
+- [ ] E05-017 — Validate the postal address format per country
+- [ ] E05-018 — Generate the plain-text signature block from the persona
+- [ ] E05-019 — Generate the HTML signature block with accessible contrast
+- [ ] E05-020 — Refuse a signature containing a tracking pixel when tracking is disabled
+- [ ] E05-021 — Warn when a persona name does not match its mailbox local part
+- [ ] E05-022 — Refuse role-style local parts (info, sales, noreply, admin) for campaign mailboxes
+- [ ] E05-023 — Build the FleetMailbox registry CRUD in packages/fleet
+- [ ] E05-024 — Implement the FleetMailboxStatus state machine with legal transitions only
+- [ ] E05-025 — Provision the system user and maildir on the node when a mailbox is created
+- [ ] E05-026 — Configure the alias and LMTP delivery for inbound to the mailbox
+- [ ] E05-027 — Verify inbound delivery with a loopback test before marking a mailbox CREATED
+- [ ] E05-028 — Verify outbound signing with a DKIM sign test before marking a mailbox WARMING
+- [ ] E05-029 — Implement mailbox PAUSED with automatic router exclusion
+- [ ] E05-030 — Implement mailbox DRAINING: stop new sends, allow replies, finish in-flight
+- [ ] E05-031 — Implement mailbox RETIRED with a maildir archive to R2 first
+- [ ] E05-032 — Implement mailbox BURNED as terminal
+- [ ] E05-033 — Never delete a maildir without archiving it; make this a hard guard
+- [ ] E05-034 — Compute mailbox health score from bounce, defer, complaint, and reply rates
+- [ ] E05-035 — Recompute rolling 7-day counters on a schedule, not on read
+- [ ] E05-036 — Auto-pause a mailbox whose bounce rate crosses the plan threshold
+- [ ] E05-037 — Auto-pause a mailbox on any complaint above the plan threshold
+- [ ] E05-038 — Auto-pause a mailbox on a spam-trap hit, with no self-serve resume
+- [ ] E05-039 — Require an operator action plus a reason to resume an auto-paused mailbox
+- [ ] E05-040 — Build the mailbox detail view: warmup curve, caps, health, recent sends, replies
+- [ ] E05-041 — Build the mailbox list view with warmup progress bars and headroom
+- [ ] E05-042 — Add a mailbox capacity summary: total daily headroom across the fleet right now
+- [ ] E05-043 — Alert when fleet headroom drops below the sum of active campaign daily caps
+- [ ] E05-044 — Add a bulk mailbox creation flow: pick a domain, pick personas, create N
+- [ ] E05-045 — Add a bulk mailbox pause and resume with a confirmation showing the impact
+- [ ] E05-046 — Add mailbox assignment to a workspace so tenants see only their own
+- [ ] E05-047 — Enforce workspace scoping on every mailbox query
+- [ ] E05-048 — Implement mailbox reassignment between workspaces with a drain first
+- [ ] E05-049 — Track mailbox age and surface it as a routing input
+- [ ] E05-050 — Track time since last send and prevent long-idle mailboxes from resuming at full cap
+- [ ] E05-051 — Implement the re-warm path for a mailbox idle longer than the configured window
+- [ ] E05-052 — Add a mailbox cost model line so cost per mailbox per month is known
+- [ ] E05-053 — Add a mailbox utilisation report: sent vs cap, per day, per mailbox
+- [ ] E05-054 — Alert on chronically underutilised mailboxes; idle capacity is wasted spend
+- [ ] E05-055 — Alert on chronically capped mailboxes; the fleet needs to grow
+- [ ] E05-056 — Add the fleet growth recommendation: domains and mailboxes needed for target volume
+- [ ] E05-057 — Wire the recommendation to the bulk purchase flow behind an approval
+- [ ] E05-058 — Implement the domain warm bench minimum per org and alert when breached
+- [ ] E05-059 — Implement automatic bench replenishment behind an approval and a spend cap
+- [ ] E05-060 — Add the domain and mailbox inventory export for audit
+- [ ] E05-061 — Add an inventory reconciliation job comparing the registry against live node state
+- [ ] E05-062 — Alert on any drift between the registry and the node
+- [ ] E05-063 — Implement registry-wins reconciliation with an operator confirmation for deletions
+- [ ] E05-064 — Write the runbook: mailbox suddenly bouncing everything
+- [ ] E05-065 — Write the runbook: domain reputation collapsed overnight
+- [ ] E05-066 — Write the runbook: emergency full-fleet pause and resume
+- [ ] E05-067 — Test domain lifecycle end to end against the DNS simulator and a staging node
+- [ ] E05-068 — Test mailbox lifecycle end to end including maildir archive and restore
+- [ ] E05-069 — Load-test mailbox selection with a fleet of 500 simulated mailboxes
+- [ ] E05-070 — Measure and record time from domain purchase to first safe send; target 14 days
+- [ ] E05-071 — Measure and record operator minutes per mailbox per month; target under two
+- [ ] E05-072 — Add a fleet overview panel: nodes, IPs, domains, mailboxes, headroom, health, in one screen
+- [ ] E05-073 — Make the fleet overview the default landing page for an operator role
+- [ ] E05-074 — Add a fleet event feed showing every state change across the fleet in real time
+- [ ] E05-075 — Add filtering and search across the whole fleet by any identifier
+- [ ] E05-076 — Add keyboard navigation across the fleet views per app-feel standards
+- [ ] E05-077 — Ensure every fleet mutation is optimistic with a rollback on failure
+- [ ] E05-078 — Ensure every fleet list is cached and deduped, never fetch-on-mount per row
+- [ ] E05-079 — Add an empty state for each fleet view that explains the next action
+- [ ] E05-080 — Add a fleet onboarding checklist for a brand-new org
+- [ ] E05-081 — Gate campaign creation on the org having at least one ACTIVE mailbox
+- [ ] E05-082 — Explain precisely what is missing when the gate blocks, with a link to fix it
+- [ ] E05-083 — Add per-domain and per-mailbox notes for operator context
+- [ ] E05-084 — Add tagging across fleet resources for grouping and reporting
+- [ ] E05-085 — Add saved views across the fleet cockpit
+- [ ] E05-086 — Add a fleet API so an agency can script its own provisioning
+- [ ] E05-087 — Add MCP tools for fleet inspection so an agent can answer fleet questions
+- [ ] E05-088 — Document the whole fleet lifecycle in planning/specs/fleet-lifecycle/
+- [ ] E05-089 — Add a fleet section to the public docs explaining what we own and why it matters
+- [ ] E05-090 — Add an honesty check: no fleet number is displayed that we cannot source

@@ -1,0 +1,110 @@
+# Epic 07 — Router, Pacing & the Send Path
+
+The router is the only package permitted to make a final send decision.
+Deferral is a first-class success (ARCHITECTURE §3.2).
+
+- [ ] E07-001 — Create packages/router with the SendPlan and Deferral types
+- [ ] E07-002 — Define the SendIntent → SendPlan contract and freeze it
+- [ ] E07-003 — Implement the hard candidate filter: domain verified and past ageReadyAt
+- [ ] E07-004 — Implement the hard candidate filter: mailbox ACTIVE and not held
+- [ ] E07-005 — Implement the hard candidate filter: IP not quarantined or throttled
+- [ ] E07-006 — Implement the hard candidate filter: node ACTIVE with all verify flags true
+- [ ] E07-007 — Implement the hard candidate filter: node role is CAMPAIGN, never VERIFY
+- [ ] E07-008 — Implement the hard candidate filter: cap headroom greater than zero on all four buckets
+- [ ] E07-009 — Implement the hard candidate filter: pool matches the campaign's domain pool
+- [ ] E07-010 — Implement the hard candidate filter: policy allows this domain for this jurisdiction
+- [ ] E07-011 — Implement the per-recipient-domain cooldown so one company is not hit from one mailbox repeatedly
+- [ ] E07-012 — Implement the per-recipient-domain fan-out cap across the whole fleet
+- [ ] E07-013 — Implement reputationScore as a router input from packages/reputation
+- [ ] E07-014 — Implement headroom normalisation across mailboxes with different caps
+- [ ] E07-015 — Implement espAffinity from measured placement per (domain, recipient ESP)
+- [ ] E07-016 — Implement warmupFit so a warming mailbox is not chosen for a large burst
+- [ ] E07-017 — Implement recencyPenalty on the recipient domain
+- [ ] E07-018 — Implement riskPenalty from listings, complaint trend, and bounce trend
+- [ ] E07-019 — Make every weight configurable and versioned, never a magic number in code
+- [ ] E07-020 — Record the full route trace on every decision into SendIntent.routeTrace
+- [ ] E07-021 — Make the route trace human-readable in the UI: why this mailbox, why not the others
+- [ ] E07-022 — Implement deterministic tie-breaking so identical inputs produce identical plans
+- [ ] E07-023 — Implement the deferral path with a reason enum and a next-attempt time
+- [ ] E07-024 — Implement exponential backoff on repeated deferrals with a jittered ceiling
+- [ ] E07-025 — Cap the deferral count and fail the intent with a clear reason at the limit
+- [ ] E07-026 — Never silently drop an intent; every terminal state has a recorded reason
+- [ ] E07-027 — Implement the recipient ESP classifier from the MX record
+- [ ] E07-028 — Maintain the MX-to-ESP-family map as data, refreshable without a deploy
+- [ ] E07-029 — Cache the ESP classification per recipient domain with a TTL
+- [ ] E07-030 — Implement the mailbox daily token bucket as an atomic Lua script
+- [ ] E07-031 — Implement the mailbox hourly token bucket with jitter
+- [ ] E07-032 — Implement the domain daily token bucket
+- [ ] E07-033 — Implement the IP hourly token bucket
+- [ ] E07-034 — Implement the adaptive per-recipient-ESP bucket in 15-minute windows
+- [ ] E07-035 — Auto-tune the ESP bucket from the observed 4xx rate for that IP and ESP
+- [ ] E07-036 — Reduce the ESP rate immediately on a sustained deferral signal
+- [ ] E07-037 — Recover the ESP rate slowly, never in one step
+- [ ] E07-038 — Reconcile every bucket against Postgres counters nightly
+- [ ] E07-039 — Make bucket decrement and intent state transition atomic; no double-spend
+- [ ] E07-040 — Test the four-bucket decrement under concurrency with a race harness
+- [ ] E07-041 — Implement the scheduler: claim-with-lock over SendIntent where dueAt has passed
+- [ ] E07-042 — Never scan the whole table; use the covering index and a bounded batch
+- [ ] E07-043 — Implement a fencing token so a stalled worker cannot resurrect and double-send
+- [ ] E07-044 — Implement graceful shutdown that releases claims rather than orphaning them
+- [ ] E07-045 — Implement claim expiry so a crashed worker's intents return to the pool
+- [ ] E07-046 — Measure and record scheduler claim latency; target p95 under 50ms
+- [ ] E07-047 — Load-test the scheduler at one million pending intents
+- [ ] E07-048 — Implement the send-window evaluator using the lead's resolved timezone
+- [ ] E07-049 — Implement the business-day evaluator using the campaign's sendDays
+- [ ] E07-050 — Implement the holiday calendar per country and honour it when configured
+- [ ] E07-051 — Defer rather than send outside the window; never clamp into the boundary minute
+- [ ] E07-052 — Spread sends across the window rather than firing at the opening minute
+- [ ] E07-053 — Implement send-time optimisation from historical reply-time data, behind a flag
+- [ ] E07-054 — Never let send-time optimisation override the compliance or pacing gates
+- [ ] E07-055 — Implement the composition stage: variable interpolation with a strict unknown-token policy
+- [ ] E07-056 — Fail the send when a required personalisation token cannot be resolved
+- [ ] E07-057 — Implement spintax with deterministic selection from the intent id
+- [ ] E07-058 — Implement the footer builder: identity, postal address, unsubscribe, ad disclosure
+- [ ] E07-059 — Refuse to compose a message missing any CAN-SPAM mandatory element
+- [ ] E07-060 — Implement List-Unsubscribe and List-Unsubscribe-Post headers on every message
+- [ ] E07-061 — Implement the RFC-compliant Message-ID generator using our own domain
+- [ ] E07-062 — Implement threading headers for follow-up steps in the same conversation
+- [ ] E07-063 — Refuse RE: or FW: on a step marked isFirstTouch
+- [ ] E07-064 — Implement the plain-text-first composer with an HTML alternative when supplied
+- [ ] E07-065 — Warn and score down heavy HTML, many links, and image-only bodies
+- [ ] E07-066 — Implement the pre-send rspamd score call against the node's local scorer
+- [ ] E07-067 — Block the send above the configured rspamd threshold with the specific symbols listed
+- [ ] E07-068 — Implement link-domain reputation checks against SURBL and our own history
+- [ ] E07-069 — Block a message containing a link on a listed domain
+- [ ] E07-070 — Implement the AI content risk advisory as a priority input, never a gate
+- [ ] E07-071 — Implement the emit stage: SMTP submit to the chosen node bound to the chosen IP
+- [ ] E07-072 — Set the VERP return-path so bounce attribution is exact
+- [ ] E07-073 — Record the SMTP response verbatim on the intent
+- [ ] E07-074 — Handle a submission-time 4xx as a defer, not a failure
+- [ ] E07-075 — Handle a submission-time 5xx by classifying it immediately through the taxonomy
+- [ ] E07-076 — Re-check suppression in Valkey immediately before emit, with a Postgres fallback on miss
+- [ ] E07-077 — Fail closed on a suppression-check error; never assume allowed
+- [ ] E07-078 — Write the send-path integration test covering all ten stages
+- [ ] E07-079 — Write a test asserting there is no code path to the MTA that skips the policy stage
+- [ ] E07-080 — Add a static analysis rule that fails CI if the SMTP client is imported outside the sender
+- [ ] E07-081 — Implement idempotency: an intent can be processed twice without sending twice
+- [ ] E07-082 — Key idempotency on the intent id and enforce it at the database level
+- [ ] E07-083 — Implement the cancel path: an intent can be cancelled up to the emit moment
+- [ ] E07-084 — Implement campaign pause propagating to every pending intent immediately
+- [ ] E07-085 — Implement the global kill switch short-circuiting the router before any candidate work
+- [ ] E07-086 — Add router decision metrics: allowed, deferred, blocked, by reason, per minute
+- [ ] E07-087 — Build the router observability view: live decision stream with traces
+- [ ] E07-088 — Add a router simulation mode: given a campaign, show the plan without sending
+- [ ] E07-089 — Use simulation mode to answer "when will this campaign finish"
+- [ ] E07-090 — Surface the projected completion date on the campaign view
+- [ ] E07-091 — Explain a slow campaign in terms of the binding constraint, not a generic message
+- [ ] E07-092 — Add a what-if tool: how much faster with N more mailboxes
+- [ ] E07-093 — Benchmark the router decision at 10,000 candidates; target p95 under 50ms
+- [ ] E07-094 — Cache the candidate set per pool with invalidation on any fleet state change
+- [ ] E07-095 — Test router behaviour when every candidate is exhausted
+- [ ] E07-096 — Test router behaviour when the fleet is empty
+- [ ] E07-097 — Test router behaviour when policy blocks every domain for a jurisdiction
+- [ ] E07-098 — Fuzz the router with randomised fleet states and assert no invariant breaks
+- [ ] E07-099 — Document the router scoring function and weights in planning/specs/router/
+- [ ] E07-100 — Publish a plain-language explanation of routing in the customer docs
+- [ ] E07-101 — Add MCP tools so an agent can ask why a specific message was routed as it was
+- [ ] E07-102 — Add a per-org routing report: which mailboxes carried which share of volume
+- [ ] E07-103 — Detect and alert on routing concentration; one mailbox carrying too much is a risk
+- [ ] E07-104 — Add an explicit even-distribution mode for operators who want it
+- [ ] E07-105 — Verify invariant I3 with a test that attempts a cap overflow under load

@@ -1,0 +1,89 @@
+# Epic 10 — Seed Accounts & Inbox Placement Testing
+
+The only true measure of placement. Everything else is a proxy.
+
+- [ ] E10-001 — Scaffold apps/seedbox as an isolated probe agent
+- [ ] E10-002 — Create the SeedAccount registry with encrypted credentials
+- [ ] E10-003 — Store seed credentials so only the seedbox process can decrypt them
+- [ ] E10-004 — Create Gmail seed accounts across several account ages and activity profiles
+- [ ] E10-005 — Create Outlook and Hotmail seed accounts
+- [ ] E10-006 — Create Yahoo and AOL seed accounts
+- [ ] E10-007 — Create Zoho, Proton, GMX, and iCloud seed accounts
+- [ ] E10-008 — Create a corporate-style seed behind a Proofpoint or Mimecast-like filter
+- [ ] E10-009 — Document how each seed was created and keep the accounts genuinely usable
+- [ ] E10-010 — Implement IMAP reading for every provider that offers it
+- [ ] E10-011 — Implement the Gmail category detection: Primary, Promotions, Social, Updates
+- [ ] E10-012 — Implement spam-folder detection for every provider
+- [ ] E10-013 — Implement missing detection when a message never arrives within the window
+- [ ] E10-014 — Capture the full received headers for every probe result
+- [ ] E10-015 — Capture Authentication-Results and any provider spam headers verbatim
+- [ ] E10-016 — Capture the X-Spam score where the receiver exposes one
+- [ ] E10-017 — Record delivery latency to each seed
+- [ ] E10-018 — Never let a seed account interact with the message beyond reading it
+- [ ] E10-019 — Do not mark seed messages as read in a way that pollutes engagement signals
+- [ ] E10-020 — Implement the PlacementTest orchestrator: pick seeds, send, wait, collect
+- [ ] E10-021 — Send the actual campaign content, not a synthetic proxy
+- [ ] E10-022 — Route the probe through the same router path the campaign will use
+- [ ] E10-023 — Exclude probe sends from customer billing
+- [ ] E10-024 — Include probe sends in mailbox reputation, because receivers see them
+- [ ] E10-025 — Implement a configurable collection window with a default of 15 minutes
+- [ ] E10-026 — Mark unreturned probes MISSING rather than assuming delivery
+- [ ] E10-027 — Aggregate results into placement rate per folder per provider
+- [ ] E10-028 — Compute an inbox rate that excludes Promotions, and show both numbers
+- [ ] E10-029 — Never present a Promotions landing as an inbox landing
+- [ ] E10-030 — Schedule a recurring placement test per active domain
+- [ ] E10-031 — Run a placement test automatically before a campaign's first bulk send
+- [ ] E10-032 — Block the campaign if pre-flight placement is below the plan's floor
+- [ ] E10-033 — Explain precisely which provider failed and what the headers said
+- [ ] E10-034 — Run a placement test after any content change to an active campaign
+- [ ] E10-035 — Run a placement test after any DNS or authentication change
+- [ ] E10-036 — Feed placement results into the espAffinity router input
+- [ ] E10-037 — Feed placement results into the domain reputation ledger
+- [ ] E10-038 — Gate warmup advancement on placement, not only on bounce rate
+- [ ] E10-039 — Build the placement view: per provider, per folder, over time
+- [ ] E10-040 — Build the placement comparison across domains for the same content
+- [ ] E10-041 — Build the placement comparison across content for the same domain
+- [ ] E10-042 — Isolate the variable that changed when placement drops
+- [ ] E10-043 — Surface the specific header difference between an inbox landing and a spam landing
+- [ ] E10-044 — Alert on any placement regression beyond the noise threshold
+- [ ] E10-045 — Distinguish a real regression from small-sample noise before alerting
+- [ ] E10-046 — Track seed account health and alert when one stops working
+- [ ] E10-047 — Rotate seed accounts on a schedule so none becomes uniquely trained on our mail
+- [ ] E10-048 — Maintain a reserve of unused seed accounts
+- [ ] E10-049 — Never use a seed account for anything other than probing
+- [ ] E10-050 — Handle provider authentication changes gracefully with a clear operator alert
+- [ ] E10-051 — Handle rate limits and lockouts on seed providers with backoff
+- [ ] E10-052 — Run the seedbox on its own host, not on a blast node
+- [ ] E10-053 — Keep seedbox credentials off every other host
+- [ ] E10-054 — Audit every seedbox credential access
+- [ ] E10-055 — Implement a manual placement test an operator can trigger with arbitrary content
+- [ ] E10-056 — Show the manual test result live as seeds report in
+- [ ] E10-057 — Let a customer run a placement test on their own content, rate-limited by plan
+- [ ] E10-058 — Show the customer the same evidence we see, not a summarised score
+- [ ] E10-059 — Explain what we can and cannot conclude from a placement test in the UI
+- [ ] E10-060 — Document the seed methodology publicly; it is a trust asset
+- [ ] E10-061 — State the sample size on every placement number shown
+- [ ] E10-062 — Never extrapolate a placement rate beyond the providers actually tested
+- [ ] E10-063 — Correlate placement with rspamd score to build a predictive model
+- [ ] E10-064 — Use the correlation to give a pre-send placement estimate
+- [ ] E10-065 — Label the estimate clearly as an estimate, never as a measurement
+- [ ] E10-066 — Feed placement outcomes back into the AI content risk task as training data
+- [ ] E10-067 — Track the estimate's accuracy against real outcomes and publish it internally
+- [ ] E10-068 — Retire the estimate if its accuracy does not beat a trivial baseline
+- [ ] E10-069 — Build a placement leaderboard across domains to spot the best and worst performers
+- [ ] E10-070 — Retire domains that persistently underperform on placement
+- [ ] E10-071 — Test the seedbox against a deliberately spammy message and assert it lands in spam
+- [ ] E10-072 — Test the seedbox against a known-good message and assert it lands in Primary
+- [ ] E10-073 — Test the MISSING path by sending to a suspended seed
+- [ ] E10-074 — Test header capture fidelity against a message with known headers
+- [ ] E10-075 — Load-test placement collection with 50 concurrent tests
+- [ ] E10-076 — Measure the cost per placement test and keep it under the plan allowance
+- [ ] E10-077 — Document the placement subsystem in planning/specs/placement/
+- [ ] E10-078 — Add MCP tools so an agent can run and read a placement test
+- [ ] E10-079 — Include the latest placement result in the weekly deliverability digest
+- [ ] E10-080 — Make placement the headline number on the deliverability cockpit
+- [ ] E10-081 — Make it impossible to ship a dashboard where opens outrank placement visually
+- [ ] E10-082 — Add a placement SLO and report against it monthly
+- [ ] E10-083 — Publish our own placement numbers on the marketing site, updated automatically
+- [ ] E10-084 — Never publish a placement number we did not measure this week
+- [ ] E10-085 — Add a public methodology page the number links to

@@ -2,7 +2,7 @@
   "name": "electronic-mail-service",
   "version": "0.0.0",
   "private": true,
-  "description": "Electronic Mail Services \u2014 cold B2B outreach infrastructure. Multi-domain / multi-mailbox sending, deliverability control plane, AI sequencing. electronicmailservices.com",
+  "description": "Electronic Mail Services — cold B2B outreach infrastructure. Multi-domain / multi-mailbox sending, deliverability control plane, AI sequencing. electronicmailservices.com",
   "packageManager": "pnpm@10.30.3",
   "engines": {
     "node": ">=20"
@@ -21,7 +21,8 @@
     "db:migrate": "pnpm --filter @ems/db migrate",
     "db:deploy": "pnpm --filter @ems/db migrate:deploy",
     "infra:up": "docker compose -f infra/docker-compose.yml up -d",
-    "infra:down": "docker compose -f infra/docker-compose.yml down"
+    "infra:down": "docker compose -f infra/docker-compose.yml down",
+    "todo:compile": "tsx scripts/compile-todo.mts"
   },
   "devDependencies": {
     "@types/node": "^22.10.0",

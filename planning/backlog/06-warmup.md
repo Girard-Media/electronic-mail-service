@@ -1,0 +1,85 @@
+# Epic 06 — Warmup Engine
+
+Two mechanisms, both required: ramp scheduling and our own peer network.
+No cross-customer warmup pool, ever (ADR-0003).
+
+- [ ] E06-001 — Create packages/warmup with the WarmupPlan evaluator
+- [ ] E06-002 — Implement the daily-cap curve: startPerDay, incrementWeek, plateau
+- [ ] E06-003 — Support a per-plan and per-domain-age override of the curve
+- [ ] E06-004 — Implement weekday-only ramping when the plan requires it
+- [ ] E06-005 — Implement jittered hourly distribution so sends do not burst on the hour
+- [ ] E06-006 — Never allow two mailboxes on one domain to fire in the same second
+- [ ] E06-007 — Implement the warmup day counter advancing only on days with actual sends
+- [ ] E06-008 — Implement the hold condition: pause the ramp when bounce rate exceeds the plan max
+- [ ] E06-009 — Implement the hold condition on defer rate
+- [ ] E06-010 — Implement the hold condition on complaint rate
+- [ ] E06-011 — Implement rollback: reduce the cap to the last healthy level rather than only holding
+- [ ] E06-012 — Record every hold and rollback with the metric that triggered it
+- [ ] E06-013 — Surface the hold reason on the mailbox detail view in plain language
+- [ ] E06-014 — Implement automatic resume once the metric recovers for a configured window
+- [ ] E06-015 — Require an operator action to resume after a second consecutive hold
+- [ ] E06-016 — Enforce minDomainAgeDays before any warmup send
+- [ ] E06-017 — Build the warmup schedule preview: what this mailbox will send for the next 30 days
+- [ ] E06-018 — Build the fleet warmup calendar: aggregate ramp across all mailboxes
+- [ ] E06-019 — Project future fleet capacity from the warmup calendar
+- [ ] E06-020 — Alert when projected capacity will not meet committed campaign volume
+- [ ] E06-021 — Design the peer warmup network: our mailboxes exchanging real mail with each other
+- [ ] E06-022 — Make peer warmup participation per-mailbox opt-in and default on
+- [ ] E06-023 — Disclose peer warmup in the product UI and in the public docs
+- [ ] E06-024 — Generate realistic peer warmup bodies from a curated corpus, not lorem ipsum
+- [ ] E06-025 — Vary peer warmup subject, length, and structure so messages are not fingerprintable
+- [ ] E06-026 — Never include a tracking pixel or a link in a peer warmup message
+- [ ] E06-027 — Implement the receiving side: open, mark-not-spam, star, and move to inbox
+- [ ] E06-028 — Implement the receiving side reply with a realistic delay distribution
+- [ ] E06-029 — Cap peer warmup reply depth so threads look human, not mechanical
+- [ ] E06-030 — Schedule peer warmup during business hours in the persona's timezone
+- [ ] E06-031 — Ramp peer warmup volume on the same curve as campaign volume
+- [ ] E06-032 — Ensure peer warmup traffic never counts toward a customer's billable sends
+- [ ] E06-033 — Ensure peer warmup traffic is excluded from campaign analytics
+- [ ] E06-034 — Include peer warmup traffic in mailbox reputation, since receivers see it
+- [ ] E06-035 — Tag peer warmup messages with a private header so we can always identify them
+- [ ] E06-036 — Ensure the private header is not a filter-evasion signal and document why
+- [ ] E06-037 — Route peer warmup across different node and IP pairs to exercise the whole fleet
+- [ ] E06-038 — Alert if peer warmup mail ever lands in spam on our own infrastructure
+- [ ] E06-039 — Treat a peer warmup spam landing as a Sev-2; it means our own filter dislikes us
+- [ ] E06-040 — Build the peer warmup dashboard: pairs, volume, placement, reply rate
+- [ ] E06-041 — Implement external seed warmup: send to our own seed accounts on Gmail and Outlook
+- [ ] E06-042 — Use seed placement during warmup as the go/no-go for advancing the ramp
+- [ ] E06-043 — Hold the ramp when Gmail seed placement drops below the configured floor
+- [ ] E06-044 — Build the warmup-to-production handoff: what has to be true before real traffic
+- [ ] E06-045 — Make the handoff a hard gate, not a recommendation
+- [ ] E06-046 — Implement gradual production blending: warmup volume decays as campaign volume rises
+- [ ] E06-047 — Never take a mailbox from zero campaign traffic to full cap in one step
+- [ ] E06-048 — Implement the re-warm path for a mailbox returning from a pause
+- [ ] E06-049 — Implement the re-warm path for a mailbox returning from a long idle
+- [ ] E06-050 — Implement IP warmup separately from mailbox warmup with its own curve
+- [ ] E06-051 — Coordinate IP and mailbox warmup so a new mailbox on a new IP ramps at the slower rate
+- [ ] E06-052 — Implement domain warmup as the aggregate of its mailboxes plus an independent ceiling
+- [ ] E06-053 — Build the warmup simulator: given a plan, project 90 days of capacity and risk
+- [ ] E06-054 — Validate the simulator against real observed ramps and correct the model
+- [ ] E06-055 — Publish the default curve and its rationale in the docs
+- [ ] E06-056 — Allow an operator to author a custom curve with guardrails on the maximum slope
+- [ ] E06-057 — Refuse a curve that exceeds the platform-wide safety ceiling
+- [ ] E06-058 — Log every curve change with actor and reason
+- [ ] E06-059 — A/B the conservative and standard curves across matched mailbox cohorts
+- [ ] E06-060 — Measure time-to-plateau and placement-at-plateau per curve and pick the winner on data
+- [ ] E06-061 — Feed the winning curve back as the new default with a documented decision
+- [ ] E06-062 — Build a warmup health score distinct from the general mailbox health score
+- [ ] E06-063 — Surface warmup progress as a first-class element of the fleet overview
+- [ ] E06-064 — Show the operator exactly when each mailbox becomes production-ready
+- [ ] E06-065 — Alert when a mailbox has been warming longer than the expected duration
+- [ ] E06-066 — Diagnose a stuck warmup automatically and propose the cause
+- [ ] E06-067 — Test the hold condition by injecting synthetic bounces
+- [ ] E06-068 — Test the rollback condition by injecting a complaint
+- [ ] E06-069 — Test the age gate by attempting to warm a domain registered yesterday
+- [ ] E06-070 — Test peer warmup end to end on a staging node with two real mailboxes
+- [ ] E06-071 — Test that peer warmup volume is excluded from billing
+- [ ] E06-072 — Test that peer warmup volume is included in reputation
+- [ ] E06-073 — Load-test warmup scheduling across 500 mailboxes for one simulated day
+- [ ] E06-074 — Verify the scheduler produces no thundering herd at any hour boundary
+- [ ] E06-075 — Document the warmup engine in planning/specs/warmup/
+- [ ] E06-076 — Write the public doc explaining our warmup approach and why we refuse pools
+- [ ] E06-077 — Add warmup state to the fleet API and MCP tools
+- [ ] E06-078 — Add a warmup section to the customer onboarding so expectations are set on day one
+- [ ] E06-079 — Show the customer a countdown to first safe send, with the reason for the wait
+- [ ] E06-080 — Never let a customer override the age gate or the safety ceiling, on any plan

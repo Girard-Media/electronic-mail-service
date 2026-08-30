@@ -1,0 +1,125 @@
+# Epic 03 — Blast Nodes: Procurement, Provisioning, Agent
+
+Goal: a node goes from "VPS does not exist" to "routable" with one command and
+no manual step, and cannot become routable until it proves it is safe.
+
+- [ ] E03-001 — Write scripts/ip-diligence.mts: DNSBL sweep of a candidate IP across all configured lists
+- [ ] E03-002 — Add passive-DNS / prior-hostname lookup to the diligence script
+- [ ] E03-003 — Add an outbound port 25 egress test to the diligence script
+- [ ] E03-004 — Add an rDNS-control confirmation step to the diligence script
+- [ ] E03-005 — Make the diligence script emit a machine-readable verdict written to SendingIp.diligenceJson
+- [ ] E03-006 — Document the "release a dirty IP" procedure with the provider
+- [ ] E03-007 — Purchase blast-node-01 on Hostinger (KVM 2, Ubuntu 24.04, 1 dedicated IPv4)
+- [ ] E03-008 — Run diligence on the assigned IP before any other step
+- [ ] E03-009 — Set rDNS/PTR to mta01.<sending-domain> via the Hostinger API
+- [ ] E03-010 — Confirm forward-confirmed reverse DNS resolves both directions
+- [ ] E03-011 — Write infra/blast-node/00-preflight.sh (diligence, egress, rDNS assertions)
+- [ ] E03-012 — Write infra/blast-node/10-base.sh (users, ufw, fail2ban, chrony, unattended-upgrades)
+- [ ] E03-013 — Restrict SSH to key-only, non-standard port, and the operator allowlist
+- [ ] E03-014 — Disable IPv6 for outbound mail on the node
+- [ ] E03-015 — Write infra/blast-node/20-postfix.sh with a templated main.cf
+- [ ] E03-016 — Template master.cf with per-transport smtp_bind_address support
+- [ ] E03-017 — Configure sender_dependent_default_transport_maps for per-domain transports
+- [ ] E03-018 — Configure smtp_destination_concurrency_limit per receiving ESP
+- [ ] E03-019 — Configure smtp_destination_rate_delay per receiving ESP
+- [ ] E03-020 — Set soft_bounce=no and a short maximal_queue_lifetime; our scheduler owns retries
+- [ ] E03-021 — Configure mynetworks to loopback plus the workers' private IP only
+- [ ] E03-022 — Configure smtpd_recipient_restrictions to reject relaying explicitly
+- [ ] E03-023 — Configure the VERP return-path envelope rewriting
+- [ ] E03-024 — Configure the bounce subdomain MX to the node
+- [ ] E03-025 — Write infra/blast-node/30-opendkim.sh with key dirs and the signing table
+- [ ] E03-026 — Support multiple domains and selectors in one OpenDKIM instance
+- [ ] E03-027 — Write infra/blast-node/40-rspamd.sh for local content scoring only
+- [ ] E03-028 — Disable every rspamd module that phones home to an external service
+- [ ] E03-029 — Expose a local rspamd HTTP scoring endpoint for the pre-send gate
+- [ ] E03-030 — Write infra/blast-node/50-dmarc.sh for inbound OpenDMARC checks
+- [ ] E03-031 — Write infra/blast-node/70-tls.sh for a Let's Encrypt cert on the PTR hostname
+- [ ] E03-032 — Configure outbound smtp_tls_security_level=may with DANE where available
+- [ ] E03-033 — Configure inbound smtpd TLS with the real certificate
+- [ ] E03-034 — Write infra/blast-node/90-verify.sh: relay test, DKIM sign test, loopback delivery, egress
+- [ ] E03-035 — Make 90-verify.sh exit non-zero on any failure and refuse to mark the node ACTIVE
+- [ ] E03-036 — Make every provisioning script idempotent and safe to re-run
+- [ ] E03-037 — Add a single infra/blast-node/provision.sh that runs all stages in order
+- [ ] E03-038 — Add a --dry-run mode that prints every change without applying it
+- [ ] E03-039 — Scaffold apps/fleet-agent as a systemd service
+- [ ] E03-040 — Implement fleet-agent registration: node announces itself to the API with a signed payload
+- [ ] E03-041 — Implement mTLS or Ed25519 request signing between agent and API
+- [ ] E03-042 — Make the API refuse any unsigned node health report
+- [ ] E03-043 — Implement fleet-agent heartbeat with queue depth, load, disk, and Postfix status
+- [ ] E03-044 — Implement fleet-agent DKIM key installation from the encrypted Postgres value
+- [ ] E03-045 — Never write a decrypted DKIM key to the agent log or to disk unencrypted at rest
+- [ ] E03-046 — Implement fleet-agent domain-add: create the transport, signing entry, and reload
+- [ ] E03-047 — Implement fleet-agent domain-remove with a drain-first guard
+- [ ] E03-048 — Implement fleet-agent mailbox-create: system user, maildir, aliases
+- [ ] E03-049 — Implement fleet-agent mailbox-delete with an archive-to-R2 step first
+- [ ] E03-050 — Implement fleet-agent IP-bind: map a transport to a specific source IP
+- [ ] E03-051 — Implement fleet-agent self-test endpoint reproducing 90-verify.sh on demand
+- [ ] E03-052 — Add an agent version field and refuse commands from an outdated agent
+- [ ] E03-053 — Implement agent auto-update with a rollback on failed health check
+- [ ] E03-054 — Scaffold apps/maillog-shipper or extend maillog-bridge for the new node
+- [ ] E03-055 — Tail /var/log/mail.log with journald fallback and position persistence
+- [ ] E03-056 — Ship maillog lines in signed batches with at-least-once delivery
+- [ ] E03-057 — Buffer maillog locally when the API is unreachable; never lose a line
+- [ ] E03-058 — Archive raw maillog to R2 daily, compressed
+- [ ] E03-059 — Build the BlastNode registry CRUD in packages/fleet
+- [ ] E03-060 — Implement the node status state machine with legal transitions only
+- [ ] E03-061 — Refuse a PROVISIONING → ACTIVE transition without all three verify flags
+- [ ] E03-062 — Implement node DRAINING: router stops selecting, in-flight completes
+- [ ] E03-063 — Implement node QUARANTINE with a required reason and an operator audit entry
+- [ ] E03-064 — Implement node RETIRED with a mailbox-migration prompt
+- [ ] E03-065 — Compute node capacity from live mailbox caps, not from a static number
+- [ ] E03-066 — Alert when a node has not heartbeat in two intervals
+- [ ] E03-067 — Alert when node disk exceeds 80% (maillog growth is the usual cause)
+- [ ] E03-068 — Alert when the Postfix deferred queue exceeds a threshold
+- [ ] E03-069 — Expose a queue-drain command that reports what would be dropped before dropping it
+- [ ] E03-070 — Build the node detail cockpit view: status, IPs, domains, mailboxes, queue, health
+- [ ] E03-071 — Build the node list view with capacity utilisation per node
+- [ ] E03-072 — Implement the node-loss playbook as a runnable script, not a document
+- [ ] E03-073 — Test the node-loss playbook by destroying a staging node and rebuilding it
+- [ ] E03-074 — Measure and record the node rebuild time; target under two hours unattended
+- [ ] E03-075 — Purchase and provision verify-node-01 with its own IP and PTR
+- [ ] E03-076 — Configure verify-node-01 with role VERIFY so the router never selects it
+- [ ] E03-077 — Assert in code that a VERIFY node can never be returned by the router
+- [ ] E03-078 — Write a chaos test: kill Postfix mid-send and assert intents defer rather than fail
+- [ ] E03-079 — Write a chaos test: sever the agent connection and assert maillog buffering holds
+- [ ] E03-080 — Write a chaos test: fill the node disk and assert graceful degradation
+- [ ] E03-081 — Add a node-level rate ceiling independent of per-mailbox caps as a safety net
+- [ ] E03-082 — Add a global kill switch that halts all sending on all nodes in one action
+- [ ] E03-083 — Require two-person confirmation to lift the global kill switch
+- [ ] E03-084 — Log every node command with actor, timestamp, and payload to the audit trail
+- [ ] E03-085 — Write the node hardening checklist and verify it with an automated scan
+- [ ] E03-086 — Run an external open-relay test against every ACTIVE node on a schedule
+- [ ] E03-087 — Page immediately if the open-relay test ever passes
+- [ ] E03-088 — Add a node clock-skew check; DKIM and TLS both care
+- [ ] E03-089 — Document the exact provider steps for buying and releasing an IP
+- [ ] E03-090 — Add a cost-per-node line to the billing cost model, updated from real invoices
+- [ ] E03-091 — Support multiple IPs on one node with independent reputation
+- [ ] E03-092 — Support pool labels so traffic classes can be segregated on shared hardware
+- [ ] E03-093 — Implement pool-aware routing candidate filtering
+- [ ] E03-094 — Build a capacity planner that answers "how many nodes for N sends/day"
+- [ ] E03-095 — Surface the capacity planner in the infra cockpit with the current fleet plugged in
+- [ ] E03-096 — Add a provisioning progress stream so the operator watches a node come up live
+- [ ] E03-097 — Add a one-click "provision node" flow gated behind platform admin plus TOTP
+- [ ] E03-098 — Store the provisioning transcript for every node for later forensics
+- [ ] E03-099 — Add a node comparison view for diagnosing "why is node 2 worse than node 1"
+- [ ] E03-100 — Write the runbook: node listed on Spamhaus, step by step to delisting
+- [ ] E03-101 — Write the runbook: provider blocked port 25 after signup
+- [ ] E03-102 — Write the runbook: PTR change did not propagate
+- [ ] E03-103 — Write the runbook: OpenDKIM signing silently stopped
+- [ ] E03-104 — Add a synthetic canary send from every ACTIVE node every 15 minutes
+- [ ] E03-105 — Alert on canary failure before customer traffic notices
+- [ ] E03-106 — Record canary latency and delivery time as a node SLI
+- [ ] E03-107 — Define node SLOs and wire them to the alerting policy
+- [ ] E03-108 — Add per-node cost and per-node throughput to compute cost per thousand sends
+- [ ] E03-109 — Automate node OS patching with a drain-patch-verify-return cycle
+- [ ] E03-110 — Never patch more than one node at a time when the fleet has fewer than three
+- [ ] E03-111 — Add a staging node that mirrors production configuration for change testing
+- [ ] E03-112 — Require every Postfix configuration change to pass on staging first
+- [ ] E03-113 — Version Postfix configuration in git and diff it against the live node
+- [ ] E03-114 — Alert on configuration drift between git and any live node
+- [ ] E03-115 — Add a node inventory export for the security questionnaire answer set
+- [ ] E03-116 — Confirm the node is not part of the hostssh cluster and cannot be deployed to by mistake
+- [ ] E03-117 — Add an explicit guard preventing the EMS app image from deploying to a blast node
+- [ ] E03-118 — Confirm no EMS traffic ever egresses via 31.220.104.223, with a test
+- [ ] E03-119 — Add a network-level assertion in CI that the transactional and blast IPs differ
+- [ ] E03-120 — Document the node fleet in the security policy as a distinct trust boundary
