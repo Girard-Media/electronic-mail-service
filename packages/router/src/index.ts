@@ -137,3 +137,5 @@ export class NotImplemented extends Error {
 export async function route(_req: RouteRequest): Promise<RouteResult> {
   throw new NotImplemented("E07-003..E07-022");
 }
+
+export * from "./buckets.js";

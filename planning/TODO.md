@@ -5,7 +5,7 @@
 The build-loop queue (`bootspring build next` reads this).
 Status: `[ ]` todo · `[~]` in progress · `[x]` done.
 
-**98 / 2502 complete.**
+**135 / 2502 complete.**
 
 Governing documents — read before taking a task:
 
@@ -26,7 +26,7 @@ invariant it protects.
 
 ---
 
-<!-- source: planning/backlog/01-foundation.md · 37/82 -->
+<!-- source: planning/backlog/01-foundation.md · 38/82 -->
 # Epic 01 — Foundation & Fork Hygiene
 
 Goal: the forked repo compiles green, carries no usermails identity, and every
@@ -42,7 +42,7 @@ inherited subsystem is consciously kept, retargeted, or deleted.
 - [x] E01-008 — pnpm typecheck green on the fork (fixed: packages/mcp imported the old `ems` SDK name; @ems/sdk must be built first)
 - [ ] E01-009a — Make `pnpm typecheck` build @ems/sdk first, or emit types in place, so the ordering is not a tribal fact
 - [x] E01-009 — pnpm lint green — but only apps/web defines a lint script; see E01-009b
-- [ ] E01-009b — Add an eslint config and a lint script to the other ten workspace packages; 10 of 11 are currently unlinted
+- [x] E01-009b — Add an eslint config and a lint script to the other ten workspace packages; 10 of 11 are currently unlinted
 - [x] E01-010 — Run the inherited pnpm test suite; triage every failure into keep/retarget/delete
 - [x] E01-011 — Update bootspring.config.js: name ems, hosting hostssh, analytics clickhouse, email own-mta
 - [x] E01-012 — Rewrite CLAUDE.md for EMS: product definition, constraints, repo map, commands
@@ -117,7 +117,7 @@ inherited subsystem is consciously kept, retargeted, or deleted.
 
 ---
 
-<!-- source: planning/backlog/02-data-model.md · 18/90 -->
+<!-- source: planning/backlog/02-data-model.md · 30/90 -->
 # Epic 02 — Data Model, Migrations & Stores
 
 Goal: Postgres holds decisions and configuration, ClickHouse holds observations,
@@ -171,7 +171,7 @@ Valkey holds nothing that cannot be rebuilt.
 - [ ] E02-046 — Define the Valkey key namespace and document every key pattern with its TTL
 - [ ] E02-047 — Implement the suppression bloom filter with a documented false-positive rate
 - [ ] E02-048 — Implement the suppression exact set with Postgres as the fallback on miss
-- [ ] E02-049 — Implement the four token buckets as Lua scripts for atomicity
+- [x] E02-049 — Implement the four token buckets as Lua scripts for atomicity
 - [ ] E02-050 — Implement the scheduler distributed lock with a fencing token
 - [ ] E02-051 — Add a Valkey warmup routine that rebuilds every derived key from Postgres on boot
 - [ ] E02-052 — Add a consistency job that reconciles Valkey counters against Postgres nightly
@@ -183,19 +183,19 @@ Valkey holds nothing that cannot be rebuilt.
 - [ ] E02-058 — Extend the restic → R2 backup runbook to cover ClickHouse
 - [ ] E02-059 — Write and test a full restore drill for Postgres from R2
 - [ ] E02-060 — Write and test a full restore drill for ClickHouse from R2
-- [ ] E02-061 — Seed JurisdictionPolicy with the rows from planning/COMPLIANCE.md §1
-- [ ] E02-062 — Seed BounceRule with the Google response dialect
-- [ ] E02-063 — Seed BounceRule with the Microsoft/Outlook response dialect
-- [ ] E02-064 — Seed BounceRule with the Yahoo response dialect
-- [ ] E02-065 — Seed BounceRule with the Proofpoint, Mimecast, and Barracuda dialects
-- [ ] E02-066 — Seed BounceRule with generic RFC 3463 enhanced status codes as the fallback layer
-- [ ] E02-067 — Seed WarmupPlan with conservative, standard, and aggressive curves
-- [ ] E02-068 — Seed AiTaskConfig rows for all eleven tasks in planning/AI.md
-- [ ] E02-069 — Seed GlobalSuppression with .gov, .mil, and known spam-trap domains
-- [ ] E02-070 — Seed GlobalSuppression with our own and our competitors' domains
+- [x] E02-061 — Seed JurisdictionPolicy with the rows from planning/COMPLIANCE.md §1
+- [x] E02-062 — Seed BounceRule with the Google response dialect
+- [x] E02-063 — Seed BounceRule with the Microsoft/Outlook response dialect
+- [x] E02-064 — Seed BounceRule with the Yahoo response dialect
+- [x] E02-065 — Seed BounceRule with the Proofpoint, Mimecast, and Barracuda dialects
+- [x] E02-066 — Seed BounceRule with generic RFC 3463 enhanced status codes as the fallback layer
+- [x] E02-067 — Seed WarmupPlan with conservative, standard, and aggressive curves
+- [x] E02-068 — Seed AiTaskConfig rows for all eleven tasks in planning/AI.md
+- [x] E02-069 — Seed GlobalSuppression with .gov, .mil, and known spam-trap domains
+- [x] E02-070 — Seed GlobalSuppression with our own and our competitors' domains
 - [ ] E02-071 — Seed the disposable-email-domain list and schedule its refresh
 - [ ] E02-072 — Seed the role-address local-part list
-- [ ] E02-073 — Write the seed runner so it is idempotent and safe to run on prod
+- [x] E02-073 — Write the seed runner so it is idempotent and safe to run on prod
 - [ ] E02-074 — Add a data-dictionary generator that emits planning/DATA_DICTIONARY.md from the schema
 - [ ] E02-075 — Add an ERD generator and commit the rendered diagram
 - [ ] E02-076 — Write query-performance tests for the ten hottest queries with EXPLAIN assertions
@@ -636,7 +636,7 @@ No cross-customer warmup pool, ever (ADR-0003).
 
 ---
 
-<!-- source: planning/backlog/07-router.md · 2/105 -->
+<!-- source: planning/backlog/07-router.md · 13/105 -->
 # Epic 07 — Router, Pacing & the Send Path
 
 The router is the only package permitted to make a final send decision.
@@ -671,17 +671,17 @@ Deferral is a first-class success (ARCHITECTURE §3.2).
 - [ ] E07-027 — Implement the recipient ESP classifier from the MX record
 - [ ] E07-028 — Maintain the MX-to-ESP-family map as data, refreshable without a deploy
 - [ ] E07-029 — Cache the ESP classification per recipient domain with a TTL
-- [ ] E07-030 — Implement the mailbox daily token bucket as an atomic Lua script
-- [ ] E07-031 — Implement the mailbox hourly token bucket with jitter
-- [ ] E07-032 — Implement the domain daily token bucket
-- [ ] E07-033 — Implement the IP hourly token bucket
-- [ ] E07-034 — Implement the adaptive per-recipient-ESP bucket in 15-minute windows
-- [ ] E07-035 — Auto-tune the ESP bucket from the observed 4xx rate for that IP and ESP
-- [ ] E07-036 — Reduce the ESP rate immediately on a sustained deferral signal
-- [ ] E07-037 — Recover the ESP rate slowly, never in one step
+- [x] E07-030 — Implement the mailbox daily token bucket as an atomic Lua script
+- [x] E07-031 — Implement the mailbox hourly token bucket with jitter
+- [x] E07-032 — Implement the domain daily token bucket
+- [x] E07-033 — Implement the IP hourly token bucket
+- [x] E07-034 — Implement the adaptive per-recipient-ESP bucket in 15-minute windows
+- [x] E07-035 — Auto-tune the ESP bucket from the observed 4xx rate for that IP and ESP
+- [x] E07-036 — Reduce the ESP rate immediately on a sustained deferral signal
+- [x] E07-037 — Recover the ESP rate slowly, never in one step
 - [ ] E07-038 — Reconcile every bucket against Postgres counters nightly
-- [ ] E07-039 — Make bucket decrement and intent state transition atomic; no double-spend
-- [ ] E07-040 — Test the four-bucket decrement under concurrency with a race harness
+- [x] E07-039 — Make bucket decrement and intent state transition atomic; no double-spend
+- [x] E07-040 — Test the four-bucket decrement under concurrency with a race harness
 - [ ] E07-041 — Implement the scheduler: claim-with-lock over SendIntent where dueAt has passed
 - [ ] E07-042 — Never scan the whole table; use the covering index and a bounded batch
 - [ ] E07-043 — Implement a fencing token so a stalled worker cannot resurrect and double-send
@@ -746,7 +746,7 @@ Deferral is a first-class success (ARCHITECTURE §3.2).
 - [ ] E07-102 — Add a per-org routing report: which mailboxes carried which share of volume
 - [ ] E07-103 — Detect and alert on routing concentration; one mailbox carrying too much is a risk
 - [ ] E07-104 — Add an explicit even-distribution mode for operators who want it
-- [ ] E07-105 — Verify invariant I3 with a test that attempts a cap overflow under load
+- [x] E07-105 — Verify invariant I3 with a test that attempts a cap overflow under load
 
 ---
 
@@ -849,12 +849,12 @@ No number on a dashboard originates from an optimistic counter.
 
 ---
 
-<!-- source: planning/backlog/09-deliverability.md · 0/95 -->
+<!-- source: planning/backlog/09-deliverability.md · 11/95 -->
 # Epic 09 — Deliverability: Bounce Taxonomy, DNSBL, DMARC, TLS-RPT
 
-- [ ] E09-001 — Create packages/deliverability with the BounceClass resolver
-- [ ] E09-002 — Implement rule matching on (espFamily, smtpCode, enhancedCode, substring) with priority
-- [ ] E09-003 — Return UNKNOWN rather than guessing when no rule matches
+- [x] E09-001 — Create packages/deliverability with the BounceClass resolver
+- [x] E09-002 — Implement rule matching on (espFamily, smtpCode, enhancedCode, substring) with priority
+- [x] E09-003 — Return UNKNOWN rather than guessing when no rule matches
 - [ ] E09-004 — Queue every UNKNOWN response for classification review
 - [ ] E09-005 — Run the AI classifier only on UNKNOWN responses
 - [ ] E09-006 — Turn AI classifications into proposed BounceRule rows requiring operator approval
@@ -864,12 +864,12 @@ No number on a dashboard originates from an optimistic counter.
 - [ ] E09-010 — Seed and test the Yahoo dialect including TSS and deferral codes
 - [ ] E09-011 — Seed and test Proofpoint, Mimecast, Barracuda, and Cisco ESA dialects
 - [ ] E09-012 — Seed the generic RFC 3463 enhanced status code fallback layer
-- [ ] E09-013 — Map each class to an action: suppress, retry with backoff, throttle, pause, or escalate
-- [ ] E09-014 — Suppress immediately on HARD without exception
-- [ ] E09-015 — Never suppress on SOFT; retry with the rule's backoff
-- [ ] E09-016 — Throttle the IP for the ESP on BLOCK_RATE rather than suppressing the recipient
-- [ ] E09-017 — Escalate BLOCK_REPUTATION to an incident, not to a retry
-- [ ] E09-018 — Escalate AUTH failures immediately; they mean our DKIM or SPF broke
+- [x] E09-013 — Map each class to an action: suppress, retry with backoff, throttle, pause, or escalate
+- [x] E09-014 — Suppress immediately on HARD without exception
+- [x] E09-015 — Never suppress on SOFT; retry with the rule's backoff
+- [x] E09-016 — Throttle the IP for the ESP on BLOCK_RATE rather than suppressing the recipient
+- [x] E09-017 — Escalate BLOCK_REPUTATION to an incident, not to a retry
+- [x] E09-018 — Escalate AUTH failures immediately; they mean our DKIM or SPF broke
 - [ ] E09-019 — Pause the campaign on a BLOCK_CONTENT cluster and surface the offending content
 - [ ] E09-020 — Build the bounce explorer: group by class, ESP, domain, mailbox, and campaign
 - [ ] E09-021 — Show the verbatim response alongside every classification
@@ -939,8 +939,8 @@ No number on a dashboard originates from an optimistic counter.
 - [ ] E09-085 — Write the runbook: a customer list turned out to be purchased
 - [ ] E09-086 — Test the DNSBL poller against a known-listed test address
 - [ ] E09-087 — Test DMARC ingest against real captured reports from three receivers
-- [ ] E09-088 — Test the bounce taxonomy against a corpus of real responses
-- [ ] E09-089 — Measure classification coverage; target above 98% non-UNKNOWN
+- [x] E09-088 — Test the bounce taxonomy against a corpus of real responses
+- [x] E09-089 — Measure classification coverage; target above 98% non-UNKNOWN
 - [ ] E09-090 — Document the whole deliverability subsystem in planning/specs/deliverability/
 - [ ] E09-091 — Publish the customer-facing deliverability guide
 - [ ] E09-092 — Add MCP tools so an agent can answer deliverability questions from real data
@@ -2412,7 +2412,7 @@ Stripe is the one unavoidable third party, isolated behind a BillingProvider sea
 
 ---
 
-<!-- source: planning/backlog/22-testing-ci.md · 0/105 -->
+<!-- source: planning/backlog/22-testing-ci.md · 2/105 -->
 # Epic 22 — Testing, CI & Quality Gates
 
 - [ ] E22-001 — Define the test taxonomy: unit, integration, contract, e2e, load, abuse
@@ -2433,12 +2433,12 @@ Stripe is the one unavoidable third party, isolated behind a BillingProvider sea
 - [ ] E22-016 — Write the test asserting PolicyDecision is written for every send
 - [ ] E22-017 — Write the test asserting suppression is re-checked before emit
 - [ ] E22-018 — Write the test asserting the emit path fails closed on a store error
-- [ ] E22-019 — Write the test asserting cap buckets cannot be overspent under concurrency
+- [x] E22-019 — Write the test asserting cap buckets cannot be overspent under concurrency
 - [ ] E22-020 — Write the test asserting Message-ID uniqueness under concurrency
 - [ ] E22-021 — Write the test asserting an intent processed twice sends once
 - [ ] E22-022 — Write the cross-tenant isolation test suite
 - [ ] E22-023 — Write the compliance test suite from planning/COMPLIANCE.md
-- [ ] E22-024 — Write the deliverability test suite from the bounce corpus
+- [x] E22-024 — Write the deliverability test suite from the bounce corpus
 - [ ] E22-025 — Write the router property tests over randomised fleet states
 - [ ] E22-026 — Write the warmup tests including hold and rollback
 - [ ] E22-027 — Write the verification tests against a known-address corpus

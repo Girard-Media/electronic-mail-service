@@ -91,7 +91,7 @@ function num(v: unknown, fallback: number): number {
 // font-family flows into a style="" attribute, so strip anything that could
 // break out of it (quotes, <>, ;, braces) — keep only font-name-safe chars.
 function safeFont(f: unknown): string {
-  const cleaned = String(f ?? "").replace(/[^a-zA-Z0-9 ,'\-]/g, "").trim();
+  const cleaned = String(f ?? "").replace(/[^a-zA-Z0-9 ,'-]/g, "").trim();
   return cleaned || DEFAULTS.fontFamily;
 }
 

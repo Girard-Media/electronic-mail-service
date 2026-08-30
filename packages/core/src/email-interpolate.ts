@@ -108,7 +108,7 @@ function format(value: unknown, formatter?: Formatter, defaultValue?: string): s
   if (Array.isArray(value)) {
     return value.map((v) => String(v)).join(", ") || defaultValue || "";
   }
-  let result = formatter ? applyFormatter(value, formatter) : String(value);
+  const result = formatter ? applyFormatter(value, formatter) : String(value);
   if (result === "" && defaultValue !== undefined) return defaultValue;
   return result;
 }

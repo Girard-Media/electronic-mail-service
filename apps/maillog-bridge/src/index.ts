@@ -20,7 +20,7 @@
  * already feeds. It is deliberately append-only and stateless beyond that map:
  * if it restarts it resumes at end-of-file and simply misses nothing new.
  */
-import { readFile, stat, open } from "node:fs/promises";
+import { stat, open } from "node:fs/promises";
 
 const LOG_PATH = process.env.MAILLOG_PATH ?? "/var/spool/postfix/maillog";
 const API_URL = process.env.MAILLOG_API_URL ?? "http://ems:8787";

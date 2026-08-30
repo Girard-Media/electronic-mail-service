@@ -23,7 +23,6 @@ import {
   isUnlimited,
   renderEmail,
   parseTemplateContent,
-  resolveTxt,
   normalizeEmail,
   isValidSyntax,
   assertPublicWebhookUrl,

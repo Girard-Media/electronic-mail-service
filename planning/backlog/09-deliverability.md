@@ -1,8 +1,8 @@
 # Epic 09 — Deliverability: Bounce Taxonomy, DNSBL, DMARC, TLS-RPT
 
-- [ ] E09-001 — Create packages/deliverability with the BounceClass resolver
-- [ ] E09-002 — Implement rule matching on (espFamily, smtpCode, enhancedCode, substring) with priority
-- [ ] E09-003 — Return UNKNOWN rather than guessing when no rule matches
+- [x] E09-001 — Create packages/deliverability with the BounceClass resolver
+- [x] E09-002 — Implement rule matching on (espFamily, smtpCode, enhancedCode, substring) with priority
+- [x] E09-003 — Return UNKNOWN rather than guessing when no rule matches
 - [ ] E09-004 — Queue every UNKNOWN response for classification review
 - [ ] E09-005 — Run the AI classifier only on UNKNOWN responses
 - [ ] E09-006 — Turn AI classifications into proposed BounceRule rows requiring operator approval
@@ -12,12 +12,12 @@
 - [ ] E09-010 — Seed and test the Yahoo dialect including TSS and deferral codes
 - [ ] E09-011 — Seed and test Proofpoint, Mimecast, Barracuda, and Cisco ESA dialects
 - [ ] E09-012 — Seed the generic RFC 3463 enhanced status code fallback layer
-- [ ] E09-013 — Map each class to an action: suppress, retry with backoff, throttle, pause, or escalate
-- [ ] E09-014 — Suppress immediately on HARD without exception
-- [ ] E09-015 — Never suppress on SOFT; retry with the rule's backoff
-- [ ] E09-016 — Throttle the IP for the ESP on BLOCK_RATE rather than suppressing the recipient
-- [ ] E09-017 — Escalate BLOCK_REPUTATION to an incident, not to a retry
-- [ ] E09-018 — Escalate AUTH failures immediately; they mean our DKIM or SPF broke
+- [x] E09-013 — Map each class to an action: suppress, retry with backoff, throttle, pause, or escalate
+- [x] E09-014 — Suppress immediately on HARD without exception
+- [x] E09-015 — Never suppress on SOFT; retry with the rule's backoff
+- [x] E09-016 — Throttle the IP for the ESP on BLOCK_RATE rather than suppressing the recipient
+- [x] E09-017 — Escalate BLOCK_REPUTATION to an incident, not to a retry
+- [x] E09-018 — Escalate AUTH failures immediately; they mean our DKIM or SPF broke
 - [ ] E09-019 — Pause the campaign on a BLOCK_CONTENT cluster and surface the offending content
 - [ ] E09-020 — Build the bounce explorer: group by class, ESP, domain, mailbox, and campaign
 - [ ] E09-021 — Show the verbatim response alongside every classification
@@ -87,8 +87,8 @@
 - [ ] E09-085 — Write the runbook: a customer list turned out to be purchased
 - [ ] E09-086 — Test the DNSBL poller against a known-listed test address
 - [ ] E09-087 — Test DMARC ingest against real captured reports from three receivers
-- [ ] E09-088 — Test the bounce taxonomy against a corpus of real responses
-- [ ] E09-089 — Measure classification coverage; target above 98% non-UNKNOWN
+- [x] E09-088 — Test the bounce taxonomy against a corpus of real responses
+- [x] E09-089 — Measure classification coverage; target above 98% non-UNKNOWN
 - [ ] E09-090 — Document the whole deliverability subsystem in planning/specs/deliverability/
 - [ ] E09-091 — Publish the customer-facing deliverability guide
 - [ ] E09-092 — Add MCP tools so an agent can answer deliverability questions from real data

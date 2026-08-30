@@ -51,7 +51,7 @@ Valkey holds nothing that cannot be rebuilt.
 - [ ] E02-046 — Define the Valkey key namespace and document every key pattern with its TTL
 - [ ] E02-047 — Implement the suppression bloom filter with a documented false-positive rate
 - [ ] E02-048 — Implement the suppression exact set with Postgres as the fallback on miss
-- [ ] E02-049 — Implement the four token buckets as Lua scripts for atomicity
+- [x] E02-049 — Implement the four token buckets as Lua scripts for atomicity
 - [ ] E02-050 — Implement the scheduler distributed lock with a fencing token
 - [ ] E02-051 — Add a Valkey warmup routine that rebuilds every derived key from Postgres on boot
 - [ ] E02-052 — Add a consistency job that reconciles Valkey counters against Postgres nightly
@@ -63,19 +63,19 @@ Valkey holds nothing that cannot be rebuilt.
 - [ ] E02-058 — Extend the restic → R2 backup runbook to cover ClickHouse
 - [ ] E02-059 — Write and test a full restore drill for Postgres from R2
 - [ ] E02-060 — Write and test a full restore drill for ClickHouse from R2
-- [ ] E02-061 — Seed JurisdictionPolicy with the rows from planning/COMPLIANCE.md §1
-- [ ] E02-062 — Seed BounceRule with the Google response dialect
-- [ ] E02-063 — Seed BounceRule with the Microsoft/Outlook response dialect
-- [ ] E02-064 — Seed BounceRule with the Yahoo response dialect
-- [ ] E02-065 — Seed BounceRule with the Proofpoint, Mimecast, and Barracuda dialects
-- [ ] E02-066 — Seed BounceRule with generic RFC 3463 enhanced status codes as the fallback layer
-- [ ] E02-067 — Seed WarmupPlan with conservative, standard, and aggressive curves
-- [ ] E02-068 — Seed AiTaskConfig rows for all eleven tasks in planning/AI.md
-- [ ] E02-069 — Seed GlobalSuppression with .gov, .mil, and known spam-trap domains
-- [ ] E02-070 — Seed GlobalSuppression with our own and our competitors' domains
+- [x] E02-061 — Seed JurisdictionPolicy with the rows from planning/COMPLIANCE.md §1
+- [x] E02-062 — Seed BounceRule with the Google response dialect
+- [x] E02-063 — Seed BounceRule with the Microsoft/Outlook response dialect
+- [x] E02-064 — Seed BounceRule with the Yahoo response dialect
+- [x] E02-065 — Seed BounceRule with the Proofpoint, Mimecast, and Barracuda dialects
+- [x] E02-066 — Seed BounceRule with generic RFC 3463 enhanced status codes as the fallback layer
+- [x] E02-067 — Seed WarmupPlan with conservative, standard, and aggressive curves
+- [x] E02-068 — Seed AiTaskConfig rows for all eleven tasks in planning/AI.md
+- [x] E02-069 — Seed GlobalSuppression with .gov, .mil, and known spam-trap domains
+- [x] E02-070 — Seed GlobalSuppression with our own and our competitors' domains
 - [ ] E02-071 — Seed the disposable-email-domain list and schedule its refresh
 - [ ] E02-072 — Seed the role-address local-part list
-- [ ] E02-073 — Write the seed runner so it is idempotent and safe to run on prod
+- [x] E02-073 — Write the seed runner so it is idempotent and safe to run on prod
 - [ ] E02-074 — Add a data-dictionary generator that emits planning/DATA_DICTIONARY.md from the schema
 - [ ] E02-075 — Add an ERD generator and commit the rendered diagram
 - [ ] E02-076 — Write query-performance tests for the ten hottest queries with EXPLAIN assertions

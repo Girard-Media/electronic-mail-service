@@ -3,21 +3,41 @@
   "version": "0.2.0",
   "description": "MCP server for ems — let AI agents send, batch-send, verify, list, and monitor email via tools.",
   "type": "module",
-  "bin": { "ems-mcp": "./dist/index.js" },
-  "files": ["dist", "README.md"],
+  "bin": {
+    "ems-mcp": "./dist/index.js"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc --noEmit",
-    "start": "node dist/index.js"
+    "start": "node dist/index.js",
+    "lint": "eslint . --config ../../eslint.config.mjs"
   },
-  "keywords": ["mcp", "model-context-protocol", "email", "ems", "ai", "agent"],
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "email",
+    "ems",
+    "ai",
+    "agent"
+  ],
   "homepage": "https://electronicmailservices.com",
   "license": "MIT",
-  "engines": { "node": ">=18" },
+  "engines": {
+    "node": ">=18"
+  },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.0.0",
     "@ems/sdk": "workspace:*",
+    "@modelcontextprotocol/sdk": "^1.0.0",
     "zod": "^3.23.0"
   },
-  "devDependencies": { "typescript": "^5.6.0" }
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.9.1",
+    "typescript": "^5.6.0",
+    "typescript-eslint": "^8.68.0"
+  }
 }

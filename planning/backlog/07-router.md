@@ -32,17 +32,17 @@ Deferral is a first-class success (ARCHITECTURE §3.2).
 - [ ] E07-027 — Implement the recipient ESP classifier from the MX record
 - [ ] E07-028 — Maintain the MX-to-ESP-family map as data, refreshable without a deploy
 - [ ] E07-029 — Cache the ESP classification per recipient domain with a TTL
-- [ ] E07-030 — Implement the mailbox daily token bucket as an atomic Lua script
-- [ ] E07-031 — Implement the mailbox hourly token bucket with jitter
-- [ ] E07-032 — Implement the domain daily token bucket
-- [ ] E07-033 — Implement the IP hourly token bucket
-- [ ] E07-034 — Implement the adaptive per-recipient-ESP bucket in 15-minute windows
-- [ ] E07-035 — Auto-tune the ESP bucket from the observed 4xx rate for that IP and ESP
-- [ ] E07-036 — Reduce the ESP rate immediately on a sustained deferral signal
-- [ ] E07-037 — Recover the ESP rate slowly, never in one step
+- [x] E07-030 — Implement the mailbox daily token bucket as an atomic Lua script
+- [x] E07-031 — Implement the mailbox hourly token bucket with jitter
+- [x] E07-032 — Implement the domain daily token bucket
+- [x] E07-033 — Implement the IP hourly token bucket
+- [x] E07-034 — Implement the adaptive per-recipient-ESP bucket in 15-minute windows
+- [x] E07-035 — Auto-tune the ESP bucket from the observed 4xx rate for that IP and ESP
+- [x] E07-036 — Reduce the ESP rate immediately on a sustained deferral signal
+- [x] E07-037 — Recover the ESP rate slowly, never in one step
 - [ ] E07-038 — Reconcile every bucket against Postgres counters nightly
-- [ ] E07-039 — Make bucket decrement and intent state transition atomic; no double-spend
-- [ ] E07-040 — Test the four-bucket decrement under concurrency with a race harness
+- [x] E07-039 — Make bucket decrement and intent state transition atomic; no double-spend
+- [x] E07-040 — Test the four-bucket decrement under concurrency with a race harness
 - [ ] E07-041 — Implement the scheduler: claim-with-lock over SendIntent where dueAt has passed
 - [ ] E07-042 — Never scan the whole table; use the covering index and a bounded batch
 - [ ] E07-043 — Implement a fencing token so a stalled worker cannot resurrect and double-send
@@ -107,4 +107,4 @@ Deferral is a first-class success (ARCHITECTURE §3.2).
 - [ ] E07-102 — Add a per-org routing report: which mailboxes carried which share of volume
 - [ ] E07-103 — Detect and alert on routing concentration; one mailbox carrying too much is a risk
 - [ ] E07-104 — Add an explicit even-distribution mode for operators who want it
-- [ ] E07-105 — Verify invariant I3 with a test that attempts a cap overflow under load
+- [x] E07-105 — Verify invariant I3 with a test that attempts a cap overflow under load

@@ -18,12 +18,12 @@
 - [ ] E22-016 — Write the test asserting PolicyDecision is written for every send
 - [ ] E22-017 — Write the test asserting suppression is re-checked before emit
 - [ ] E22-018 — Write the test asserting the emit path fails closed on a store error
-- [ ] E22-019 — Write the test asserting cap buckets cannot be overspent under concurrency
+- [x] E22-019 — Write the test asserting cap buckets cannot be overspent under concurrency
 - [ ] E22-020 — Write the test asserting Message-ID uniqueness under concurrency
 - [ ] E22-021 — Write the test asserting an intent processed twice sends once
 - [ ] E22-022 — Write the cross-tenant isolation test suite
 - [ ] E22-023 — Write the compliance test suite from planning/COMPLIANCE.md
-- [ ] E22-024 — Write the deliverability test suite from the bounce corpus
+- [x] E22-024 — Write the deliverability test suite from the bounce corpus
 - [ ] E22-025 — Write the router property tests over randomised fleet states
 - [ ] E22-026 — Write the warmup tests including hold and rollback
 - [ ] E22-027 — Write the verification tests against a known-address corpus

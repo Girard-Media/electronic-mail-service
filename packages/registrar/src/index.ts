@@ -58,7 +58,7 @@ export function desiredRecords(opts: {
   dmarcPolicy: "none" | "quarantine" | "reject";
 }): DnsRecord[] {
   const {
-    domain, nodeIp, ptrHost, dkimSelector, dkimPublicKey,
+    nodeIp, ptrHost, dkimSelector, dkimPublicKey,
     aggregateDomain, siteIp, dmarcPolicy,
   } = opts;
   return [

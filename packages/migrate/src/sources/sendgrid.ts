@@ -67,7 +67,7 @@ export class SendGridSource implements MigrationSource {
         const subdomain = d.subdomain ? String(d.subdomain) : "";
         inv.domains.push({
           name: subdomain ? `${subdomain}.${domain}` : domain,
-          status: Boolean(d.valid) ? "verified" : "pending",
+          status: d.valid ? "verified" : "pending",
           createdAt: undefined,
         });
       }
