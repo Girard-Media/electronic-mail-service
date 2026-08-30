@@ -7,33 +7,33 @@ Stripe is the one unavoidable third party, isolated behind a BillingProvider sea
 - [ ] E19-003 — Implement the Stripe adapter behind the interface
 - [ ] E19-004 — Assert in code that no Stripe symbol is imported outside packages/billing
 - [ ] E19-005 — Add a CI rule enforcing that assertion
-- [ ] E19-006 — Design the plan matrix: mailboxes, domains, sends, verifications, AI tokens, seats
-- [ ] E19-007 — Define what each plan honestly includes; never list a feature we have not shipped
-- [ ] E19-008 — Gate dedicated IPs and dedicated domains to the plans that actually get them
-- [ ] E19-009 — Never claim a dedicated IP on a shared-pool plan
-- [ ] E19-010 — Implement plan definitions as versioned code with a migration path
-- [ ] E19-011 — Implement quota enforcement at the point of consumption, not at billing time
+- [x] E19-006 — Design the plan matrix: mailboxes, domains, sends, verifications, AI tokens, seats
+- [x] E19-007 — Define what each plan honestly includes; never list a feature we have not shipped
+- [x] E19-008 — Gate dedicated IPs and dedicated domains to the plans that actually get them
+- [x] E19-009 — Never claim a dedicated IP on a shared-pool plan
+- [x] E19-010 — Implement plan definitions as versioned code with a migration path
+- [x] E19-011 — Implement quota enforcement at the point of consumption, not at billing time
 - [ ] E19-012 — Enforce the mailbox quota at mailbox creation
 - [ ] E19-013 — Enforce the domain quota at domain purchase
 - [ ] E19-014 — Enforce the send quota in the router as a hard filter
 - [ ] E19-015 — Enforce the verification quota in the verify engine
 - [ ] E19-016 — Enforce the AI token budget in the AI gateway
 - [ ] E19-017 — Enforce the seat quota at invitation
-- [ ] E19-018 — Show remaining quota in the UI before the user hits the limit
-- [ ] E19-019 — Warn at 80% of any quota, not only at 100%
-- [ ] E19-020 — Never hard-stop a running campaign mid-flight on a quota boundary without notice
-- [ ] E19-021 — Implement metered usage recording per send, verification, and AI call
-- [ ] E19-022 — Record usage idempotently so a retry does not double-bill
-- [ ] E19-023 — Exclude peer warmup and placement probes from billable sends
-- [ ] E19-024 — Test that exclusion explicitly
+- [x] E19-018 — Show remaining quota in the UI before the user hits the limit
+- [x] E19-019 — Warn at 80% of any quota, not only at 100%
+- [x] E19-020 — Never hard-stop a running campaign mid-flight on a quota boundary without notice
+- [x] E19-021 — Implement metered usage recording per send, verification, and AI call
+- [x] E19-022 — Record usage idempotently so a retry does not double-bill
+- [x] E19-023 — Exclude peer warmup and placement probes from billable sends
+- [x] E19-024 — Test that exclusion explicitly
 - [ ] E19-025 — Implement the usage aggregation job with a reconciliation against raw events
 - [ ] E19-026 — Alert on any drift between aggregated and raw usage
-- [ ] E19-027 — Implement overage pricing per metered dimension
+- [x] E19-027 — Implement overage pricing per metered dimension
 - [ ] E19-028 — Show projected overage before the billing period closes
-- [ ] E19-029 — Let the customer set a spend cap that pauses rather than surprises
+- [x] E19-029 — Let the customer set a spend cap that pauses rather than surprises
 - [ ] E19-030 — Implement subscription creation, upgrade, downgrade, and cancellation
-- [ ] E19-031 — Handle downgrade when current usage exceeds the lower plan's quota
-- [ ] E19-032 — Never silently delete resources on a downgrade; require an explicit choice
+- [x] E19-031 — Handle downgrade when current usage exceeds the lower plan's quota
+- [x] E19-032 — Never silently delete resources on a downgrade; require an explicit choice
 - [ ] E19-033 — Implement the Stripe webhook receiver with signature verification
 - [ ] E19-034 — Make webhook handling idempotent on the event id
 - [ ] E19-035 — Handle payment failure with a dunning sequence and a grace period
@@ -47,13 +47,13 @@ Stripe is the one unavoidable third party, isolated behind a BillingProvider sea
 - [ ] E19-043 — Show the usage detail behind every invoice line
 - [ ] E19-044 — Make usage detail downloadable as CSV
 - [ ] E19-045 — Build the usage page showing every metered dimension over time
-- [ ] E19-046 — Show cost per positive reply as the headline efficiency metric
-- [ ] E19-047 — Show infrastructure, verification, and AI cost separately
+- [x] E19-046 — Show cost per positive reply as the headline efficiency metric
+- [x] E19-047 — Show infrastructure, verification, and AI cost separately
 - [ ] E19-048 — Build the plan comparison and upgrade flow
 - [ ] E19-049 — Show exactly what changes on upgrade, including capacity
 - [ ] E19-050 — Implement annual billing with the discount stated plainly
 - [ ] E19-051 — Implement the trial with a real warmed shared mailbox
-- [ ] E19-052 — Never provision a dedicated resource for a trial
+- [x] E19-052 — Never provision a dedicated resource for a trial
 - [ ] E19-053 — Implement trial expiry with a clear path to conversion
 - [ ] E19-054 — Implement the KYC gate before the first live send on any plan
 - [ ] E19-055 — Never let a payment method alone substitute for KYC
@@ -78,12 +78,12 @@ Stripe is the one unavoidable third party, isolated behind a BillingProvider sea
 - [ ] E19-074 — Implement the win-back offer path on cancellation
 - [ ] E19-075 — Ask for and record the cancellation reason
 - [ ] E19-076 — Report cancellation reasons monthly and act on the top one
-- [ ] E19-077 — Test quota enforcement at every consumption point
-- [ ] E19-078 — Test that usage recording is idempotent under retry
+- [x] E19-077 — Test quota enforcement at every consumption point
+- [x] E19-078 — Test that usage recording is idempotent under retry
 - [ ] E19-079 — Test the webhook receiver against replayed Stripe events
 - [ ] E19-080 — Test the dunning and suspension timeline end to end
-- [ ] E19-081 — Test the downgrade path with usage over the lower quota
-- [ ] E19-082 — Test that peer warmup never appears on an invoice
+- [x] E19-081 — Test the downgrade path with usage over the lower quota
+- [x] E19-082 — Test that peer warmup never appears on an invoice
 - [ ] E19-083 — Test reseller usage attribution across three levels
 - [ ] E19-084 — Load-test usage aggregation at ten million events per period
 - [ ] E19-085 — Document the billing subsystem in planning/specs/billing/
@@ -100,10 +100,10 @@ Stripe is the one unavoidable third party, isolated behind a BillingProvider sea
 - [ ] E19-096 — Add usage alerts the customer can configure
 - [ ] E19-097 — Add a monthly usage summary email
 - [ ] E19-098 — Show the customer their own cost trend over time
-- [ ] E19-099 — Never present a cost number we cannot reconcile to an invoice line
+- [x] E19-099 — Never present a cost number we cannot reconcile to an invoice line
 - [ ] E19-100 — Add billing MCP tools for internal reporting only
 - [ ] E19-101 — Never expose a billing mutation through MCP
 - [ ] E19-102 — Add an internal tool to simulate a customer's bill before a pricing change
 - [ ] E19-103 — Run that simulation before every pricing change and record the result
-- [ ] E19-104 — Add a plan-fit recommender suggesting the plan that matches actual usage
-- [ ] E19-105 — Recommend a downgrade when the data supports it
+- [x] E19-104 — Add a plan-fit recommender suggesting the plan that matches actual usage
+- [x] E19-105 — Recommend a downgrade when the data supports it
