@@ -2,7 +2,7 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
-import { EMS } from "ems";
+import { EMS } from "@ems/sdk";
 
 // MCP server for ems — exposes send + verify as tools so AI agents
 // (Claude Desktop, Claude Code, etc.) can use ems directly.

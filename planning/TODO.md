@@ -5,7 +5,7 @@
 The build-loop queue (`bootspring build next` reads this).
 Status: `[ ]` todo · `[~]` in progress · `[x]` done.
 
-**13 / 2500 complete.**
+**15 / 2501 complete.**
 
 Governing documents — read before taking a task:
 
@@ -26,7 +26,7 @@ invariant it protects.
 
 ---
 
-<!-- source: planning/backlog/01-foundation.md · 9/80 -->
+<!-- source: planning/backlog/01-foundation.md · 11/81 -->
 # Epic 01 — Foundation & Fork Hygiene
 
 Goal: the forked repo compiles green, carries no usermails identity, and every
@@ -38,8 +38,9 @@ inherited subsystem is consciously kept, retargeted, or deleted.
 - [x] E01-004 — Set root package name to electronic-mail-service with EMS description
 - [x] E01-005 — Rename SDK package to @ems/sdk and fix the @ems/mcp workspace dependency
 - [x] E01-006 — git init and commit the fork baseline
-- [ ] E01-007 — Run pnpm install and record the resolved lockfile as a fork artifact
-- [ ] E01-008 — pnpm typecheck must pass green on the untouched fork before any new code
+- [x] E01-007 — pnpm install clean; lockfile regenerated as a fork artifact
+- [x] E01-008 — pnpm typecheck green on the fork (fixed: packages/mcp imported the old `ems` SDK name; @ems/sdk must be built first)
+- [ ] E01-009a — Make `pnpm typecheck` build @ems/sdk first, or emit types in place, so the ordering is not a tribal fact
 - [ ] E01-009 — pnpm lint must pass green; fix inherited violations rather than widening the config
 - [ ] E01-010 — Run the inherited pnpm test suite; triage every failure into keep/retarget/delete
 - [x] E01-011 — Update bootspring.config.js: name ems, hosting hostssh, analytics clickhouse, email own-mta
