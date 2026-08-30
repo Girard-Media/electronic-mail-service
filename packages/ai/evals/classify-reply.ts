@@ -23,6 +23,8 @@ export const CLASSIFY_REPLY_FIXTURES: Array<Fixture<ClassifyReplyInput, ReplyInt
   { id: "u9", input: { subject: "Re: quick question", body: "Take us off your mailing list please." }, expected: "UNSUBSCRIBE" },
   { id: "u10", input: { subject: "Re:", body: "Cease contact." }, expected: "UNSUBSCRIBE",
     note: "terse; added after u4 showed the rule was too narrow" },
+  { id: "u11", input: { subject: "Re:", body: "please remove me" }, expected: "UNSUBSCRIBE",
+    note: "bare form with no off/from — broadening the rule for u4 briefly broke this" },
 
   // ── OUT_OF_OFFICE
   { id: "o1", input: { subject: "Automatic reply: quick question", body: "I am out of the office until 5 September with limited access to email." }, expected: "OUT_OF_OFFICE" },

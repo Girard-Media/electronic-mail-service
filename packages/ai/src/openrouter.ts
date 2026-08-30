@@ -88,7 +88,7 @@ export class OpenRouterProvider implements ProviderPort {
       if (e instanceof Error && e.name === "AbortError") {
         // Normalised so the gateway records "timeout" rather than a generic
         // provider error — the two want different operator responses.
-        throw new Error(`openrouter request timed out after ${req.timeoutMs}ms`);
+        throw new Error(`openrouter request timed out after ${req.timeoutMs}ms`, { cause: e });
       }
       throw e;
     } finally {

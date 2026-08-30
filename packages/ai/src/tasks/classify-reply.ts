@@ -31,7 +31,7 @@ const RULES: Array<[RegExp, ReplyIntent]> = [
   // Broad on purpose. Over-matching costs one lead; under-matching is illegal,
   // so the eval gate requires 100% recall on this class.
   [/\b(unsubscribe|un-?subscribe)\b/i, "UNSUBSCRIBE"],
-  [/\b(remove|take)\s+(me|us)\s+(off|from)\b/i, "UNSUBSCRIBE"],
+  [/\b(remove|take)\s+(me|us)\b/i, "UNSUBSCRIBE"],
   [/\bopt\s+(me|us)?\s*-?\s*out\b/i, "UNSUBSCRIBE"],
   [/\b(stop|cease)\s+(email|contact|messag|sending)/i, "UNSUBSCRIBE"],
   [/\b(do ?n[o']?t|please don'?t)\s+(email|contact|message)\s+(me|us)\b/i, "UNSUBSCRIBE"],
