@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Deliverability — EMS</title>
+<meta name="description" content="We operate the mail server, so delivered, bounced, and complained are real events — not a send count. SPF/DKIM/DMARC, pre-send suppression, and RFC 8058 unsubscribe ship today. Seed-list inbox tests are on the roadmap.">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="stylesheet" href="/assets/site.css">
+</head>
+<body>
+<header class="nav"><div class="wrap">
+  <a class="brand" href="/"><i class="ti ti-mail-fast"></i>EMS</a>
+  <nav><a href="/features">Features</a><a href="/deliverability">Deliverability</a><a href="/pricing">Pricing</a><a href="/docs">Docs</a></nav>
+  <div class="right"><a href="/dashboard" style="color:var(--tx2);font-size:14.5px;font-weight:500">Dashboard</a><a class="btn pri" href="/dashboard">Start free</a></div>
+</div></header>
+
+<section class="hero"><div class="wrap center">
+  <span class="eyebrow"><i class="ti ti-shield-check"></i> Deliverability</span>
+  <h1>Sent isn't the metric. Delivered is.</h1>
+  <p class="muted" style="max-width:680px;margin:18px auto 0">Most providers report "sent" when they accepted your API call. We run Postfix, so a 250 from the receiving host becomes <span class="mono">delivered</span> — and a hard bounce or complaint auto-suppresses before the next send. Inbox-vs-spam seed tests are coming; we don't sell them as live.</p>
+  <div style="margin-top:26px;display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+    <a class="btn pri lg" href="/dashboard"><i class="ti ti-rocket"></i> Authenticate a domain</a>
+    <a class="btn lg" href="/docs"><i class="ti ti-book"></i> Read the docs</a>
+  </div>
+</div></section>
+
+<section class="band"><div class="wrap">
+  <div class="stats">
+    <div class="stat"><span class="n">Own MTA</span><span class="l">Postfix we operate — delivery status from the log</span></div>
+    <div class="stat"><span class="n">Auth</span><span class="l">SPF + DKIM generated; sending gated on verified</span></div>
+    <div class="stat"><span class="n">Pre-send</span><span class="l">Hard bounce and complaint auto-suppress</span></div>
+    <div class="stat"><span class="n">RFC 8058</span><span class="l">List-Unsubscribe + one-click headers injected</span></div>
+  </div>
+</div></section>
+
+<section class="wrap">
+  <div class="section-head center">
+    <span class="eyebrow"><i class="ti ti-stack-2"></i> What ships today</span>
+    <h2>Four layers between your API call and the receiving server</h2>
+    <p class="muted">Each one is live in production. The suite that is not live is listed below, not mixed in.</p>
+  </div>
+  <div class="grid g2">
+    <div class="card"><span class="ic"><i class="ti ti-certificate"></i></span><h3>Authentication &amp; alignment</h3><p>Auto-generated DKIM keys, derived SPF and DMARC, optional custom MAIL FROM. One-click DNS publishing on supported providers, copy-paste records for any registrar, and live re-verification. Unverified domains cannot send.</p></div>
+    <div class="card"><span class="ic"><i class="ti ti-filter"></i></span><h3>List hygiene &amp; suppression</h3><p>Hard bounces and complaints auto-suppress, and the per-project list is enforced pre-send. Optional <span class="mono">/verify</span> checks syntax, MX, disposable and role accounts, and Spamhaus DBL before a message leaves.</p></div>
+    <div class="card"><span class="ic"><i class="ti ti-mail-check"></i></span><h3>Delivery events from the mail server</h3><p>Bounce and complaint arrive via DSN/ARF. Delivered is derived from Postfix <span class="mono">status=sent (250 …)</span> — not from hoping a receiver honors <span class="mono">NOTIFY=SUCCESS</span>. Signed webhooks fire for sent, delivered, bounced, and complained.</p></div>
+    <div class="card"><span class="ic"><i class="ti ti-discount-check"></i></span><h3>Bulk-sender headers</h3><p><span class="mono">List-Unsubscribe</span> and RFC 8058 one-click headers are injected on mail we relay. DMARC records are generated at domain setup with a guided path from <span class="mono">p=none</span> toward enforcement.</p></div>
+  </div>
+</section>
+
+<section class="wrap">
+  <div class="section-head center">
+    <span class="eyebrow"><i class="ti ti-mailbox"></i> Google and Yahoo rules</span>
+    <h2>What we handle automatically — and what we don't yet</h2>
+  </div>
+  <div class="doc">
+    <table style="width:100%;border-collapse:collapse;font-size:14.5px">
+      <thead><tr style="text-align:left;border-bottom:1px solid var(--line2)">
+        <th style="padding:14px 16px;font-weight:600">Requirement</th>
+        <th style="padding:14px 16px;font-weight:600">Today</th>
+      </tr></thead>
+      <tbody>
+        <tr style="border-bottom:1px solid var(--line)"><td style="padding:14px 16px;font-weight:600">SPF + DKIM aligned</td><td style="padding:14px 16px"><i class="ti ti-check" style="color:var(--ok)"></i> Keys and records generated at domain setup; sending is blocked until the domain is verified.</td></tr>
+        <tr style="border-bottom:1px solid var(--line)"><td style="padding:14px 16px;font-weight:600">DMARC published</td><td style="padding:14px 16px"><i class="ti ti-check" style="color:var(--ok)"></i> DMARC derived automatically with a guided path from <span class="mono">p=none</span> to enforcement.</td></tr>
+        <tr style="border-bottom:1px solid var(--line)"><td style="padding:14px 16px;font-weight:600">One-click unsubscribe</td><td style="padding:14px 16px"><i class="ti ti-check" style="color:var(--ok)"></i> <span class="mono">List-Unsubscribe</span> and one-click headers injected; processed immediately.</td></tr>
+        <tr style="border-bottom:1px solid var(--line)"><td style="padding:14px 16px;font-weight:600">Complaint rate under 0.3%</td><td style="padding:14px 16px">We record complaints and show the rate on the dashboard. Automatic throttle / kill-switch is not live yet.</td></tr>
+        <tr><td style="padding:14px 16px;font-weight:600">Forward &amp; reverse DNS</td><td style="padding:14px 16px">We operate the sending hosts. PTR cutover for the public sending IP is an ops task, not a self-serve product.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="band"><div class="wrap">
+  <div class="section-head center">
+    <span class="eyebrow"><i class="ti ti-sparkles"></i> On the roadmap</span>
+    <h2>The rest of the deliverability suite</h2>
+    <p class="muted">These are the paid, defensible layer. They are not in the product today.</p>
+  </div>
+  <div class="grid g3">
+    <div class="card"><span class="ic"><i class="ti ti-network"></i></span><h3>Dedicated IP pools <span class="soon-tag">Coming</span></h3><p>Per-tenant or per-stream IPs so a campaign cannot poison password resets. Today every tenant shares the mail server we operate.</p></div>
+    <div class="card"><span class="ic"><i class="ti ti-temperature"></i></span><h3>Automated warmup <span class="soon-tag">Coming</span></h3><p>Volume ramps per IP per day that react to bounce and complaint signals.</p></div>
+    <div class="card"><span class="ic"><i class="ti ti-inbox"></i></span><h3>Seed-list placement <span class="soon-tag">Coming</span></h3><p>Inbox / spam / missing, per mailbox provider. Until then we report accepted-by-receiver, not folder placement.</p></div>
+    <div class="card"><span class="ic"><i class="ti ti-radar"></i></span><h3>Customer blocklist alerts <span class="soon-tag">Coming</span></h3><p>Platform operators already see DNSBL checks in God Mode. Tenant-facing listing alerts are not shipped.</p></div>
+    <div class="card"><span class="ic"><i class="ti ti-file-report"></i></span><h3>DMARC report ingest <span class="soon-tag">Coming</span></h3><p>Parsed aggregate reports — who sends as you, and where alignment fails.</p></div>
+    <div class="card"><span class="ic"><i class="ti ti-shield-x"></i></span><h3>Abuse auto-throttle <span class="soon-tag">Coming</span></h3><p>Signup screening, send-pattern anomaly detection, and a complaint-rate kill-switch. Plan send caps are already enforced.</p></div>
+  </div>
+</div></section>
+
+<section class="wrap"><div class="cta center">
+  <h2>Stop guessing whether the receiver accepted it.</h2>
+  <p class="muted" style="max-width:600px;margin:14px auto 0">Authenticate a domain in minutes, send through a mail server we operate, and watch delivered / bounced / complained on the same dashboard. Drop-in compatible API — change the base URL and you're sending.</p>
+  <div style="margin-top:26px;display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+    <a class="btn pri lg" href="/dashboard"><i class="ti ti-rocket"></i> Start free</a>
+    <a class="btn lg" href="/docs"><i class="ti ti-arrows-exchange"></i> Migrate from your current provider</a>
+  </div>
+</div></section>
+
+<footer><div class="wrap">
+  <div class="cols">
+    <div style="max-width:300px"><a class="brand" href="/"><i class="ti ti-mail-fast"></i>EMS</a><p class="muted" style="margin-top:14px">Application email on infrastructure you control.</p></div>
+    <div><b>Product</b><a href="/features">Features</a><a href="/deliverability">Deliverability</a><a href="/pricing">Pricing</a><a href="/dashboard">Dashboard</a></div>
+    <div><b>Developers</b><a href="/docs">Docs</a><a href="/docs/dev">Quickstart</a><a href="/docs/dev">API reference</a></div>
+    <div><b>Company</b><a href="/status">Status</a><a href="mailto:hello@electronicmailservices.com">Contact</a></div>
+  </div>
+  <div class="bot"><span>© 2026 EMS</span><span class="muted">Built on independent, self-hosted infrastructure.</span></div>
+</div></footer>
+</body>
+</html>

@@ -1,0 +1,13 @@
+{
+  "id": "fact_671af1a8771c4c48",
+  "revision": 1,
+  "createdAt": "2026-08-24T02:36:16.183Z",
+  "updatedAt": "2026-08-24T02:36:16.183Z",
+  "name": "a1-handoff-2026-08-24",
+  "title": "A1 in-repo done, prod ops not run",
+  "description": "A1 in-repo done, prod ops not run",
+  "type": "project",
+  "scope": "project",
+  "activation": "relevant",
+  "body": "Next session: remaining A1 is PRODUCTION only plus commit/deploy of this session's uncommitted work.\n\nMust deploy worker shared-inbox MTA-sign fix (apps/workers/src/index.ts) or send/reply from agents.*/inbox.* will throw 'not a verified sending domain'.\n\nThen: shared-inbox-dns.sh → setup-shared-inbox-mta.sh on hub → clear 67 failed send jobs → git push hostssh main → dogfood create/receive/reply.\n\ninbox.electronicmailservices.com MX already live. agents.electronicmailservices.com empty. Apex MX = Google, never touch.\n\nAPI / must stay JSON. Working tree also has unrelated Wave 1 leftovers — do not bundle into the A1 commit.\n\nQuality already green: pnpm test, typecheck 11/11."
+}

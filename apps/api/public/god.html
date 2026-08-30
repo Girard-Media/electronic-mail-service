@@ -1,0 +1,364 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>God Mode — EMS</title>
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="stylesheet" href="/assets/site.css">
+<style>
+.shell{max-width:1160px;margin:0 auto;padding:22px 24px}
+.bar{display:flex;align-items:center;gap:12px;margin-bottom:18px;flex-wrap:wrap}
+.god-badge{display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,#f3b257,#f59e0b);color:#1a1205;font-weight:700;font-size:12px;padding:3px 11px;border-radius:999px}
+.gate{max-width:460px;margin:9vh auto;text-align:center}
+.mc{background:var(--surface2);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+.mc .l{font-size:12px;color:var(--tx2)} .mc .n{font-size:26px;font-weight:700;letter-spacing:-.5px;margin-top:4px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+.tabs{display:flex;gap:6px;margin:18px 0;flex-wrap:wrap}
+.tab{padding:8px 14px;border:1px solid var(--line);border-radius:9px;cursor:pointer;color:var(--tx2);font-size:13.5px;font-weight:600;display:flex;align-items:center;gap:7px}
+.tab:hover{color:var(--tx)} .tab.on{background:var(--brandsoft);border-color:var(--brand);color:var(--tx)}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;color:var(--tx2);font-weight:500;font-size:11.5px;text-transform:uppercase;letter-spacing:.04em;padding:9px 10px;border-bottom:1px solid var(--line)}
+td{padding:10px;border-bottom:1px solid var(--line);vertical-align:middle}
+.chip{display:inline-flex;align-items:center;gap:5px;font-size:11px;padding:2px 9px;border-radius:999px;font-weight:600}
+.c-sent{background:var(--okbg);color:var(--ok)} .c-fail{background:rgba(248,113,113,.13);color:#f87171}
+.c-q{background:rgba(109,94,252,.16);color:var(--brand2)} .c-mut{background:#1a2230;color:var(--tx2)}
+.c-gold{background:rgba(243,178,87,.15);color:var(--warn)}
+.in{width:100%;background:var(--bg);border:1px solid var(--line2);color:var(--tx);border-radius:9px;padding:10px 12px;font-size:14px;font-family:inherit;outline:none}
+.in:focus{border-color:var(--brand)}
+.hide{display:none} .muted{color:var(--tx2)}
+.scope-pick{display:flex;flex-wrap:wrap;gap:7px;margin:8px 0}
+.scope-pick label{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;border:1px solid var(--line2);border-radius:8px;padding:5px 10px;cursor:pointer;color:var(--tx2)}
+.scope-pick input{accent-color:var(--brand)}
+.tier{background:var(--surface2);border:1px solid var(--line);border-radius:11px;padding:16px}
+.tier .nm{font-size:13px;color:var(--tx2);font-weight:600}
+.tier .pr{font-size:24px;font-weight:700;margin:6px 0}
+.bars{display:flex;align-items:flex-end;gap:6px;height:60px;margin-top:6px}
+.bars > i{flex:1;background:linear-gradient(180deg,var(--brand2),var(--brand));border-radius:3px 3px 0 0;min-height:3px}
+.warn-box{background:rgba(243,178,87,.08);border:1px solid rgba(243,178,87,.3);border-radius:9px;padding:11px 13px;font-size:12.5px;color:var(--warn)}
+</style>
+</head>
+<body>
+<header class="nav"><div class="wrap">
+  <a class="brand" href="https://electronicmailservices.com"><i class="ti ti-mail-fast"></i>EMS</a>
+  <nav><a href="/dashboard">Dashboard</a><a href="/docs">Docs</a></nav>
+  <div class="right"><span class="god-badge"><i class="ti ti-bolt"></i> God Mode</span><span id="who" class="chip c-mut hide"></span><button id="signout" class="btn hide" style="padding:7px 12px"><i class="ti ti-logout"></i></button></div>
+</div></header>
+
+<div id="gate" class="gate hide">
+  <div class="card">
+    <div style="font-size:34px;color:var(--warn);margin-bottom:6px"><i class="ti ti-lock"></i></div>
+    <h2 style="font-size:18px;margin:0 0 6px">God Mode is restricted</h2>
+    <p class="muted" style="font-size:14px">This control panel is available to platform admins only. <a href="/dashboard" style="color:var(--brand2)">Sign in</a> with an admin account.</p>
+    <p id="gateMsg" class="muted" style="font-size:12.5px;margin-top:10px"></p>
+  </div>
+</div>
+
+<div id="app" class="shell hide">
+  <div class="bar">
+    <h1 style="font-size:20px;font-weight:600;margin:0">Control panel</h1>
+    <span id="roleChip" class="chip c-gold"></span>
+    <button id="refresh" class="btn" style="margin-left:auto;padding:8px 13px"><i class="ti ti-refresh"></i> Refresh</button>
+  </div>
+  <div class="tabs" id="tabs"></div>
+  <div id="view"></div>
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+const esc=s=>String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+async function api(path,opts={}){const r=await fetch(path,{credentials:"include",...opts,headers:{"Content-Type":"application/json",...(opts.headers||{})}});if(!r.ok)throw new Error((await r.json().catch(()=>({}))).message||("HTTP "+r.status));return r.status===204?{}:r.json();}
+function ago(t){const d=(Date.now()-new Date(t).getTime())/1000;if(d<60)return Math.round(d)+"s";if(d<3600)return Math.round(d/60)+"m";if(d<86400)return Math.round(d/3600)+"h";return Math.round(d/86400)+"d";}
+function chip(s){const m={sent:"c-sent",delivered:"c-sent",failed:"c-fail",bounced:"c-fail",queued:"c-q",scheduled:"c-q"};return `<span class="chip ${m[s]||"c-mut"}">${esc(s)}</span>`;}
+const fmt=n=>Number(n||0).toLocaleString();
+const money=n=>"$"+Number(n||0).toLocaleString(undefined,{maximumFractionDigits:2});
+
+const SCOPE_LABEL={metrics:"Metrics",profitability:"Profitability",users:"Users",impersonate:"Impersonate",logs:"Logs",admins:"Admins"};
+const PLAN_IDS=["free","pro","scale","white-label","enterprise"];
+const TIERS=[
+  {key:"free",name:"Free",price:0,quota:"3,000 emails / mo",feat:["1 sending domain","Community support"]},
+  {key:"pro",name:"Pro",price:18,quota:"50,000 emails / mo",feat:["$0.70 / 1k overage","10 sending domains","Webhooks"]},
+  {key:"scale",name:"Scale",price:80,quota:"500,000 emails / mo",feat:["Priority support","Custom branding"]},
+  {key:"white-label",name:"White-label",price:400,quota:"5,000,000 emails / mo",feat:["Reseller sub-tenants","Custom branding"]},
+  {key:"enterprise",name:"Enterprise",price:0,label:"Custom",quota:"Unlimited",feat:["God Mode operator plan","Unlimited domains, seats, webhooks"]},
+];
+let ME=null, TAB="overview", repTimer=null;
+
+const TABS=[
+  {id:"overview",label:"Overview",icon:"ti-chart-dots",scope:"metrics"},
+  {id:"rep",label:"Reputation",icon:"ti-shield-check",scope:"metrics"},
+  {id:"profit",label:"Profitability",icon:"ti-coin",scope:"profitability"},
+  {id:"users",label:"Users & tenants",icon:"ti-users",scope:"users"},
+  {id:"logs",label:"Logs & audit",icon:"ti-list-search",scope:"logs"},
+  {id:"admins",label:"Admins",icon:"ti-shield-half",scope:"admins"},
+  {id:"sim",label:"Account simulator",icon:"ti-switch-3",scope:"metrics"},
+];
+
+$("signout").onclick=async()=>{await api("/auth/logout",{method:"POST"}).catch(()=>{});location.href="/dashboard";};
+$("refresh").onclick=()=>render();
+
+function has(scope){return ME && (ME.superadmin || (ME.scopes||[]).includes(scope));}
+
+function renderTabs(){
+  const avail=TABS.filter(t=>has(t.scope));
+  if(!avail.some(t=>t.id===TAB)) TAB=avail[0]?.id;
+  $("tabs").innerHTML=avail.map(t=>`<div class="tab ${t.id===TAB?'on':''}" data-tab="${t.id}"><i class="ti ${t.icon}"></i> ${t.label}</div>`).join("");
+  document.querySelectorAll("[data-tab]").forEach(b=>b.onclick=()=>{TAB=b.dataset.tab;render();});
+}
+async function render(){
+  if(repTimer){ clearInterval(repTimer); repTimer=null; }
+  renderTabs();
+  $("view").innerHTML='<p class="muted" style="font-size:13px">Loading…</p>';
+  try{ await VIEWS[TAB](); }catch(e){ $("view").innerHTML=`<p class="muted">${esc(e.message)}</p>`; }
+}
+
+const VIEWS={
+  async overview(){
+    const o=await api("/god/overview");
+    const rate=o.deliveryRate===null||o.deliveryRate===undefined?"—":o.deliveryRate+"%";
+    const cards=[["Users",fmt(o.users)],["Organizations",fmt(o.orgs)],["Projects",fmt(o.projects)],["Verified domains",fmt(o.verifiedDomains)+" / "+fmt(o.domains)],["Active API keys",fmt(o.keys)],["Emails (all time)",fmt(o.emails)],["Accepted",fmt(o.accepted)],["Delivered",fmt(o.delivered)],["Bounced",fmt(o.bounced)],["Failed",fmt(o.failed)],["Delivered rate",rate],["Last 24h",fmt(o.last24h)],["Last 7d",fmt(o.last7d)]];
+    $("view").innerHTML=`<div class="grid">${cards.map(([l,n])=>`<div class="mc"><div class="l">${l}</div><div class="n">${n}</div></div>`).join("")}</div>
+      <div class="card" style="margin-top:16px"><h3 style="font-size:15px;margin:0 0 10px"><i class="ti ti-flame" style="color:var(--brand2)"></i> Top tenants by volume</h3>
+      ${o.topOrgs.length?`<table><thead><tr><th>Organization</th><th>Project</th><th style="text-align:right">Sends</th></tr></thead><tbody>${o.topOrgs.map(t=>`<tr><td>${esc(t.org)}</td><td class="muted">${esc(t.project)}</td><td style="text-align:right" class="mono">${fmt(t.sends)}</td></tr>`).join("")}</tbody></table>`:'<p class="muted" style="font-size:13px">No send volume yet.</p>'}</div>
+      <div class="card" style="margin-top:16px" id="totpCard">
+        <h3 style="font-size:15px;margin:0 0 6px"><i class="ti ti-lock" style="color:var(--warn)"></i> Authenticator (TOTP)</h3>
+        <p class="muted" style="font-size:13px;margin:0 0 10px">${ME.totpEnabled?"Enabled. Impersonation requires a 6-digit code.":"Required before impersonating. Scan the otpauth URI with any authenticator app, then confirm."}</p>
+        ${ME.totpEnabled?"":`<button class="btn pri" id="totpBegin" style="padding:8px 13px"><i class="ti ti-qrcode"></i> Set up authenticator</button><div id="totpSetup" class="hide" style="margin-top:12px"></div>`}
+      </div>`;
+    const begin=$("totpBegin");
+    if(begin) begin.onclick=async()=>{
+      try{
+        const r=await api("/god/totp/begin",{method:"POST",body:"{}"});
+        $("totpSetup").classList.remove("hide");
+        $("totpSetup").innerHTML=`<p class="mono" style="font-size:12px;word-break:break-all">${esc(r.otpauth)}</p>
+          <p class="muted" style="font-size:12px">Secret: <span class="mono">${esc(r.secret)}</span></p>
+          <input class="in" id="totpCode" placeholder="6-digit code" maxlength="8" style="max-width:180px;margin:8px 0">
+          <button class="btn pri" id="totpConfirm" style="padding:8px 13px">Confirm</button>
+          <p id="totpErr" class="muted" style="font-size:12px;color:#f87171"></p>`;
+        $("totpConfirm").onclick=async()=>{
+          try{
+            await api("/god/totp/confirm",{method:"POST",body:JSON.stringify({code:$("totpCode").value})});
+            ME.totpEnabled=true; render();
+          }catch(e){ $("totpErr").textContent=e.message; }
+        };
+      }catch(e){ alert(e.message); }
+    };
+  },
+  async rep(){
+    const draw=async()=>{
+      const r=await api("/god/reputation");
+      const a=r.auth;
+      const dot=(ok)=>ok?'<span class="dot ok"><i class="ti ti-check"></i></span>':'<span class="dot wait"><i class="ti ti-alert-triangle"></i></span>';
+      const authRows=[
+        ["Reverse DNS (PTR)", a.fcrdns, a.ptr?`${esc(a.ptr)}`:"not set", a.fcrdns?"forward-confirmed":`should be ${esc(a.ptrExpected)}`],
+        ["SPF", a.spf, a.spfCount===1?"1 record":a.spfCount+" records", a.spf?"valid":(a.spfCount>1?"multiple = PERMERROR":"missing")],
+        ["DKIM", a.dkim, a.dkim?"published":"missing", "selector "+esc("mail")],
+        ["DMARC", a.dmarc, a.dmarc?"published":"missing", ""],
+      ];
+      const listed=r.blocklists.filter(b=>b.status==="listed");
+      const repScore=(()=>{ let s=0,m=0;
+        for(const x of [a.fcrdns,a.spf,a.dkim,a.dmarc]){m++; if(x)s++;}
+        m++; if(listed.length===0)s++;
+        const hr=r.health.d7; if(hr){ m++; if(hr.bounceRate<5)s++; m++; if(hr.complaintRate<0.3)s++; }
+        return Math.round(s/m*100); })();
+      const scoreColor=repScore>=85?"var(--ok)":repScore>=60?"var(--warn)":"#f87171";
+      const hcell=(label,val,unit,good,warn)=>{ const col=val<=good?"var(--ok)":val<=warn?"var(--warn)":"#f87171"; return `<div class="mc"><div class="l">${label}</div><div class="n" style="color:${col}">${val}${unit}</div></div>`; };
+      const h=r.health.d7;
+      const maxV=Math.max(1,...r.volume.map(v=>v.sent+v.bounced));
+      const bars=r.volume.map(v=>{ const tot=v.sent+v.bounced; const hh=Math.round(tot/maxV*52)+2; const bp=tot?Math.round(v.bounced/tot*100):0; return `<div title="${new Date(v.day).toLocaleDateString()}: ${v.sent} sent, ${v.bounced} bounced" style="flex:1;display:flex;flex-direction:column;justify-content:flex-end;height:60px"><div style="height:${hh}px;background:linear-gradient(180deg,var(--brand2),var(--brand));border-radius:3px 3px 0 0;position:relative">${bp>0?`<div style="position:absolute;bottom:0;left:0;right:0;height:${bp}%;background:#f87171;border-radius:0 0 3px 3px"></div>`:""}</div></div>`; }).join("");
+      const wm=r.warmup;
+      $("view").innerHTML=`
+        <div style="display:flex;align-items:center;gap:16px;margin-bottom:14px;flex-wrap:wrap">
+          <div style="width:84px;height:84px;border-radius:50%;display:grid;place-items:center;border:5px solid ${scoreColor};flex:0 0 auto"><div style="text-align:center"><div style="font-size:24px;font-weight:700;color:${scoreColor}">${repScore}</div><div style="font-size:9px;color:var(--tx2)">SCORE</div></div></div>
+          <div><div style="font-size:15px;font-weight:600">Sender reputation — <span class="mono">${esc(a.ip)}</span></div>
+          <div class="muted" style="font-size:12.5px">${esc(a.domain)} · ${listed.length?`<span style="color:#f87171">listed on ${listed.length} blocklist(s)</span>`:'<span style="color:var(--ok)">no blocklist hits</span>'} · <span class="pulsing"><span class="spin"></span> live (30s)</span></div></div>
+        </div>
+        <div class="card" style="margin-bottom:14px"><h3 style="font-size:14px;margin:0 0 10px"><i class="ti ti-certificate" style="color:var(--brand2)"></i> Authentication & identity</h3>
+          ${authRows.map(([l,ok,v,note])=>`<div class="rec" style="padding:9px 12px;align-items:center">${dot(ok)}<div class="body"><div class="h">${l}<span style="margin-left:auto;font-size:12px;color:${ok?"var(--ok)":"var(--warn)"}">${v}</span></div>${note?`<div class="muted" style="font-size:11.5px;margin-top:2px">${note}</div>`:""}</div></div>`).join("")}
+        </div>
+        <div class="card" style="margin-bottom:14px"><h3 style="font-size:14px;margin:0 0 10px"><i class="ti ti-shield-x" style="color:var(--brand2)"></i> Blocklists</h3>
+          <div style="display:flex;flex-wrap:wrap;gap:8px">${r.blocklists.map(b=>`<span class="chip ${b.status==='clean'?'c-sent':b.status==='listed'?'c-fail':'c-mut'}">${b.status==='clean'?'<i class="ti ti-check"></i>':b.status==='listed'?'<i class="ti ti-x"></i>':'<i class="ti ti-help"></i>'} ${esc(b.name)}</span>`).join("")}</div>
+        </div>
+        ${r.watchdog&&(r.watchdog.deliveryDrop||r.watchdog.staleFeedback)?`<div class="warn-box" style="margin-bottom:14px"><b>Sending health alert.</b> ${r.watchdog.deliveryDrop?"24h delivered rate dropped more than 15 points vs the 7-day rate. ":""}${r.watchdog.staleFeedback?"Mail is being accepted but no delivered/bounced/complained events landed in 24h — the feedback loop may be down. ":""}${r.watchdog.lastDeliveredAt?`Last delivered ${new Date(r.watchdog.lastDeliveredAt).toLocaleString()}.`:"No delivered event on record."}</div>`:""}
+        <div class="card" style="margin-bottom:14px"><h3 style="font-size:14px;margin:0 0 10px"><i class="ti ti-heartbeat" style="color:var(--brand2)"></i> Sending health (7-day)</h3>
+          <div class="grid">${[hcell("Bounce rate",h.bounceRate,"%",2,5),hcell("Complaint rate",h.complaintRate,"%",0.1,0.3)].join("")}
+            <div class="mc"><div class="l">Accepted rate</div><div class="n" style="color:var(--ok)">${h.acceptedRate}%</div></div>
+            <div class="mc"><div class="l">Delivered rate</div><div class="n" style="color:var(--ok)">${h.deliveredRate===null||h.deliveredRate===undefined?"—":h.deliveredRate+"%"}</div></div>
+            <div class="mc"><div class="l">Accepted (7d)</div><div class="n">${fmt(h.accepted)}</div></div>
+            <div class="mc"><div class="l">Bounced (7d)</div><div class="n">${fmt(h.bounced)}</div></div>
+          </div>
+          <div class="muted" style="font-size:11px;margin-top:8px">Targets: bounce &lt;2% · complaints &lt;0.1% (per Gmail/Postmaster).</div>
+        </div>
+        <div class="card" style="margin-bottom:14px"><h3 style="font-size:14px;margin:0 0 4px"><i class="ti ti-chart-bar" style="color:var(--brand2)"></i> Volume — last 14 days</h3>
+          <div style="display:flex;align-items:flex-end;gap:3px;margin-top:8px">${bars||'<span class="muted" style="font-size:12px">no sends yet</span>'}</div>
+          <div class="muted" style="font-size:11px;margin-top:5px"><span style="color:var(--brand2)">■</span> sent &nbsp; <span style="color:#f87171">■</span> bounced</div>
+        </div>
+        <div class="card"><h3 style="font-size:14px;margin:0 0 10px"><i class="ti ti-flame" style="color:var(--brand2)"></i> IP warmup</h3>
+          <div class="grid">
+            <div class="mc"><div class="l">Warmup day</div><div class="n">${wm.dayIndex||"—"}</div></div>
+            <div class="mc"><div class="l">Sent today</div><div class="n">${fmt(wm.sentToday)}</div></div>
+            <div class="mc"><div class="l">Recommended cap</div><div class="n">${fmt(wm.recommendedToday)}</div></div>
+          </div>
+          <div class="prog" style="margin-top:12px"><i style="width:${Math.min(100,Math.round(wm.sentToday/(wm.recommendedToday||1)*100))}%;background:${wm.sentToday>wm.recommendedToday?'#f87171':'linear-gradient(90deg,var(--brand),var(--brand2))'}"></i></div>
+          <div class="muted" style="font-size:11px;margin-top:6px">${wm.startedAt?`Warming since ${new Date(wm.startedAt).toLocaleDateString()}. `:""}Ramp gradually — staying under the cap with low bounces builds reputation fastest.</div>
+        </div>
+        <div style="text-align:right;margin-top:8px"><span class="muted" style="font-size:11px">updated just now · auto-refreshes</span></div>`;
+    };
+    await draw();
+    repTimer=setInterval(()=>{ if(TAB==="rep") draw().catch(()=>{}); }, 30000);
+  },
+  async profit(){
+    const p=await api("/god/profitability");
+    $("view").innerHTML=`<div class="grid">
+        <div class="mc"><div class="l">Est. MRR</div><div class="n" style="color:var(--ok)">${money(p.mrr)}</div></div>
+        <div class="mc"><div class="l">Est. ARR</div><div class="n">${money(p.arr)}</div></div>
+        <div class="mc"><div class="l">Sends (all time)</div><div class="n">${fmt(p.sentTotal)}</div></div>
+        <div class="mc"><div class="l">Est. send cost</div><div class="n">${money(p.costEstimate)}</div></div>
+        <div class="mc"><div class="l">Gross margin</div><div class="n" style="color:var(--ok)">${p.grossMarginPct}%</div></div>
+      </div>
+      <div class="card" style="margin-top:16px"><h3 style="font-size:15px;margin:0 0 10px"><i class="ti ti-receipt" style="color:var(--brand2)"></i> MRR by plan</h3>
+        <table><thead><tr><th>Plan</th><th style="text-align:right">Orgs</th><th style="text-align:right">List price</th><th style="text-align:right">Subtotal</th></tr></thead><tbody>
+        ${p.planRows.map(r=>`<tr><td><span class="chip c-mut">${esc(r.plan)}</span></td><td style="text-align:right">${fmt(r.count)}</td><td style="text-align:right" class="mono">${money(r.price)}</td><td style="text-align:right" class="mono">${money(r.subtotal)}</td></tr>`).join("")}
+        </tbody></table>
+        <div class="warn-box" style="margin-top:12px"><i class="ti ti-info-circle"></i> ${esc(p.note)}</div>
+      </div>`;
+  },
+  async users(){
+    $("view").innerHTML=`<div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+        <input id="uq" class="in" placeholder="Search by email…" style="max-width:300px"><button id="usearch" class="btn" style="padding:9px 14px"><i class="ti ti-search"></i></button>
+        <button id="adduser" class="btn pri" style="margin-left:auto;padding:9px 14px"><i class="ti ti-user-plus"></i> Add user</button>
+      </div>
+      <div id="addform" class="card hide" style="margin-bottom:12px">
+        <h3 style="font-size:14px;margin:0 0 10px"><i class="ti ti-user-plus" style="color:var(--brand2)"></i> Create a user</h3>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;max-width:560px">
+          <input id="nu_email" class="in" placeholder="email@company.com" type="email">
+          <input id="nu_name" class="in" placeholder="Name / company (optional)">
+          <input id="nu_pw" class="in" placeholder="Temp password (min 8)" type="text" style="grid-column:1/3">
+        </div>
+        <div style="margin-top:10px;display:flex;align-items:center;gap:8px">
+          <button id="nu_create" class="btn pri" style="padding:8px 14px"><i class="ti ti-check"></i> Create user</button>
+          <button id="nu_cancel" class="btn" style="padding:8px 12px">Cancel</button>
+          <span id="nu_msg" style="font-size:13px"></span>
+        </div>
+        <p class="muted" style="font-size:11.5px;margin:9px 0 0">Creates a full workspace (org + default project). Share the temp password with them to sign in.</p>
+      </div>
+      <div id="ulist"></div>`;
+    const run=async()=>{
+      const q=$("uq").value.trim();
+      const {data}=await api("/god/users"+(q?"?q="+encodeURIComponent(q):""));
+      $("ulist").innerHTML=data.length?`<table><thead><tr><th>Email</th><th>Org</th><th>Plan</th><th>Role</th><th>Joined</th><th style="text-align:right">Actions</th></tr></thead><tbody>${data.map(u=>{
+        const self=u.id===ME.userId, isAdmin=!!u.admin;
+        return `<tr>
+        <td class="mono">${esc(u.email)}${isAdmin?` <span class="chip c-gold">${esc(u.admin)}</span>`:""}${self?' <span class="chip c-mut">you</span>':""}</td>
+        <td>${esc(u.org?.name||"—")}</td><td>${u.org?`<select class="in plan-set" data-org="${esc(u.org.id)}" style="width:auto;padding:5px 8px;font-size:12px">${PLAN_IDS.map(p=>`<option value="${p}" ${u.org.plan===p?"selected":""}>${p}</option>`).join("")}</select>`:'<span class="muted">—</span>'}</td>
+        <td class="muted">${esc(u.orgRole||"—")}</td><td class="muted">${ago(u.createdAt)} ago</td>
+        <td style="text-align:right;white-space:nowrap">${has("impersonate")&&!self?`<button class="btn" data-imp="${u.id}" data-email="${esc(u.email)}" style="padding:5px 10px"><i class="ti ti-user-bolt"></i></button> `:""}${(!self&&!isAdmin)?`<button class="btn" data-deluser="${u.id}" data-email="${esc(u.email)}" style="padding:5px 10px;border-color:rgba(248,113,113,.4);color:#f87171"><i class="ti ti-trash"></i></button>`:""}</td>
+      </tr>`;}).join("")}</tbody></table>`:'<p class="muted" style="font-size:13px">No users found.</p>';
+      document.querySelectorAll("[data-imp]").forEach(b=>b.onclick=async()=>{
+        if(!confirm("Impersonate "+b.dataset.email+"?\n\nYou'll be signed in AS this user (logged + reversible). Use only for support/debugging."))return;
+        b.disabled=true;b.innerHTML='…';
+        try{
+          const totp=prompt("Authenticator code (6 digits) to impersonate "+b.dataset.email);
+          if(!totp) return;
+          await api("/god/impersonate/"+b.dataset.imp,{method:"POST",body:JSON.stringify({totp})});
+          location.href="/dashboard";
+        }
+        catch(e){ alert(e.message); b.disabled=false; b.innerHTML='<i class="ti ti-user-bolt"></i>'; }
+      });
+      document.querySelectorAll("[data-deluser]").forEach(b=>b.onclick=async()=>{
+        if(!confirm("Delete "+b.dataset.email+"?\n\nThis permanently removes the user AND their workspace (org, projects, emails, domains, API keys) if they're the sole member. This cannot be undone."))return;
+        b.disabled=true;b.innerHTML='…';
+        try{ await api("/god/users/"+b.dataset.deluser,{method:"DELETE"}); run(); }
+        catch(e){ alert(e.message); b.disabled=false; b.innerHTML='<i class="ti ti-trash"></i>'; }
+      });
+      document.querySelectorAll(".plan-set").forEach(s=>s.onchange=async()=>{
+        s.disabled=true;
+        try{ await api("/god/orgs/"+s.dataset.org,{method:"PATCH",body:JSON.stringify({plan:s.value})}); }
+        catch(e){ alert(e.message); run(); }
+        finally{ s.disabled=false; }
+      });
+    };
+    $("usearch").onclick=run; $("uq").onkeydown=e=>{if(e.key==="Enter")run();};
+    $("adduser").onclick=()=>$("addform").classList.toggle("hide");
+    $("nu_cancel").onclick=()=>$("addform").classList.add("hide");
+    $("nu_create").onclick=async()=>{
+      const email=$("nu_email").value.trim(), password=$("nu_pw").value, name=$("nu_name").value.trim();
+      if(!email||password.length<8){ $("nu_msg").innerHTML='<span style="color:#f87171">Email + 8+ char password required</span>'; return; }
+      $("nu_msg").textContent="…";
+      try{ await api("/god/users",{method:"POST",body:JSON.stringify({email,password,...(name?{name}:{})})});
+        $("addform").classList.add("hide"); $("nu_email").value=$("nu_pw").value=$("nu_name").value=""; run();
+      }catch(e){ $("nu_msg").innerHTML=`<span style="color:#f87171">${esc(e.message)}</span>`; }
+    };
+    run();
+  },
+  async logs(){
+    const l=await api("/god/logs");
+    $("view").innerHTML=`<div class="card"><h3 style="font-size:15px;margin:0 0 10px"><i class="ti ti-mail" style="color:var(--brand2)"></i> Recent emails (platform-wide)</h3>
+      ${l.emails.length?`<table><thead><tr><th>From</th><th>Org</th><th>Subject</th><th>Status</th><th style="text-align:right">When</th></tr></thead><tbody>${l.emails.map(e=>`<tr><td class="mono">${esc(e.from)}</td><td class="muted">${esc(e.org)}</td><td>${esc(e.subject||"")}</td><td>${chip(e.status)}</td><td style="text-align:right;color:var(--tx3)">${ago(e.createdAt)} ago</td></tr>`).join("")}</tbody></table>`:'<p class="muted" style="font-size:13px">No emails yet.</p>'}</div>
+      <div class="card" style="margin-top:16px"><h3 style="font-size:15px;margin:0 0 10px"><i class="ti ti-history" style="color:var(--brand2)"></i> Admin audit trail</h3>
+      ${l.audit.length?`<table><thead><tr><th>Actor</th><th>Action</th><th>Target</th><th style="text-align:right">When</th></tr></thead><tbody>${l.audit.map(a=>`<tr><td class="mono">${esc(a.actor)}</td><td><span class="chip ${a.action.includes("impersonate")?"c-gold":"c-mut"}">${esc(a.action)}</span></td><td class="muted">${esc((a.meta&&a.meta.email)||a.targetId||"—")}</td><td style="text-align:right;color:var(--tx3)">${ago(a.createdAt)} ago</td></tr>`).join("")}</tbody></table>`:'<p class="muted" style="font-size:13px">No audit events yet.</p>'}</div>`;
+  },
+  async admins(){
+    const {data}=await api("/god/admins");
+    const canSuper=ME.superadmin;
+    const scopeBoxes=ME.allScopes.map(s=>`<label><input type="checkbox" value="${s}" class="newscope"> ${SCOPE_LABEL[s]||s}</label>`).join("");
+    $("view").innerHTML=`<div class="card"><h3 style="font-size:15px;margin:0 0 10px"><i class="ti ti-shield-half" style="color:var(--brand2)"></i> Platform admins</h3>
+      <table><thead><tr><th>Email</th><th>Role</th><th>Scopes</th><th></th></tr></thead><tbody>${data.map(a=>`<tr>
+        <td class="mono">${esc(a.email)}</td>
+        <td><span class="chip ${a.role==='superadmin'?'c-gold':'c-q'}">${a.role}</span></td>
+        <td>${a.role==='superadmin'?'<span class="muted">all</span>':(a.scopes.map(s=>`<span class="chip c-mut" style="margin:1px">${SCOPE_LABEL[s]||s}</span>`).join("")||'<span class="muted">none</span>')}</td>
+        <td style="text-align:right">${canSuper?`<button class="btn" data-rmadmin="${a.id}" data-email="${esc(a.email)}" style="padding:5px 10px"><i class="ti ti-trash"></i></button>`:''}</td>
+      </tr>`).join("")}</tbody></table></div>
+      ${canSuper?`<div class="card" style="margin-top:16px"><h3 style="font-size:15px;margin:0 0 4px"><i class="ti ti-user-plus" style="color:var(--brand2)"></i> Add an admin</h3>
+        <p class="muted" style="font-size:12.5px;margin:0 0 10px">The person must already have a EMS account. Pick the capabilities to grant.</p>
+        <input id="newadmin" class="in" placeholder="person@company.com" style="max-width:340px">
+        <div class="scope-pick">${scopeBoxes}</div>
+        <label style="font-size:12.5px;display:inline-flex;gap:6px;align-items:center;color:var(--warn)"><input type="checkbox" id="newsuper" style="accent-color:var(--warn)"> Grant full superadmin (all access)</label><br>
+        <button id="addadmin" class="btn pri" style="margin-top:10px;padding:9px 15px"><i class="ti ti-plus"></i> Add admin</button>
+        <span id="addmsg" style="font-size:13px;margin-left:8px"></span>
+      </div>`:'<p class="muted" style="font-size:12.5px;margin-top:10px"><i class="ti ti-info-circle"></i> Only the superadmin can add or change admins.</p>'}`;
+    document.querySelectorAll("[data-rmadmin]").forEach(b=>b.onclick=async()=>{ if(!confirm("Remove admin "+b.dataset.email+"?"))return; try{ await api("/god/admins/"+b.dataset.rmadmin,{method:"DELETE"}); render(); }catch(e){ alert(e.message);} });
+    if($("addadmin")) $("addadmin").onclick=async()=>{
+      const email=$("newadmin").value.trim(); if(!email){$("addmsg").innerHTML='<span style="color:#f87171">Enter an email</span>';return;}
+      const scopes=[...document.querySelectorAll(".newscope:checked")].map(x=>x.value);
+      const role=($("newsuper")&&$("newsuper").checked)?"superadmin":"admin";
+      $("addmsg").textContent="…";
+      try{ await api("/god/admins",{method:"POST",body:JSON.stringify({email,role,scopes})}); render(); }
+      catch(e){ $("addmsg").innerHTML=`<span style="color:#f87171">${esc(e.message)}</span>`; }
+    };
+  },
+  async sim(){
+    const cur=(document.cookie.match(/(?:^|; )um_simplan=([^;]+)/)||[])[1]||"";
+    $("view").innerHTML=`<div class="card"><h3 style="font-size:15px;margin:0 0 4px"><i class="ti ti-switch-3" style="color:var(--brand2)"></i> Account-type simulator</h3>
+      <p class="muted" style="font-size:12.5px;margin:0 0 14px">Preview the dashboard as if you were on any plan — to test limits, gating, and the customer experience. This only changes your own view; it does not modify any account.</p>
+      <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(200px,1fr))">
+      ${TIERS.map(t=>`<div class="tier"><div class="nm">${t.name}</div><div class="pr">${t.price?money(t.price)+'<span style="font-size:13px;color:var(--tx2)">/mo</span>':(t.label||'Free')}</div>
+        <div class="muted" style="font-size:12.5px">${t.quota}</div>
+        <ul style="margin:8px 0 12px;padding-left:16px;font-size:12px;color:var(--tx2)">${t.feat.map(f=>`<li>${f}</li>`).join("")}</ul>
+        <button class="btn ${cur===t.key?'pri':''}" data-sim="${t.key}" style="width:100%;justify-content:center;padding:8px">${cur===t.key?'<i class="ti ti-eye"></i> Previewing':'Preview as '+t.name}</button>
+      </div>`).join("")}
+      </div>
+      ${cur?`<div style="margin-top:12px"><button id="simoff" class="btn" style="padding:8px 13px"><i class="ti ti-x"></i> Stop simulating (${esc(cur)})</button></div>`:""}
+      </div>`;
+    document.querySelectorAll("[data-sim]").forEach(b=>b.onclick=()=>{ document.cookie="um_simplan="+b.dataset.sim+";path=/;max-age=86400"; location.href="/dashboard"; });
+    if($("simoff")) $("simoff").onclick=()=>{ document.cookie="um_simplan=;path=/;max-age=0"; render(); };
+  },
+};
+
+async function boot(){
+  try{
+    ME=await api("/god/me");
+    $("gate").classList.add("hide"); $("app").classList.remove("hide");
+    $("signout").classList.remove("hide"); $("who").classList.remove("hide");
+    $("who").textContent=ME.email||"admin";
+    $("roleChip").innerHTML=(ME.superadmin?'<i class="ti ti-crown"></i> superadmin':'<i class="ti ti-shield"></i> admin');
+    if(!ME.totpEnabled){
+      $("roleChip").insertAdjacentHTML("afterend", `<span class="chip c-fail" id="totpWarn" style="margin-left:8px">TOTP required</span>`);
+    }
+    render();
+  }catch(e){ $("app").classList.add("hide"); $("gate").classList.remove("hide"); $("gateMsg").textContent=e.message; }
+}
+boot();
+</script>
+</body>
+</html>

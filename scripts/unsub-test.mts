@@ -1,0 +1,10 @@
+import { signUnsubscribe, verifyUnsubscribe, unsubscribeUrl } from "../packages/core/src/unsubscribe.js";
+let fail=0; const ok=(n:string,c:boolean)=>{console.log((c?"✓":"✗")+" "+n); if(!c)fail++;};
+const t = signUnsubscribe("proj_123", "User@Acme.com");
+const v = verifyUnsubscribe(t);
+ok("roundtrip projectId", v?.projectId==="proj_123");
+ok("address lowercased", v?.address==="user@acme.com");
+ok("tampered token rejected", verifyUnsubscribe(t.slice(0,-1)+(t.slice(-1)==="a"?"b":"a"))===null);
+ok("garbage rejected", verifyUnsubscribe("nope")===null);
+ok("url shape", unsubscribeUrl("p","a@b.com").includes("/u/"));
+console.log(fail===0?"\nALL PASS":`\n${fail} FAIL`); process.exit(fail?1:0);

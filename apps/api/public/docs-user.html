@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>User Guide — EMS</title>
+<meta name="description" content="Use EMS from the dashboard: add and verify a sending domain, publish DNS automatically in one click, verify email lists, manage suppressions, track sender reputation, and send.">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="stylesheet" href="/assets/site.css">
+</head>
+<body>
+<header class="nav"><div class="wrap">
+  <a class="brand" href="/"><i class="ti ti-mail-fast"></i>EMS</a>
+  <nav><a href="/features">Features</a><a href="/deliverability">Deliverability</a><a href="/pricing">Pricing</a><a href="/docs">Docs</a></nav>
+  <div class="right"><a href="/dashboard" style="color:var(--tx2);font-size:14.5px;font-weight:500">Dashboard</a><a class="btn pri" href="/dashboard">Start free</a></div>
+</div></header>
+
+<section class="hero"><div class="wrap center">
+  <span class="eyebrow"><i class="ti ti-user-heart"></i> User guide</span>
+  <h1>Everything you can do from the dashboard</h1>
+  <p class="muted">No code required. Add your domain, make sure mail lands in the inbox, clean your lists, and send — all from <a href="/dashboard" style="color:var(--brand2)">the dashboard</a>. Building an app instead? See the <a href="/docs/dev" style="color:var(--brand2)">developer docs →</a></p>
+  <div style="margin-top:26px"><a class="btn pri lg" href="/dashboard"><i class="ti ti-login"></i> Open the dashboard</a></div>
+</div></section>
+
+<section class="wrap">
+<div class="doc">
+
+  <span class="eyebrow"><i class="ti ti-list-numbers"></i> Getting started</span>
+  <h2>From sign-up to first send</h2>
+
+  <h3><span class="tag">1</span> Create your account</h3>
+  <p>Go to the <a href="/dashboard">dashboard</a> and create an account. You get an organization and a default project automatically — everything (domains, keys, logs, suppressions) lives inside your project.</p>
+
+  <h3><span class="tag">2</span> Add a sending domain</h3>
+  <p>Under <b>Sending domains</b>, click <b>Add domain</b> and enter the domain you want to send from (e.g. <span class="mono">mail.yourcompany.com</span>). EMS generates the three DNS records that authenticate your mail — <b>DKIM</b>, <b>SPF</b>, and <b>DMARC</b> — so inbox providers trust it.</p>
+  <p class="note"><i class="ti ti-shield-check"></i> These records are how Gmail/Outlook know the mail is really from you. Without them, your mail goes to spam — so this step matters most.</p>
+
+  <h3><span class="tag">3</span> Publish the DNS — one click with a connected DNS provider</h3>
+  <p>Open the domain to see the live <b>propagation monitor</b>. If your domain is on a connected managed-DNS account, hit <b>Publish DNS automatically</b> and all three records are added for you. Otherwise, copy each record into your DNS provider.</p>
+  <p>The monitor then checks every few seconds and flips each record from <span class="mono">pending</span> → <span class="mono">verified</span> as it propagates. When DKIM is verified, the domain is ready to send.</p>
+
+  <h3><span class="tag">4</span> Send a test email</h3>
+  <p>Use the <b>Send a test email</b> card to fire one off and watch it appear in <b>Recent emails</b> with its status (<span class="mono">queued → sent → delivered</span>). That confirms your setup end-to-end.</p>
+
+  <span class="eyebrow" style="margin-top:36px;display:block" id="inbox"><i class="ti ti-inbox"></i> Hosted inbox</span>
+  <h2>Check mail without Google Workspace</h2>
+  <p>After a domain is verified, open it and use the <b>Inboxes</b> tab — or the left-nav <b>Inbox</b> — to create addresses like <span class="mono">hello@yourdomain.com</span>. Read, reply, compose, search, archive, and trash live in the dashboard.</p>
+  <h3><span class="tag">4b</span> Point MX at EMS — without stealing live mail</h3>
+  <p>Mail arrives only when the domain's <b>MX</b> record points at <span class="mono">mail.electronicmailservices.com</span>. If Google Workspace or Microsoft 365 already handles that domain, <b>do not change the apex MX</b> — create inboxes on a subdomain (e.g. <span class="mono">inbox.yourdomain.com</span>) and point only that subdomain's MX here.</p>
+  <h3><span class="tag">4c</span> Forward a copy to Gmail</h3>
+  <p>Inbox → address → <b>Settings</b>. Destinations must confirm via email first. The copy is sent <b>from this mailbox</b> (DKIM-aligned). Keep-a-copy is on by default. Catch-all puts unknown local-parts on that domain into this mailbox. IMAP is not shipped — webmail + forwarding is the Workspace replacement. Apps can subscribe to <span class="mono">email.inbound</span> (see <a href="/docs/dev#inbound" style="color:var(--brand2)">developer docs</a>).</p>
+
+  <span class="eyebrow" style="margin-top:36px;display:block"><i class="ti ti-shield-heart"></i> Protecting your reputation</span>
+  <h2>Send clean, stay in the inbox</h2>
+
+  <h3><span class="tag">5</span> Verify a list before you send</h3>
+  <p>Before importing or mailing a list, paste it (or upload a CSV) into <b>Verify a list</b>. EMS checks every address and labels it:</p>
+  <ul style="color:var(--tx2);font-size:15px;line-height:1.9">
+    <li><b style="color:var(--ok)">Deliverable</b> — looks good to send.</li>
+    <li><b style="color:var(--brand2)">Risky</b> — disposable domain, role address (admin@, info@), on a blacklist, or already suppressed.</li>
+    <li><b style="color:#f87171">Undeliverable</b> — invalid format or a domain that can't receive mail.</li>
+  </ul>
+  <p>Then <b>Download the clean list</b> or <b>Suppress the bad ones</b> in one click — so dead addresses never bounce and drag down your reputation.</p>
+
+  <h3><span class="tag">6</span> Suppressions</h3>
+  <p>The <b>Suppressions</b> list is the set of addresses EMS will never send to. Hard bounces and complaints are added automatically; you can also add or remove addresses yourself. This keeps you from repeatedly mailing people who bounced or unsubscribed.</p>
+
+  <h3><span class="tag">7</span> Watch your reputation</h3>
+  <p>Authenticated domains + clean lists + steady volume = inbox placement. EMS tracks your <b>delivery, bounce, and complaint rates</b> and your sending health over time, with targets based on what Gmail expects (bounces under 2%, complaints under 0.1%). Keep an eye on these as you ramp up volume. Platform status is on <a href="/status" style="color:var(--brand2)">/status</a>.</p>
+  <p class="note"><i class="ti ti-flame"></i> New domain or IP? Warm it up — start with low volume to engaged recipients and increase gradually. Sudden large sends from a cold sender are the fastest way into spam.</p>
+
+  <span class="eyebrow" style="margin-top:36px;display:block"><i class="ti ti-plug"></i> Connecting your app</span>
+  <h2>When you're ready to automate</h2>
+
+  <h3><span class="tag">8</span> Create an API key</h3>
+  <p>Under <b>API keys</b>, click <b>New key</b> — it's shown once, so copy it somewhere safe. Hand it to your developer (or your app's settings) and they can send programmatically. Set up <b>Webhooks</b> too, to get notified when mail is delivered, bounces, or is marked spam.</p>
+  <p>Everything technical — sending from code, the <span class="mono">EMS</span> npm package, verification API, webhooks, and the MCP server for AI agents — is in the <a href="/docs/dev" style="color:var(--brand2)">developer docs</a>.</p>
+
+</div>
+</section>
+
+<section class="cta"><div class="wrap center">
+  <h2>Ready to send</h2>
+  <p class="muted">Add your domain, verify your list, and put your first email through — all from the dashboard.</p>
+  <div style="margin-top:24px"><a class="btn pri lg" href="/dashboard"><i class="ti ti-rocket"></i> Open the dashboard</a> <a class="btn lg" href="/docs/dev"><i class="ti ti-code"></i> Developer docs</a></div>
+</div></section>
+
+<footer><div class="wrap">
+  <div class="cols">
+    <div style="max-width:300px"><a class="brand" href="/"><i class="ti ti-mail-fast"></i>EMS</a><p class="muted" style="margin-top:14px">Application email on infrastructure you control.</p></div>
+    <div><b>Product</b><a href="/features">Features</a><a href="/deliverability">Deliverability</a><a href="/pricing">Pricing</a><a href="/dashboard">Dashboard</a></div>
+    <div><b>Docs</b><a href="/docs/user">User guide</a><a href="/docs/dev">Developer docs</a><a href="/docs/dev">API reference</a></div>
+    <div><b>Company</b><a href="/">About</a><a href="/">Status</a><a href="/">Contact</a></div>
+  </div>
+  <div class="bot"><span>© 2026 EMS</span><span class="muted">Built on independent, self-hosted infrastructure.</span></div>
+</div></footer>
+</body>
+</html>

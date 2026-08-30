@@ -1,0 +1,42 @@
+{
+  "name": "@ems/sdk",
+  "version": "0.3.0",
+  "description": "Official SDK for Electronic Mail Services \u2014 cold outreach campaigns, mailbox pools, and deliverability telemetry.",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./compat": {
+      "types": "./dist/compat.d.ts",
+      "import": "./dist/compat.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": [
+    "email",
+    "transactional",
+    "mail",
+    "verification",
+    "deliverability",
+    "ems"
+  ],
+  "homepage": "https://electronicmailservices.com",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.0"
+  }
+}

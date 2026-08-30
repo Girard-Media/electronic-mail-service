@@ -1,0 +1,4 @@
+# Keep apps/web/public/ in git even when it has no static assets yet.
+# The Dockerfile does `COPY apps/web/public ...` for the standalone runner;
+# Docker COPY fails if the source dir is absent. Do not delete this file
+# unless real assets live here. (Next app/ conventions handle favicon/icons.)

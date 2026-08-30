@@ -1,0 +1,1701 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dashboard — EMS</title>
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="stylesheet" href="/assets/site.css">
+<style>
+/* dashboard app shell: left nav + content */
+.shell{max-width:1200px;margin:0 auto;display:flex;align-items:flex-start;gap:0}
+.side{flex:0 0 208px;width:208px;padding:20px 12px;position:sticky;top:0}
+.side nav{display:flex;flex-direction:column;gap:2px}
+.nav-i{display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:9px;color:var(--tx2);font-size:14px;font-weight:500;cursor:pointer;user-select:none}
+.nav-i:hover{background:var(--surface2);color:var(--tx)}
+.nav-i.active{background:var(--brandsoft);color:var(--tx)}
+.nav-i i{font-size:18px;color:var(--brand2);width:18px;text-align:center}
+.main{flex:1;min-width:0;padding:22px 24px;border-left:1px solid var(--line)}
+.view{display:none}
+.view.active{display:block;animation:fade .18s ease}
+@keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+@media(max-width:760px){
+  .shell{flex-direction:column}
+  .side{position:static;width:100%;flex-basis:auto;padding:10px 8px 0}
+  .side nav{flex-direction:row;overflow-x:auto;gap:4px}
+  .nav-i{padding:8px 11px;white-space:nowrap}
+  .main{border-left:0;border-top:1px solid var(--line);padding:18px 14px;min-width:0}
+  .main .formgrid{grid-template-columns:1fr} .main .formgrid .full{grid-column:1}
+  .main .tpl-grid{grid-template-columns:1fr}
+  .keyrow{flex-wrap:wrap} .keyrow .mono{word-break:break-all;min-width:0}
+}
+.bar{display:flex;align-items:center;gap:12px;margin-bottom:18px}
+.gate{max-width:420px;margin:7vh auto}
+.in{width:100%;background:var(--bg);border:1px solid var(--line2);color:var(--tx);border-radius:9px;padding:11px 13px;font-size:14px;font-family:inherit;outline:none}
+.in:focus{border-color:var(--brand);box-shadow:0 0 0 3px rgba(109,94,252,.18)}
+.lbl{font-size:12px;color:var(--tx2);margin:0 0 5px;display:block}
+.field{margin-bottom:12px}
+.row3{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+.mc{background:var(--surface2);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+.mc .l{font-size:12px;color:var(--tx2)} .mc .n{font-size:26px;font-weight:700;letter-spacing:-.5px;margin-top:4px}
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+th{text-align:left;color:var(--tx2);font-weight:500;font-size:12px;padding:8px 10px;border-bottom:1px solid var(--line)}
+td{padding:10px;border-bottom:1px solid var(--line)}
+.chip{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;padding:2px 9px;border-radius:999px;font-weight:500}
+.c-sent{background:var(--okbg);color:var(--ok)} .c-fail{background:rgba(248,113,113,.13);color:#f87171}
+.c-q{background:rgba(109,94,252,.16);color:var(--brand2)} .c-mut{background:#1a2230;color:var(--tx2)}
+.c-gold{background:rgba(243,178,87,.15);color:var(--warn)}
+.hide{display:none!important} .formgrid{display:grid;grid-template-columns:1fr 1fr;gap:11px} .formgrid .full{grid-column:1/3}
+/* Template editor: a compact editor column + a wide, flexible preview (so the 600px email isn't squished). min-width:0 stops the form content forcing the column wide. */
+.tpl-grid{grid-template-columns:minmax(0,340px) minmax(0,1fr)} .tpl-grid>div{min-width:0}
+.toast{margin-top:10px;font-size:13px} .tabs{display:flex;gap:6px;margin-bottom:16px}
+.tab{flex:1;text-align:center;padding:8px;border:1px solid var(--line);border-radius:8px;cursor:pointer;color:var(--tx2);font-size:14px}
+.tab.on{background:var(--brandsoft);border-color:var(--brand);color:var(--tx)}
+.keyrow{display:flex;align-items:center;gap:10px;padding:9px 0;border-top:1px solid var(--line);font-size:13px}
+.inbox-shell{display:grid;grid-template-columns:240px 1fr;gap:0;border:1px solid var(--line);border-radius:12px;overflow:hidden;min-height:520px;background:var(--surface)}
+.inbox-list{border-right:1px solid var(--line);background:var(--surface2);overflow:auto}
+.inbox-main{min-width:0;padding:12px 14px}
+.inbox-mb{display:flex;align-items:center;gap:8px;padding:11px 12px;cursor:pointer;border-bottom:1px solid var(--line);font-size:13px}
+.inbox-mb:hover{background:var(--surface)}
+.inbox-mb.on{background:var(--brandsoft)}
+@media(max-width:760px){.inbox-shell{grid-template-columns:1fr;min-height:0}.inbox-list{border-right:0;border-bottom:1px solid var(--line);max-height:180px}}
+/* sending domains + propagation monitor */
+.dom{border-top:1px solid var(--line)}
+.dom-row{display:flex;align-items:center;gap:10px;padding:13px 0;cursor:pointer}
+.dom-row:hover .dom-name{color:var(--brand2)}
+.dom-name{font-family:"JetBrains Mono",monospace;font-size:13.5px}
+.dom-panel{padding:2px 0 14px}
+/* .prog/.rec/.dot/.spin/.pulsing + keyframes now live in site.css (shared with god.html) */
+.kv{margin-top:8px;font-size:11px;color:var(--tx3);text-transform:uppercase;letter-spacing:.05em}
+.copybox{display:flex;align-items:center;gap:8px;background:#070a10;border:1px solid var(--line);border-radius:7px;padding:6px 9px;margin-top:3px}
+.copybox code{font-family:"JetBrains Mono",monospace;font-size:11.5px;color:#aeb6c7;white-space:nowrap;overflow-x:auto;flex:1}
+.copybtn{flex:0 0 auto;border:1px solid var(--line2);background:transparent;color:var(--tx2);border-radius:6px;padding:3px 8px;cursor:pointer;font-size:11px;font-family:inherit}
+.copybtn:hover{color:var(--tx);border-color:#36405a}
+/* modal */
+.ov{position:fixed;inset:0;background:rgba(5,8,13,.66);backdrop-filter:blur(5px);display:flex;align-items:center;justify-content:center;z-index:200;padding:20px;opacity:0;pointer-events:none;transition:opacity .16s}
+.ov.show{opacity:1;pointer-events:auto}
+.modal{background:var(--surface);border:1px solid var(--line2);border-radius:15px;padding:24px;width:100%;max-width:440px;box-shadow:0 24px 70px rgba(0,0,0,.55);transform:translateY(10px) scale(.985);transition:transform .16s}
+.ov.show .modal{transform:none}
+.modal h3{font-size:17px;font-weight:600;margin:0 0 5px;display:flex;align-items:center;gap:9px}
+.modal .sub{font-size:13px;color:var(--tx2);margin:0 0 16px;line-height:1.5}
+.modal .acts{display:flex;gap:10px;justify-content:flex-end;margin-top:20px}
+.modal .merr{color:#f87171;font-size:12.5px;margin-top:10px;min-height:1px}
+</style>
+</head>
+<body>
+<header class="nav"><div class="wrap">
+  <a class="brand" href="https://electronicmailservices.com"><i class="ti ti-mail-fast"></i>EMS</a>
+  <nav><a href="/features">Features</a><a href="/deliverability">Deliverability</a><a href="/pricing">Pricing</a><a href="/docs">Docs</a></nav>
+  <div class="right"><div id="orgsw" class="hide" style="position:relative"><button id="orgswBtn" class="btn" style="padding:7px 12px;gap:7px"><i class="ti ti-building" style="color:var(--brand2)"></i><span id="orgswName" style="max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Account</span><i class="ti ti-selector" style="font-size:14px;color:var(--tx3)"></i></button><div id="orgswMenu" class="hide" style="position:absolute;top:calc(100% + 6px);right:0;min-width:250px;background:var(--surface);border:1px solid var(--line);border-radius:11px;box-shadow:0 10px 34px rgba(0,0,0,.28);padding:6px;z-index:60"></div></div><a id="godlink" href="/god" class="btn hide" style="padding:7px 12px;border-color:var(--warn);color:var(--warn)"><i class="ti ti-bolt"></i> God Mode</a><span id="who" class="chip c-mut hide"></span><button id="signout" class="btn hide"><i class="ti ti-logout"></i> Sign out</button></div>
+</div></header>
+
+<!-- auth gate -->
+<div id="gate" class="gate hide">
+  <div class="card">
+    <div id="inviteBanner" class="hide" style="background:var(--brandsoft);border:1px solid var(--brand);border-radius:9px;padding:10px 12px;margin-bottom:14px;font-size:13px;line-height:1.5"></div>
+    <div class="tabs"><div class="tab on" data-mode="login">Sign in</div><div class="tab" data-mode="signup">Create account</div></div>
+    <div class="field" id="nameField" style="display:none"><label class="lbl">Name / company</label><input id="a_name" class="in" placeholder="Acme Inc"></div>
+    <div class="field"><label class="lbl">Email</label><input id="a_email" class="in" type="email" placeholder="you@company.com" autocomplete="email"></div>
+    <div class="field"><label class="lbl">Password</label><input id="a_pw" class="in" type="password" placeholder="••••••••" autocomplete="current-password"></div>
+    <button id="a_submit" class="btn pri" style="width:100%;justify-content:center"><i class="ti ti-login"></i> <span id="a_btnlabel">Sign in</span></button>
+    <div style="text-align:center;margin-top:10px"><a id="forgotLink" style="font-size:12.5px;color:var(--tx2);cursor:pointer">Forgot your password?</a></div>
+    <div id="a_msg" class="toast muted"></div>
+  </div>
+</div>
+
+<!-- password reset (reached via the emailed ?reset= link) -->
+<div id="resetView" class="gate hide">
+  <div class="card">
+    <h3 style="font-size:17px;font-weight:600;margin:0 0 14px"><i class="ti ti-lock" style="color:var(--brand2)"></i> Set a new password</h3>
+    <div class="field"><label class="lbl">New password</label><input id="r_pw" class="in" type="password" placeholder="At least 8 characters" autocomplete="new-password"></div>
+    <button id="r_submit" class="btn pri" style="width:100%;justify-content:center"><i class="ti ti-check"></i> Update password</button>
+    <div id="r_msg" class="toast muted"></div>
+  </div>
+</div>
+
+<!-- app -->
+<div id="banner"></div>
+<div id="ov" class="ov hide"><div class="modal">
+  <h3 id="m_title"></h3>
+  <p id="m_sub" class="sub"></p>
+  <div id="m_fields"></div>
+  <div id="m_err" class="merr"></div>
+  <div class="acts"><button id="m_cancel" class="btn">Cancel</button><button id="m_ok" class="btn pri"></button></div>
+</div></div>
+<div id="app" class="shell hide">
+  <aside class="side"><nav>
+    <a class="nav-i active" data-view="overview"><i class="ti ti-layout-dashboard"></i> Overview</a>
+    <a class="nav-i" data-view="inbox"><i class="ti ti-inbox"></i> Inbox <span id="inboxBadge" class="hide" style="margin-left:auto;background:var(--brand);color:#fff;font-size:10px;padding:1px 6px;border-radius:999px">0</span></a>
+    <a class="nav-i" data-view="send"><i class="ti ti-send"></i> Send</a>
+    <a class="nav-i" data-view="templates"><i class="ti ti-template"></i> Templates</a>
+    <a class="nav-i" data-view="domains"><i class="ti ti-world"></i> Domains</a>
+    <a class="nav-i" data-view="accounts"><i class="ti ti-mail-cog"></i> Connected</a>
+    <a class="nav-i" data-view="keys"><i class="ti ti-key"></i> API keys</a>
+    <a class="nav-i" data-view="webhooks"><i class="ti ti-webhook"></i> Webhooks</a>
+    <a class="nav-i" data-view="verify"><i class="ti ti-list-check"></i> Verify</a>
+    <a class="nav-i" data-view="suppressions"><i class="ti ti-ban"></i> Suppressions</a>
+    <a class="nav-i" data-view="logs"><i class="ti ti-list-search"></i> Logs</a>
+    <a class="nav-i hide" data-view="subaccounts" id="nav-subaccounts"><i class="ti ti-building-store"></i> Sub-accounts</a>
+    <a class="nav-i" data-view="settings"><i class="ti ti-user-circle"></i> Account</a>
+  </nav></aside>
+  <main class="main">
+  <div class="bar">
+    <h1 id="viewTitle" style="font-size:20px;font-weight:600;margin:0">Overview</h1>
+    <span class="chip c-mut" id="planChipTop" style="text-transform:capitalize">—</span>
+    <button id="refresh" class="btn" style="margin-left:auto"><i class="ti ti-refresh"></i> Refresh</button>
+  </div>
+  <section class="view" id="view-inbox">
+    <p class="muted" style="font-size:13px;margin:0 0 12px">Mail for addresses on your verified domains. Forward a copy to Gmail if you want — it goes out from this address so it actually lands.</p>
+    <div class="inbox-shell" id="inboxApp">
+      <div class="inbox-list" id="inboxMailboxes"><div class="muted" style="padding:14px;font-size:13px">Loading…</div></div>
+      <div class="inbox-main" id="inboxMain"><p class="muted" style="font-size:13px;padding:8px">Select an inbox.</p></div>
+    </div>
+  </section>
+  <section class="view active" id="view-overview">
+    <div class="row3" id="metrics"></div>
+    <div class="card" id="gscard" style="margin-top:18px;display:none">
+      <h3 style="font-size:15px;font-weight:600;margin:0 0 4px"><i class="ti ti-rocket" style="color:var(--brand2)"></i> Get started</h3>
+      <p class="muted" style="font-size:12px;margin:0 0 10px">A few steps to your first delivered email.</p>
+      <div id="getstarted"></div>
+    </div>
+    <div class="card" style="margin-top:18px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+        <h3 style="font-size:15px;font-weight:600;margin:0"><i class="ti ti-activity" style="color:var(--brand2)"></i> Recent activity</h3>
+        <a class="nav-i" data-view="logs" style="font-size:12.5px;padding:4px 8px">View all logs →</a>
+      </div>
+      <div id="recent"></div>
+    </div>
+  </section>
+  <section class="view" id="view-send">
+  <div class="card" style="margin-top:18px">
+    <h3 style="font-size:15px;font-weight:600;margin:0 0 12px"><i class="ti ti-send" style="color:var(--brand2)"></i> Send a test email</h3>
+    <div class="formgrid">
+      <div><label class="lbl">From</label><input id="f_from" class="in" value="hello@electronicmailservices.com"></div>
+      <div><label class="lbl">To</label><input id="f_to" class="in" value="you@example.com"></div>
+      <div class="full"><label class="lbl">Subject</label><input id="f_subject" class="in" value="Hello from EMS"></div>
+      <div class="full"><label class="lbl">HTML</label><input id="f_html" class="in" value="<b>It works.</b>"></div>
+    </div>
+    <div style="display:flex;gap:10px;align-items:center;margin-top:12px">
+      <button id="send" class="btn pri"><i class="ti ti-send"></i> Send</button><span id="sendMsg" class="toast muted"></span>
+    </div>
+  </div>
+  </section>
+  <section class="view" id="view-templates">
+    <div id="tpl_list_mode">
+      <div class="card" style="margin-top:18px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+          <h3 style="font-size:15px;font-weight:600;margin:0"><i class="ti ti-template" style="color:var(--brand2)"></i> Email templates</h3>
+          <button id="tpl_new" class="btn"><i class="ti ti-plus"></i> New template</button>
+        </div>
+        <p class="muted" style="font-size:12px;margin:0 0 8px">Design reusable emails with blocks, then send with <span class="mono">template_id</span> + <span class="mono">{{variables}}</span>. Your brand is available as <span class="mono">{{organization.name}}</span>.</p>
+        <div id="tpl_list"></div>
+      </div>
+    </div>
+    <div id="tpl_edit_mode" class="hide">
+      <div class="card" style="margin-top:18px">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap">
+          <button id="tpl_back" class="btn" style="padding:6px 10px"><i class="ti ti-arrow-left"></i> Back</button>
+          <input id="tpl_name" class="in" placeholder="Template name" style="max-width:240px">
+          <button id="tpl_save" class="btn pri" style="margin-left:auto"><i class="ti ti-device-floppy"></i> Save</button>
+          <span id="tpl_msg" class="toast" style="margin-top:0"></span>
+        </div>
+        <label class="lbl">Subject</label><input id="tpl_subject" class="in" placeholder="Subject — supports {{variables}}">
+        <div class="tpl-grid" style="display:grid;gap:16px;margin-top:14px">
+          <div>
+            <div class="lbl" style="margin-bottom:6px">Add block</div>
+            <div id="tpl_palette" style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px"></div>
+            <div id="tpl_blocks"></div>
+            <div id="tpl_props" style="margin-top:12px"></div>
+          </div>
+          <div style="position:sticky;top:12px;align-self:start">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px">
+              <div class="lbl" style="margin:0">Live preview <span class="muted" style="font-weight:400">— 600px email width</span></div>
+              <button id="tpl_fullpreview" class="btn" style="padding:3px 9px;font-size:12px"><i class="ti ti-arrows-diagonal"></i> Full width</button>
+            </div>
+            <iframe id="tpl_preview" sandbox style="width:100%;height:600px;border:1px solid var(--line);border-radius:10px;background:#fff"></iframe>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section class="view" id="view-domains">
+  <div class="card" style="margin-top:18px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+      <h3 style="font-size:15px;font-weight:600;margin:0"><i class="ti ti-world" style="color:var(--brand2)"></i> Sending domains</h3>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button id="importEsp" class="btn"><i class="ti ti-transfer-in"></i> Import from Resend</button>
+        <button id="syncDomains" class="btn"><i class="ti ti-cloud-download"></i> Sync from Cloudflare</button>
+        <button id="verifyAll" class="btn"><i class="ti ti-rosette-discount-check"></i> Verify all</button>
+        <button id="newDomain" class="btn"><i class="ti ti-plus"></i> Add domain</button>
+      </div>
+    </div>
+    <div id="dnsconn" style="font-size:12.5px;margin-bottom:8px"></div>
+    <div id="domains"></div>
+  </div>
+  </section>
+  <section class="view" id="view-accounts">
+  <div class="card" style="margin-top:18px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:8px">
+      <h3 style="font-size:15px;font-weight:600;margin:0"><i class="ti ti-mail-cog" style="color:var(--brand2)"></i> Sending accounts</h3>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button id="connGoogle" class="btn"><i class="ti ti-brand-google"></i> Connect Gmail</button>
+        <button id="connMs" class="btn"><i class="ti ti-brand-windows"></i> Connect Outlook</button>
+      </div>
+    </div>
+    <p class="muted" style="font-size:12px;margin:0 0 8px">Send from a mailbox you connect — mail goes out through your own Gmail or Outlook account, no domain setup needed.</p>
+    <div id="accounts"></div>
+  </div>
+  </section>
+  <section class="view" id="view-keys">
+  <div class="card" style="margin-top:18px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+      <h3 style="font-size:15px;font-weight:600;margin:0"><i class="ti ti-key" style="color:var(--brand2)"></i> API keys</h3>
+      <button id="newKey" class="btn"><i class="ti ti-plus"></i> New key</button>
+    </div>
+    <div id="newKeyOut" class="toast hide"></div>
+    <div id="keys"></div>
+  </div>
+  </section>
+  <section class="view" id="view-webhooks">
+  <div class="card" style="margin-top:18px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+      <h3 style="font-size:15px;font-weight:600;margin:0"><i class="ti ti-webhook" style="color:var(--brand2)"></i> Webhooks</h3>
+      <button id="newHook" class="btn"><i class="ti ti-plus"></i> Add endpoint</button>
+    </div>
+    <div id="newHookOut" class="toast hide"></div>
+    <div id="hooks"></div>
+  </div>
+  </section>
+  <section class="view" id="view-verify">
+  <div class="card" style="margin-top:18px">
+    <h3 style="font-size:15px;font-weight:600;margin:0 0 4px"><i class="ti ti-list-check" style="color:var(--brand2)"></i> Verify a list</h3>
+    <p class="muted" style="font-size:12px;margin:0 0 8px">Check addresses before you send — flags invalid, dead-domain, disposable, role-based, blacklisted (industry domain blocklists), and already-suppressed addresses, so you don't bounce or hit spam traps.</p>
+    <textarea id="vlist" class="in" rows="4" placeholder="Paste emails (one per line or comma-separated)…" style="resize:vertical;font-family:'JetBrains Mono',monospace;font-size:12.5px"></textarea>
+    <div style="display:flex;gap:10px;align-items:center;margin-top:8px;flex-wrap:wrap">
+      <label class="btn" style="padding:8px 12px;cursor:pointer"><i class="ti ti-upload"></i> Upload CSV<input type="file" id="vfile" accept=".csv,.txt" style="display:none"></label>
+      <button id="vrun" class="btn pri" style="margin-left:auto"><i class="ti ti-checks"></i> Verify</button>
+    </div>
+    <div id="vout" style="margin-top:12px"></div>
+  </div>
+  </section>
+  <section class="view" id="view-suppressions">
+  <div class="card" style="margin-top:18px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+      <h3 style="font-size:15px;font-weight:600;margin:0"><i class="ti ti-ban" style="color:var(--brand2)"></i> Suppressions</h3>
+      <button id="newSupp" class="btn"><i class="ti ti-plus"></i> Add</button>
+    </div>
+    <p class="muted" style="font-size:12px;margin:0 0 6px">Addresses here are never sent to — auto-added on hard bounces & complaints to protect your sending reputation.</p>
+    <div id="supps"></div>
+  </div>
+  </section>
+  <section class="view" id="view-logs">
+  <div class="card" style="margin-top:18px">
+    <h3 style="font-size:15px;font-weight:600;margin:0 0 4px"><i class="ti ti-list-search" style="color:var(--brand2)"></i> Recent emails</h3>
+    <table><thead><tr><th>To</th><th>Subject</th><th>Status</th><th style="text-align:right">When</th></tr></thead>
+      <tbody id="logs"><tr><td colspan="4" class="muted">Loading…</td></tr></tbody>
+    </table>
+  </div>
+  </section>
+  <section class="view" id="view-subaccounts">
+  <div class="card" style="margin-top:18px">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px">
+      <h3 style="font-size:15px;font-weight:600;margin:0"><i class="ti ti-building-store" style="color:var(--brand2)"></i> Sub-accounts <span class="chip c-q" style="font-size:11px">white-label</span></h3>
+      <button id="newSubacct" class="btn pri" style="margin-left:auto;padding:5px 12px;font-size:13px;display:none"><i class="ti ti-plus"></i> New sub-account</button>
+    </div>
+    <p class="muted" style="font-size:12px;margin:0 0 12px">Client accounts you manage. Each is a fully isolated tenant — its own domains, sending, mailboxes, and usage. Open one to manage it as that account.</p>
+    <div id="subacctbox"><span class="muted" style="font-size:13px">Loading…</span></div>
+  </div>
+  <div class="card" style="margin-top:18px">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;flex-wrap:wrap">
+      <h3 style="font-size:15px;font-weight:600;margin:0"><i class="ti ti-receipt" style="color:var(--brand2)"></i> Billing rollup</h3>
+      <span id="billPeriod" class="chip c-mut" style="font-size:11px"></span>
+      <span style="margin-left:auto;font-size:13px;font-weight:600" id="billTotal"></span>
+    </div>
+    <p class="muted" style="font-size:12px;margin:0 0 12px">This month's usage and cost across your client accounts — ready to invoice. Charging is configured separately.</p>
+    <div id="billbox"><span class="muted" style="font-size:13px">Loading…</span></div>
+  </div>
+  <div class="card" style="margin-top:18px">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;flex-wrap:wrap">
+      <h3 style="font-size:15px;font-weight:600;margin:0"><i class="ti ti-credit-card" style="color:var(--brand2)"></i> Payments</h3>
+      <span id="payStatus" style="font-size:12px"></span>
+    </div>
+    <p class="muted" style="font-size:12px;margin:0 0 12px">Connect your own Stripe account to charge clients for their usage — funds settle straight to you (Stripe Connect).</p>
+    <div id="paybox"><span class="muted" style="font-size:13px">Loading…</span></div>
+  </div>
+  <div class="card" style="margin-top:18px">
+    <h3 style="font-size:14px;font-weight:600;margin:0 0 4px"><i class="ti ti-history" style="color:var(--brand2)"></i> Access log</h3>
+    <p class="muted" style="font-size:12px;margin:0 0 12px">A record of when your team opened or created a client account — kept for reseller compliance.</p>
+    <div id="subauditbox"><span class="muted" style="font-size:13px">Loading…</span></div>
+  </div>
+  </section>
+
+  <section class="view" id="view-settings">
+  <div class="card" style="margin-top:18px">
+    <h3 style="font-size:15px;font-weight:600;margin:0 0 12px"><i class="ti ti-user" style="color:var(--brand2)"></i> Account</h3>
+    <div class="keyrow"><span class="muted" style="flex:0 0 120px">Email</span><span class="mono" id="set_email">—</span><span id="set_verify" style="margin-left:auto"></span></div>
+    <div class="keyrow"><span class="muted" style="flex:0 0 120px">Name</span><span id="set_name">—</span></div>
+    <div class="keyrow"><span class="muted" style="flex:0 0 120px">Member since</span><span id="set_since">—</span></div>
+  </div>
+  <div class="card" style="margin-top:18px">
+    <h3 style="font-size:15px;font-weight:600;margin:0 0 10px"><i class="ti ti-rosette" style="color:var(--brand2)"></i> Plan &amp; usage</h3>
+    <div id="planbox"><span class="muted" style="font-size:13px">Loading…</span></div>
+  </div>
+  <div class="card" style="margin-top:18px" id="teamcard">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px">
+      <h3 style="font-size:15px;font-weight:600;margin:0"><i class="ti ti-users" style="color:var(--brand2)"></i> Team</h3>
+      <span id="team_seats" class="chip c-mut" style="font-size:11px"></span>
+      <button id="team_invite" class="btn pri" style="margin-left:auto;padding:5px 12px;font-size:13px;display:none"><i class="ti ti-user-plus"></i> Invite</button>
+    </div>
+    <p class="muted" style="font-size:12px;margin:0 0 12px">People with access to this account. Roles control what each member can do.</p>
+    <div id="teambox"><span class="muted" style="font-size:13px">Loading…</span></div>
+  </div>
+  <div class="card" style="margin-top:18px">
+    <h3 style="font-size:15px;font-weight:600;margin:0 0 4px"><i class="ti ti-palette" style="color:var(--brand2)"></i> Branding <span class="chip c-q" style="font-size:11px">white-label</span></h3>
+    <p class="muted" style="font-size:12px;margin:0 0 12px">Make the console wear your brand. Leave blank for EMS defaults.</p>
+    <div class="formgrid">
+      <div><label class="lbl">Brand colour</label><input id="br_color" class="in" type="text" placeholder="#6d5efc" maxlength="7"></div>
+      <div><label class="lbl">Logo URL (https)</label><input id="br_logo" class="in" type="text" placeholder="https://…/logo.png"></div>
+    </div>
+    <label style="display:flex;align-items:center;gap:8px;margin-top:12px;font-size:13px;cursor:pointer"><input type="checkbox" id="br_powered"> Show “Powered by EMS” on customer-facing pages</label>
+    <div style="display:flex;gap:10px;align-items:center;margin-top:12px">
+      <button id="br_save" class="btn pri"><i class="ti ti-check"></i> Save branding</button>
+      <span id="br_msg" class="toast" style="margin-top:0"></span>
+    </div>
+  </div>
+  <div class="card" style="margin-top:18px">
+    <h3 style="font-size:15px;font-weight:600;margin:0 0 4px"><i class="ti ti-lock" style="color:var(--brand2)"></i> Change password</h3>
+    <p class="muted" style="font-size:12px;margin:0 0 12px">Updating your password signs you out of every other session.</p>
+    <div class="formgrid">
+      <div class="full"><label class="lbl">Current password</label><input id="cpw_cur" class="in" type="password" autocomplete="current-password"></div>
+      <div><label class="lbl">New password</label><input id="cpw_new" class="in" type="password" autocomplete="new-password" placeholder="At least 8 characters"></div>
+      <div><label class="lbl">Confirm new password</label><input id="cpw_confirm" class="in" type="password" autocomplete="new-password"></div>
+    </div>
+    <div style="display:flex;gap:10px;align-items:center;margin-top:12px">
+      <button id="cpw_submit" class="btn pri"><i class="ti ti-lock-check"></i> Update password</button>
+      <span id="cpw_msg" class="toast" style="margin-top:0"></span>
+    </div>
+  </div>
+  <div class="card" style="margin-top:18px">
+    <h3 style="font-size:15px;font-weight:600;margin:0 0 4px"><i class="ti ti-devices" style="color:var(--brand2)"></i> Sessions</h3>
+    <p class="muted" style="font-size:12px;margin:0 0 12px">Sign out of every other device — useful after using a shared or lost computer. You'll stay signed in here.</p>
+    <button id="signoutOthers" class="btn"><i class="ti ti-logout"></i> Sign out all other sessions</button>
+  </div>
+  <div class="card" style="margin-top:18px" id="privcard">
+    <h3 style="font-size:15px;font-weight:600;margin:0 0 4px"><i class="ti ti-shield-lock" style="color:var(--brand2)"></i> Privacy</h3>
+    <p class="muted" style="font-size:12px;margin:0 0 12px">Download a JSON copy of the account data we store about you, or delete your account. Organizations you solely own are deleted with you; organizations with other members stay until you transfer ownership.</p>
+    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+      <button id="priv_export" class="btn"><i class="ti ti-download"></i> Download my data</button>
+      <button id="priv_delete" class="btn" style="border-color:#f87171;color:#f87171"><i class="ti ti-trash"></i> Delete account</button>
+      <span id="priv_msg" class="toast" style="margin-top:0"></span>
+    </div>
+  </div>
+  </section>
+  </main>
+</div>
+
+<script>
+const $ = (id) => document.getElementById(id);
+let mode = "login";
+let pendingInvite = null;
+let ME = null;
+const canDo = (p) => !!(ME && Array.isArray(ME.permissions) && ME.permissions.includes(p));
+function applyRoleGates(){
+  const show = (id, on) => { const el = $(id); if (el) el.classList.toggle("hide", !on); };
+  show("send", canDo("email:send"));
+  show("newKey", canDo("key:write"));
+  show("newDomain", canDo("domain:write"));
+  show("importEsp", canDo("domain:write"));
+  show("syncDomains", canDo("domain:write"));
+  show("verifyAll", canDo("domain:write"));
+  show("newHook", canDo("webhook:write"));
+  show("newSupp", canDo("suppression:write"));
+  show("tpl_new", canDo("template:write"));
+  show("tpl_save", canDo("template:write"));
+  show("connGoogle", canDo("mailbox:write"));
+  show("connMs", canDo("mailbox:write"));
+  document.querySelectorAll('[data-view="send"]').forEach((el) => el.classList.toggle("hide", !canDo("email:send")));
+}
+async function api(path, opts={}) {
+  const r = await fetch(path, { credentials:"include", ...opts, headers:{ "Content-Type":"application/json", ...(opts.headers||{}) } });
+  if (!r.ok) throw new Error((await r.json().catch(()=>({}))).message || ("HTTP "+r.status));
+  return r.status===204 ? {} : r.json();
+}
+// Mirrors CANCELABLE_STATUSES in packages/core/src/lifecycle.ts.
+const CANCELABLE_STATUSES=["queued","scheduled"];
+function chip(s){const m={sent:"c-sent",delivered:"c-sent",failed:"c-fail",bounced:"c-fail",complained:"c-fail",queued:"c-q",scheduled:"c-q",opened:"c-q",clicked:"c-q"};return `<span class="chip ${m[s]||"c-mut"}">${s}</span>`;}
+function ago(t){const d=(Date.now()-new Date(t).getTime())/1000;if(d<60)return Math.round(d)+"s ago";if(d<3600)return Math.round(d/60)+"m ago";if(d<86400)return Math.round(d/3600)+"h ago";return Math.round(d/86400)+"d ago";}
+
+document.querySelectorAll(".tab").forEach(t=>t.onclick=()=>{
+  mode=t.dataset.mode; document.querySelectorAll(".tab").forEach(x=>x.classList.toggle("on",x===t));
+  $("nameField").style.display = mode==="signup"?"block":"none";
+  $("a_btnlabel").textContent = mode==="signup"?"Create account":"Sign in";
+  $("a_msg").textContent="";
+});
+
+$("a_submit").onclick = async () => {
+  $("a_msg").textContent="…";
+  try {
+    const body = { email:$("a_email").value.trim(), password:$("a_pw").value };
+    if (mode==="signup" && $("a_name").value.trim()) body.name=$("a_name").value.trim();
+    if (mode==="signup" && pendingInvite) body.inviteToken=pendingInvite;
+    await api("/auth/"+mode, { method:"POST", body:JSON.stringify(body) });
+    // Signing up with an invite joins the org server-side; a returning user logs in
+    // then accepts. Either way, drop the token from the URL before booting.
+    if (mode==="login" && pendingInvite){ try{ await api("/auth/accept-invite",{method:"POST",body:JSON.stringify({token:pendingInvite})}); }catch{} }
+    pendingInvite=null; history.replaceState({},"",location.pathname);
+    boot();
+  } catch(e){ $("a_msg").innerHTML=`<span style="color:#f87171">${e.message}</span>`; }
+};
+function setupInviteGate(token, invite){
+  pendingInvite=token;
+  const b=$("inviteBanner");
+  if(b){ b.classList.remove("hide"); b.innerHTML=`<i class="ti ti-mail-share" style="color:var(--brand2)"></i> You've been invited to join <b>${esc2(invite.orgName)}</b> as <b>${esc2(invite.role)}</b>. ${invite.hasAccount?'Sign in to accept.':'Create your account to accept.'}`; }
+  if($("a_email")){ $("a_email").value=invite.email||""; $("a_email").readOnly=true; }
+  const want = invite.hasAccount ? 'login' : 'signup';
+  document.querySelectorAll(".tab").forEach(t=>t.classList.toggle("on", t.dataset.mode===want));
+  mode=want;
+  $("nameField").style.display = mode==="signup"?"block":"none";
+  $("a_btnlabel").textContent = mode==="signup"?"Create account":"Sign in";
+}
+$("signout").onclick = async () => { await api("/auth/logout",{method:"POST"}).catch(()=>{}); location.reload(); };
+$("refresh").onclick = () => load().catch(e=>alert(e.message));
+$("send").onclick = async () => {
+  $("sendMsg").textContent="Sending…";
+  try { const r=await api("/app/test-email",{method:"POST",body:JSON.stringify({from:$("f_from").value,to:$("f_to").value,subject:$("f_subject").value,html:$("f_html").value})});
+    $("sendMsg").innerHTML=`<span style="color:var(--ok)">Queued ${r.id}</span>`; setTimeout(load,1500);
+  } catch(e){ $("sendMsg").innerHTML=`<span style="color:#f87171">${e.message}</span>`; }
+};
+// Reusable on-brand modal. onSubmit(values) runs on confirm; throw to show an
+// inline error and keep it open; resolve to close. Esc/backdrop cancel, Enter submits.
+function openModal({ title, icon, sub, fields, submitLabel, onSubmit }){
+  const ov=$("ov");
+  $("m_title").innerHTML=(icon?`<i class="ti ${icon}" style="color:var(--brand2)"></i> `:"")+esc(title);
+  $("m_sub").textContent=sub||""; $("m_sub").style.display=sub?"block":"none";
+  $("m_err").textContent="";
+  $("m_fields").innerHTML=fields.map(f=>{
+    const lbl=f.label?`<label class="lbl" style="display:block;margin-bottom:4px">${esc(f.label)}</label>`:"";
+    const hint=f.hint?`<div class="muted" style="font-size:11.5px;margin-top:4px">${esc(f.hint)}</div>`:"";
+    const ctrl=f.type==='select'
+      ? `<select id="mf_${f.id}" class="in">${(f.options||[]).map(o=>`<option value="${esc(o[0])}" ${String(f.value)===String(o[0])?'selected':''}>${esc(o[1])}</option>`).join("")}</select>`
+      : f.type==='textarea'
+        ? `<textarea id="mf_${f.id}" class="in" rows="${f.rows||5}" placeholder="${esc(f.placeholder||'')}" style="resize:vertical">${esc(f.value||'')}</textarea>`
+      : `<input id="mf_${f.id}" class="in" type="${f.type||'text'}" placeholder="${esc(f.placeholder||'')}" value="${esc(f.value||'')}">`;
+    return `<div style="margin-bottom:12px">${lbl}${ctrl}${hint}</div>`;
+  }).join("");
+  $("m_ok").textContent=submitLabel||"Save"; $("m_ok").disabled=false;
+  ov.classList.remove("hide"); requestAnimationFrame(()=>ov.classList.add("show"));
+  const first=$("m_fields").querySelector("input,textarea,select"); if(first) setTimeout(()=>{first.focus(); first.select&&first.select();},60);
+  const close=()=>{ ov.classList.remove("show"); setTimeout(()=>ov.classList.add("hide"),160); document.removeEventListener("keydown",onKey); ov.onclick=null; };
+  const submit=async()=>{
+    const vals={}; for(const f of fields) vals[f.id]=$("mf_"+f.id).value.trim();
+    if(!onSubmit){ close(); return; }
+    const label=$("m_ok").textContent; $("m_ok").disabled=true; $("m_ok").innerHTML='<span class="spin"></span>'; $("m_err").textContent="";
+    try{ await onSubmit(vals); close(); }
+    catch(e){ $("m_err").textContent=e.message||String(e); $("m_ok").disabled=false; $("m_ok").textContent=label; }
+  };
+  function onKey(e){ if(e.key==="Escape") close(); else if(e.key==="Enter" && e.target.tagName!=="TEXTAREA"){ e.preventDefault(); submit(); } }
+  $("m_ok").onclick=submit; $("m_cancel").onclick=close;
+  ov.onclick=(e)=>{ if(e.target===ov) close(); };
+  document.addEventListener("keydown",onKey);
+}
+
+$("newKey").onclick = () => openModal({
+  title:"New API key", icon:"ti-key", sub:"It's shown once — copy it somewhere safe.",
+  fields:[{id:"name",label:"Name",placeholder:"Production key",value:"Production key"}], submitLabel:"Create key",
+  onSubmit: async ({name}) => {
+    const k=await api("/app/keys",{method:"POST",body:JSON.stringify({name:name||"API key"})});
+    $("newKeyOut").classList.remove("hide");
+    $("newKeyOut").innerHTML=`<div class="card" style="background:var(--brandsoft);border-color:var(--brand)"><b>Copy this key now — it won't be shown again:</b><div class="copybox" style="margin-top:8px"><code style="color:var(--brand2)">${esc2(k.key)}</code><button class="copybtn" data-copy="${encodeURIComponent(k.key)}">Copy</button></div></div>`;
+    bindCopy($("newKeyOut"));
+    loadKeys();
+  }
+});
+$("newHook").onclick = () => openModal({
+  title:"Add webhook endpoint", icon:"ti-webhook", sub:"We'll POST signed delivery/bounce/complaint events here.",
+  fields:[{id:"url",label:"Endpoint URL",placeholder:"https://your-app.com/webhooks/ems"}], submitLabel:"Add endpoint",
+  onSubmit: async ({url}) => {
+    if(!url) throw new Error("Enter an https URL.");
+    const h=await api("/app/webhooks",{method:"POST",body:JSON.stringify({url})});
+    $("newHookOut").classList.remove("hide");
+    $("newHookOut").innerHTML=`<div class="card" style="background:var(--brandsoft);border-color:var(--brand)"><b>Signing secret — copy now, shown once:</b><div class="copybox" style="margin-top:8px"><code style="color:var(--brand2)">${esc2(h.secret)}</code><button class="copybtn" data-copy="${encodeURIComponent(h.secret)}">Copy</button></div><span class="muted" style="font-size:12px;display:block;margin-top:8px">Verify the <code>ems-signature</code> header (HMAC-SHA256 of the body with this secret).</span></div>`;
+    bindCopy($("newHookOut"));
+    loadHooks();
+  }
+});
+$("newSupp").onclick = () => openModal({
+  title:"Suppress an address", icon:"ti-ban", sub:"This address will never be sent to.",
+  fields:[{id:"address",label:"Email address",placeholder:"blocked@example.com",type:"email"}], submitLabel:"Add",
+  onSubmit: async ({address}) => {
+    if(!address) throw new Error("Enter an email address.");
+    await api("/app/suppressions",{method:"POST",body:JSON.stringify({address})}); loadSupps();
+  }
+});
+
+// --- Import from another provider (Resend / SendGrid / Postmark) ---
+const slugify=s=>String(s||"").toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,60)||'item';
+function dl(name, content, mime){ const blob=new Blob([content],{type:mime||'text/plain'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),2000); }
+function contactsCsv(contacts){ const cell=v=>{ const s=v==null?'':String(v); return /[",\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s; }; return ['email,first_name,last_name,unsubscribed',...contacts.map(c=>[c.email,c.firstName,c.lastName,c.unsubscribed].map(cell).join(','))].join('\n')+'\n'; }
+const IMPORT_PROVIDERS={
+  resend:{fields:[{id:'apiKey',label:'Resend API key',ph:'re_…'}]},
+  sendgrid:{fields:[{id:'apiKey',label:'SendGrid API key',ph:'SG.…'}]},
+  postmark:{fields:[{id:'apiKey',label:'Server API token (templates)',ph:'server token'},{id:'accountToken',label:'Account API token (domains)',ph:'account token'}]},
+  mailgun:{fields:[{id:'apiKey',label:'Mailgun API key',ph:'key-…'},{id:'region',label:'Region',select:[['us','US (api.mailgun.net)'],['eu','EU (api.eu.mailgun.net)']]}]},
+};
+const importFieldsHtml=p=>IMPORT_PROVIDERS[p].fields.map(f=>`<div style="margin-bottom:10px"><label class="lbl" style="display:block;margin-bottom:4px">${esc(f.label)}</label>${f.select?`<select id="imp_${f.id}" class="in">${f.select.map(o=>`<option value="${esc(o[0])}">${esc(o[1])}</option>`).join('')}</select>`:`<input id="imp_${f.id}" class="in" type="password" placeholder="${esc(f.ph)}">`}</div>`).join('');
+function openImport(){
+  const ov=$("ov");
+  $("m_title").innerHTML='<i class="ti ti-transfer-in" style="color:var(--brand2)"></i> Import from another provider';
+  $("m_sub").style.display="block";
+  $("m_sub").textContent="Read-only — your key is used once to read the account and is never stored. Nothing in the source account changes.";
+  $("m_err").textContent="";
+  $("m_fields").innerHTML=`
+    <div style="margin-bottom:10px"><label class="lbl" style="display:block;margin-bottom:4px">Provider</label>
+      <select id="imp_provider" class="in"><option value="resend">Resend</option><option value="sendgrid">SendGrid</option><option value="postmark">Postmark</option><option value="mailgun">Mailgun</option></select></div>
+    <div id="imp_keys">${importFieldsHtml('resend')}</div>
+    <div id="imp_out"></div>`;
+  $("m_ok").textContent="Scan account"; $("m_ok").disabled=false;
+  ov.classList.remove("hide"); requestAnimationFrame(()=>ov.classList.add("show"));
+  setTimeout(()=>{ const f=$("imp_apiKey"); if(f) f.focus(); },60);
+  const close=()=>{ ov.classList.remove("show"); setTimeout(()=>ov.classList.add("hide"),160); document.removeEventListener("keydown",onKey); ov.onclick=null; };
+  function onKey(e){ if(e.key==="Escape") close(); }
+  $("m_cancel").onclick=close; ov.onclick=(e)=>{ if(e.target===ov) close(); }; document.addEventListener("keydown",onKey);
+  $("imp_provider").onchange=()=>{ $("imp_keys").innerHTML=importFieldsHtml($("imp_provider").value); $("imp_out").innerHTML=""; };
+  $("m_ok").onclick=async()=>{
+    const provider=$("imp_provider").value, body={provider};
+    for(const f of IMPORT_PROVIDERS[provider].fields){ const el=$("imp_"+f.id); if(el&&el.value.trim()) body[f.id]=el.value.trim(); }
+    if(!body.apiKey&&!body.accountToken){ $("m_err").textContent="Paste your API key."; return; }
+    const lbl=$("m_ok").textContent; $("m_err").textContent=""; $("m_ok").disabled=true; $("m_ok").innerHTML='<span class="spin"></span> Scanning…';
+    try{
+      const r=await api("/app/import",{method:"POST",body:JSON.stringify(body)});
+      renderImportResult(r);
+      $("m_ok").textContent="Done"; $("m_ok").disabled=false; $("m_ok").onclick=close;
+    }catch(e){ $("m_err").textContent=e.message||String(e); $("m_ok").disabled=false; $("m_ok").textContent=lbl; }
+  };
+}
+function renderImportResult(r){
+  const c=r.counts, names=r.domains.map(d=>d.name), tpls=r.kit.templates||[], auds=r.kit.audiences||[];
+  const domRows=r.domains.length?r.domains.map(d=>`<div class="keyrow"><span class="mono">${esc2(d.name)}</span><span class="chip ${d.status==='verified'?'c-sent':'c-q'}">${esc2(d.status)}</span></div>`).join(''):'<p class="muted" style="font-size:12px">No domains found.</p>';
+  $("imp_out").innerHTML=`
+    <div style="border-top:1px solid var(--line2);margin-top:6px;padding-top:12px">
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">
+        <span class="chip c-mut">${c.domains} domains</span><span class="chip c-mut">${c.templates} templates</span><span class="chip c-mut">${c.audiences} lists · ${c.contacts} contacts</span><span class="chip c-mut">${c.apiKeys} keys</span>
+      </div>
+      <div style="max-height:140px;overflow:auto;margin-bottom:8px">${domRows}</div>
+      ${r.domains.length?`<button id="imp_adddoms" class="btn pri" style="width:100%;margin-bottom:8px"><i class="ti ti-plus"></i> Add ${r.domains.length} domain${r.domains.length>1?'s':''} to EMS</button>`:''}
+      <div id="imp_addout" style="font-size:12px;margin-bottom:8px"></div>
+      ${tpls.length?`<div class="lbl" style="margin:6px 0 4px">Templates — download to reuse in your code</div><div style="max-height:120px;overflow:auto;display:flex;flex-direction:column;gap:4px">${tpls.map((t,i)=>`<button class="btn" data-tpl="${i}" style="justify-content:flex-start;padding:6px 10px"><i class="ti ti-download"></i> ${esc2(t.name)}.html</button>`).join('')}</div>`:''}
+      ${auds.length?`<div class="lbl" style="margin:8px 0 4px">Contact lists (CSV)</div><div style="display:flex;flex-direction:column;gap:4px">${auds.map((a,i)=>`<button class="btn" data-aud="${i}" style="justify-content:flex-start;padding:6px 10px"><i class="ti ti-download"></i> ${esc2(a.name)}.csv (${a.contacts.length})</button>`).join('')}</div>`:''}
+      ${r.notes&&r.notes.length?`<details style="margin-top:10px"><summary class="muted" style="font-size:12px;cursor:pointer">${r.notes.length} note${r.notes.length>1?'s':''}</summary><ul style="font-size:11.5px;color:var(--tx2);margin:6px 0 0;padding-left:16px">${r.notes.map(n=>`<li>${esc2(n)}</li>`).join('')}</ul></details>`:''}
+      <p class="muted" style="font-size:11.5px;margin-top:10px">Next: publish each domain's DNS (EMS generates its own DKIM), create API keys, and switch your code to <code>ems/compat</code>.</p>
+    </div>`;
+  if($("imp_adddoms")) $("imp_adddoms").onclick=async()=>{
+    $("imp_adddoms").disabled=true; $("imp_adddoms").innerHTML='<span class="spin"></span> Adding…';
+    try{ const rr=await api("/app/domains/bulk",{method:"POST",body:JSON.stringify({names:names.slice(0,50)})});
+      const added=rr.results.filter(x=>x.status!=='error').length;
+      $("imp_addout").innerHTML=`<span style="color:var(--ok)">Added ${added} domain(s) — see Sending domains below to publish DNS.</span>`;
+      $("imp_adddoms").style.display="none"; loadDomains();
+    }catch(e){ $("imp_addout").innerHTML=`<span style="color:#f87171">${esc2(e.message)}</span>`; $("imp_adddoms").disabled=false; $("imp_adddoms").innerHTML='Retry'; }
+  };
+  $("imp_out").querySelectorAll("[data-tpl]").forEach(b=>b.onclick=()=>{ const t=tpls[+b.dataset.tpl]; dl(slugify(t.name)+'.html', t.html||t.text||'', 'text/html'); });
+  $("imp_out").querySelectorAll("[data-aud]").forEach(b=>b.onclick=()=>{ const a=auds[+b.dataset.aud]; dl(slugify(a.name)+'.csv', contactsCsv(a.contacts), 'text/csv'); });
+}
+if($("importEsp")) $("importEsp").onclick=openImport;
+
+// --- List verification ---
+function parseEmails(text){ return [...new Set((text.match(/[^\s,;<>"']+@[^\s,;<>"']+/g)||[]).map(s=>s.trim().toLowerCase()))]; }
+let lastVerify=null;
+$("vfile").onchange = (e) => { const f=e.target.files[0]; if(!f) return; const r=new FileReader(); r.onload=()=>{ $("vlist").value=($("vlist").value?$("vlist").value+"\n":"")+r.result; }; r.readAsText(f); };
+$("vrun").onclick = async () => {
+  const emails = parseEmails($("vlist").value);
+  if(!emails.length){ $("vout").innerHTML='<p class="muted" style="font-size:13px">No email addresses found.</p>'; return; }
+  if(emails.length>2000){ $("vout").innerHTML=`<p style="color:#f87171;font-size:13px">Max 2000 per run (found ${emails.length}). Trim the list.</p>`; return; }
+  $("vrun").disabled=true; $("vrun").innerHTML='<span class="spin"></span> Verifying '+emails.length+'…';
+  try{
+    const r = await api("/app/verify",{method:"POST",body:JSON.stringify({emails})});
+    lastVerify = r;
+    const s=r.summary;
+    const chip=(n,label,cls)=>`<span class="chip ${cls}" style="font-size:12px">${n} ${label}</span>`;
+    const sc={deliverable:"c-sent",risky:"c-q",undeliverable:"c-fail",unknown:"c-mut"};
+    const rowsHtml = r.results.map(x=>`<tr><td class="mono" style="font-size:12px">${esc2(x.email)}</td><td><span class="chip ${sc[x.status]}">${x.status}</span></td><td class="muted" style="font-size:11.5px">${esc2((x.reasons||[]).join(", "))}</td></tr>`).join("");
+    $("vout").innerHTML=`
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
+        ${chip(s.total,"checked","c-mut")}${chip(s.deliverable,"deliverable","c-sent")}${chip(s.risky,"risky","c-q")}${chip(s.undeliverable,"undeliverable","c-fail")}${s.unknown?chip(s.unknown,"unknown","c-mut"):""}
+      </div>
+      <div style="max-height:300px;overflow:auto;border:1px solid var(--line);border-radius:9px">
+        <table style="font-size:12px"><thead><tr><th>Email</th><th>Status</th><th>Notes</th></tr></thead><tbody>${rowsHtml}</tbody></table>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+        <button id="vdl" class="btn" style="padding:7px 12px"><i class="ti ti-download"></i> Download ${s.deliverable} clean</button>
+        ${(s.risky+s.undeliverable)&&canDo("suppression:write")?`<button id="vsupp" class="btn" style="padding:7px 12px;border-color:rgba(248,113,113,.4);color:#f87171"><i class="ti ti-ban"></i> Suppress ${s.risky+s.undeliverable} bad</button>`:""}
+      </div>`;
+    $("vdl").onclick=()=>{ const clean=lastVerify.results.filter(x=>x.status==="deliverable").map(x=>x.email).join("\n"); const blob=new Blob([clean],{type:"text/plain"}); const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="verified-clean.txt"; a.click(); };
+    if($("vsupp")) $("vsupp").onclick=async()=>{ const bad=lastVerify.results.filter(x=>x.status==="risky"||x.status==="undeliverable").map(x=>x.email); if(!confirm("Add "+bad.length+" risky/undeliverable addresses to your suppression list?"))return; try{ const rr=await api("/app/verify/suppress",{method:"POST",body:JSON.stringify({addresses:bad})}); alert("Suppressed "+rr.added+" addresses."); loadSupps(); }catch(e){ alert(e.message); } };
+  }catch(e){ $("vout").innerHTML=`<p style="color:#f87171;font-size:13px">${esc2(e.message)}</p>`; }
+  finally{ $("vrun").disabled=false; $("vrun").innerHTML='<i class="ti ti-checks"></i> Verify'; }
+};
+
+async function loadKeys(){
+  const { data } = await api("/app/keys");
+  $("keys").innerHTML = data.length ? data.map(k=>`<div class="keyrow"><span class="mono">${k.prefix}…</span><span class="muted">${k.name}</span>${k.revokedAt?'<span class="chip c-fail">revoked</span>':'<span class="chip c-sent">active</span>'}<span style="margin-left:auto;color:var(--tx3)" title="Created ${new Date(k.createdAt).toLocaleString()}">${k.lastUsedAt?'Last used '+ago(k.lastUsedAt):'Never used'} · created ${ago(k.createdAt)}</span>${(!k.revokedAt&&canDo("key:write"))?`<button class="btn" data-revoke="${k.id}" style="padding:4px 9px"><i class="ti ti-trash"></i></button>`:""}</div>`).join('')
+    : '<p class="muted" style="font-size:13px;margin:8px 0 0">No keys yet — create one to use the API.</p>';
+  document.querySelectorAll("[data-revoke]").forEach(b=>b.onclick=async()=>{ if(confirm("Revoke this key?")){ await api("/app/keys/"+b.dataset.revoke,{method:"DELETE"}); loadKeys(); }});
+}
+async function loadOverview(){
+  const s = await api("/app/stats");
+  // "Accepted" = handed off to the receiving server. "Delivered" = confirmed by a
+  // delivery receipt. Only show a rate once real feedback has landed.
+  const rate = s.deliveryRate === null || s.deliveryRate === undefined ? "—" : s.deliveryRate+"%";
+  $("metrics").innerHTML = [["Accepted",s.accepted,"var(--ok)"],["Delivered",s.delivered,"var(--ok)"],["Bounced",s.bounced,"#f87171"],["Failed",s.failed,"#f87171"],["Delivered rate",rate,"var(--ok)"],["Last 24h",s.last24h,""],["Domains",s.domains,""],["Active keys",s.keys,""]]
+    .map(([l,n,col])=>`<div class="mc"><div class="l">${l}</div><div class="n" style="color:${col||"var(--tx)"}">${n}</div></div>`).join("");
+  // Get-started checklist (hidden once everything's done).
+  const steps=[
+    {done:s.domains>0, label:"Verify a sending domain", view:"domains"},
+    {done:s.keys>0, label:"Create an API key", view:"keys"},
+    {done:s.sent>0, label:"Send your first email", view:"send"},
+  ];
+  $("getstarted").innerHTML = steps.map(st=>`<div class="keyrow" data-go="${st.view}" style="cursor:pointer">${st.done?'<span class="dot ok" style="width:22px;height:22px"><i class="ti ti-check"></i></span>':'<span class="dot miss" style="width:22px;height:22px"></span>'}<span style="${st.done?'color:var(--tx3);text-decoration:line-through':''}">${st.label}</span><i class="ti ti-arrow-right" style="margin-left:auto;color:var(--tx3)"></i></div>`).join("");
+  $("getstarted").querySelectorAll("[data-go]").forEach(r=>r.onclick=()=>showSection(r.dataset.go));
+  $("gscard").style.display = steps.every(st=>st.done) ? "none" : "block";
+  // Recent activity preview.
+  const { data } = await api("/app/emails");
+  $("recent").innerHTML = data.length ? data.slice(0,6).map(e=>`<div class="keyrow" data-email="${e.id}" style="cursor:pointer"><span style="flex:0 0 auto">${chip(e.status)}</span><span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc2((e.to||[]).join(", "))} <span class="muted">— ${esc2(e.subject||"")}</span></span><span style="color:var(--tx3);font-size:11.5px;flex:0 0 auto">${ago(e.created_at)}</span></div>`).join("") : '<p class="muted" style="font-size:13px;margin:8px 0 0">No emails yet — send one from the Send tab.</p>';
+  $("recent").querySelectorAll("[data-email]").forEach(r=>r.onclick=()=>openEmail(r.dataset.email));
+}
+async function loadLogs(){
+  const { data } = await api("/app/emails");
+  $("logs").innerHTML = data.length ? data.map(e=>`<tr data-email="${e.id}" style="cursor:pointer"><td class="mono">${esc2((e.to||[]).join(", "))}</td><td>${esc2(e.subject||"")}</td><td>${chip(e.status)}</td><td style="text-align:right;color:var(--tx3)">${ago(e.created_at)}</td></tr>`).join("") : `<tr><td colspan="4" class="muted">No emails yet — send one from the Send tab.</td></tr>`;
+  $("logs").querySelectorAll("[data-email]").forEach(r=>r.onclick=()=>openEmail(r.dataset.email));
+}
+// Email detail + delivery event timeline (showcases the feedback loop).
+async function openEmail(id){
+  let m; try{ m=await api("/app/emails/"+id); }catch(e){ alert(e.message); return; }
+  const evs=(m.events||[]);
+  const timeline = evs.length ? evs.map(e=>{ const p=e.payload||{}; const note=[p.reason,p.code,p.recipient,p.error].filter(Boolean).join(" · ");
+    return `<div class="keyrow"><span style="flex:0 0 auto">${chip(e.type)}</span><span class="muted" style="flex:1;font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc2(note)}</span><span style="color:var(--tx3);font-size:11.5px;flex:0 0 auto">${new Date(e.occurredAt).toLocaleString()}</span></div>`; }).join("")
+    : '<p class="muted" style="font-size:12.5px;margin:6px 0 0">No delivery events yet.</p>';
+  $("m_title").innerHTML='<i class="ti ti-mail" style="color:var(--brand2)"></i> '+esc2(m.subject||"(no subject)");
+  $("m_sub").style.display="block";
+  $("m_sub").innerHTML=`${chip(m.status)} · to <b>${esc2((m.to||[]).join(", "))}</b> · ${new Date(m.createdAt).toLocaleString()}`;
+  $("m_err").textContent="";
+  $("m_fields").innerHTML=`<div style="font-size:12.5px;color:var(--tx2);line-height:1.7"><b>From</b> ${esc2(m.from||"")}${m.routedVia?` &nbsp;·&nbsp; via <span class="chip c-mut">${esc2(m.routedVia)}</span>`:""}${m.providerMessageId?`<br><b>Message-ID</b> <span class="mono" style="font-size:11px">${esc2(m.providerMessageId)}</span>`:""}${m.scheduledAt?`<br><b>Scheduled</b> ${new Date(m.scheduledAt).toLocaleString()}`:""}</div><div class="lbl" style="margin:12px 0 5px">Delivery timeline</div>${timeline}`;
+  $("m_ok").textContent="Close"; $("m_ok").disabled=false;
+  const ov=$("ov"); ov.classList.remove("hide"); requestAnimationFrame(()=>ov.classList.add("show"));
+  const close=()=>{ ov.classList.remove("show"); setTimeout(()=>ov.classList.add("hide"),160); document.removeEventListener("keydown",onKey); ov.onclick=null; };
+  function onKey(e){ if(e.key==="Escape") close(); }
+  ov.onclick=(e)=>{ if(e.target===ov) close(); }; document.addEventListener("keydown",onKey);
+  // A message can only be pulled back while it is still ours (queued/scheduled).
+  // Past that the server returns 409 not_cancelable, so don't offer the action.
+  if(CANCELABLE_STATUSES.includes(m.status) && canDo("email:send")){
+    $("m_cancel").textContent="Close"; $("m_cancel").onclick=close;
+    $("m_ok").textContent="Cancel send";
+    $("m_ok").onclick=async()=>{
+      $("m_ok").disabled=true; $("m_err").textContent="";
+      try{
+        await api("/app/emails/"+id+"/cancel",{method:"POST"});
+        close(); loadLogs(); if(currentView==="overview") loadOverview();
+      }catch(e){
+        $("m_err").textContent=e.message; $("m_ok").disabled=false;
+      }
+    };
+  } else {
+    $("m_cancel").textContent="Cancel"; $("m_cancel").onclick=close;
+    $("m_ok").textContent="Close"; $("m_ok").onclick=close;
+  }
+}
+// Section nav: load only the active section's data (cheaper + a real dashboard feel).
+const SECTION_LOAD = { overview:loadOverview, inbox:loadInbox, logs:loadLogs, domains:loadDomains, accounts:loadAccounts, keys:loadKeys, webhooks:loadHooks, suppressions:loadSupps, settings:loadSettings, templates:loadTemplatesSection, subaccounts:loadSubaccounts };
+const SECTION_TITLE = { overview:"Overview", inbox:"Inbox", send:"Send a test email", domains:"Sending domains", accounts:"Connected accounts", keys:"API keys", webhooks:"Webhooks", verify:"Verify a list", suppressions:"Suppressions", logs:"Recent emails", settings:"Account", templates:"Email templates", subaccounts:"Sub-accounts" };
+let currentView = "overview";
+function showSection(name){
+  if(!document.getElementById("view-"+name)) name="overview";
+  currentView = name;
+  document.querySelectorAll(".view").forEach(v=>v.classList.toggle("active", v.id==="view-"+name));
+  document.querySelectorAll(".nav-i").forEach(n=>n.classList.toggle("active", n.dataset.view===name));
+  const vt=$("viewTitle"); if(vt) vt.textContent = SECTION_TITLE[name]||name;
+  try{ history.replaceState(null,"","#"+name); }catch{}
+  const fn = SECTION_LOAD[name]; if(fn) fn().catch(()=>{});
+}
+document.querySelectorAll(".nav-i").forEach(n=>n.onclick=()=>showSection(n.dataset.view));
+// boot()/refresh entry point — show the hash section (or overview) and load it.
+function load(){
+  const h = (location.hash||"").slice(1);
+  return Promise.resolve(showSection(document.getElementById("view-"+h) ? h : currentView));
+}
+// --- Native mailboxes (webmail) ---
+let inboxActiveId=null;
+function setInboxBadge(n){
+  const b=$("inboxBadge"); if(!b) return;
+  if(n>0){ b.textContent=n>99?"99+":String(n); b.classList.remove("hide"); }
+  else b.classList.add("hide");
+}
+function msgPanel(id){
+  if(currentView==="inbox") return $("inboxMain");
+  return $("mpanel-"+id);
+}
+async function loadInbox(){
+  const listEl=$("inboxMailboxes"), main=$("inboxMain");
+  if(!listEl) return;
+  let data=[]; try{ ({data}=await api("/app/mailboxes")); }catch{ listEl.innerHTML='<p class="muted" style="padding:14px;font-size:13px">Could not load inboxes.</p>'; return; }
+  setInboxBadge(data.reduce((s,m)=>s+(m.unread||0),0));
+  if(!data.length){
+    listEl.innerHTML='<p class="muted" style="padding:14px;font-size:13px">No inboxes yet. Open a verified domain and create one on the Inboxes tab.</p>';
+    if(main) main.innerHTML='<p class="muted" style="font-size:13px;padding:8px">Create an inbox on a verified domain to start receiving mail here.</p>';
+    return;
+  }
+  if(!inboxActiveId || !data.some(m=>m.id===inboxActiveId)) inboxActiveId=data[0].id;
+  listEl.innerHTML=data.map(m=>`<div class="inbox-mb${m.id===inboxActiveId?' on':''}" data-inboxmb="${m.id}">
+    <div style="min-width:0;flex:1"><div style="font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc2(m.address)}</div>
+    <div class="muted" style="font-size:11px">${m.catchAll?'catch-all · ':''}${m.forwardCount?m.forwardCount+' forward · ':''}${(m.usedBytes/1048576).toFixed(1)} MB</div></div>
+    ${m.unread?`<span style="background:var(--brand);color:#fff;font-size:10px;padding:1px 6px;border-radius:999px">${m.unread}</span>`:''}
+  </div>`).join('');
+  listEl.querySelectorAll("[data-inboxmb]").forEach(r=>r.onclick=()=>{ inboxActiveId=r.dataset.inboxmb; loadInbox(); });
+  inboxRefresh=()=>loadInbox();
+  if(inboxActiveId) loadMessages(inboxActiveId);
+}
+function mboxMxRow(host, value, prio){
+  const hid=host.replace(/[^a-z0-9]/gi,'_');
+  return `<div class="copybox" style="margin-top:6px"><code>MX&nbsp; host <b>${esc2(host)}</b>&nbsp;→&nbsp;<b>${esc2(value)}</b>&nbsp; priority ${prio}</code><button class="copybtn" data-copy="${encodeURIComponent(value)}">Copy</button></div>
+    <div style="display:flex;align-items:center;gap:8px;margin-top:7px;flex-wrap:wrap">${canDo("mailbox:write")?`<button class="btn pri" data-pubmx="${esc2(host)}" style="padding:5px 11px;font-size:12px"><i class="ti ti-cloud-bolt"></i> Publish to my DNS</button>`:""}<button class="btn" data-recheckmx="1" style="padding:5px 11px;font-size:12px"><i class="ti ti-refresh"></i> Re-check</button><span class="muted" id="pubmx_${hid}" style="font-size:11.5px"></span></div>`;
+}
+// Per-domain receiving readiness: a mailbox only gets mail if the domain's MX
+// points at our MTA. Tell the truth + show the exact fix (and never suggest
+// changing an apex MX that already carries live mail — use a subdomain).
+function mboxRecvBanner(s){
+  if(s.ready) return `<div style="display:flex;align-items:center;gap:8px;font-size:12.5px;margin:0 0 8px"><span class="chip c-sent"><i class="ti ti-circle-check-filled"></i> receiving ready</span><span class="muted">${esc2(s.domain)} — mail reaches your mailboxes.</span></div>`;
+  if(s.conflictsWithExistingMail){
+    return `<div class="card" style="background:rgba(243,178,87,.08);border-color:#f3b257;margin:0 0 10px;padding:12px 14px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px"><i class="ti ti-alert-triangle" style="color:#f3b257"></i><b style="font-size:13.5px">${esc2(s.domain)} isn't receiving — its mail goes to ${esc2(s.handledBy||'another provider')}</b></div>
+      <p class="muted" style="font-size:12px;margin:0 0 2px">Changing this domain's MX would break that mail. Keep it — create mailboxes on a <b>subdomain</b> and point only the subdomain's MX here:</p>
+      ${mboxMxRow('inbox.'+s.domain, s.expectedMx, 10)}
+      <p class="muted" style="font-size:11.5px;margin:8px 0 0">Then add <span class="mono">inbox.${esc2(s.domain)}</span> as a domain, verify it, and use addresses like <span class="mono">support@inbox.${esc2(s.domain)}</span>.</p>
+    </div>`;
+  }
+  return `<div class="card" style="background:var(--brandsoft);border-color:var(--brand);margin:0 0 10px;padding:12px 14px">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px"><i class="ti ti-cloud-bolt" style="color:var(--brand2)"></i><b style="font-size:13.5px">${esc2(s.domain)} isn't receiving yet</b></div>
+    <p class="muted" style="font-size:12px;margin:0 0 2px">Add this MX record at your DNS provider so mail reaches your mailboxes:</p>
+    ${mboxMxRow(s.record.host, s.record.value, s.record.priority)}</div>`;
+}
+// Inboxes (mailboxes) are domain-centric — rendered inside a domain's detail
+// panel (Inboxes tab), scoped to that domain. inboxRefresh re-renders whatever
+// inbox list is currently shown (used by the webmail after a reply/move).
+let inboxRefresh=null;
+async function renderDomainInboxes(domainId, domainName){
+  const cont=$("dominbox-"+domainId); if(!cont) return;
+  inboxRefresh=()=>renderDomainInboxes(domainId, domainName);
+  let data=[], s=null;
+  try{ const [a,b]=await Promise.all([api("/app/mailboxes?domainId="+domainId), api("/app/mailboxes/receiving?domain="+encodeURIComponent(domainName)).catch(()=>null)]); data=a.data||[]; s=b; }catch{ cont.innerHTML='<p class="muted" style="font-size:13px">Could not load inboxes.</p>'; return; }
+  const banner = s?mboxRecvBanner(s):'';
+  const rows = data.length ? data.map(m=>{ const notReady=s&&!s.ready;
+    return `<div class="dom"><div class="dom-row" data-mbox="${m.id}">
+      <i class="ti ti-chevron-right" id="mchev-${m.id}" style="color:var(--tx3);transition:.15s"></i>
+      <span class="dom-name">${esc2(m.address)}</span>
+      <span class="chip c-mut">${m.messages} msg</span>${m.status!=='active'?`<span class="chip c-fail">${esc2(m.status)}</span>`:''}${notReady?`<span class="chip c-q" title="${esc2(s.advice)}">not receiving</span>`:''}
+      <span style="margin-left:auto;color:var(--tx3);font-size:12px">${(m.usedBytes/1048576).toFixed(1)} / ${(m.quotaBytes/1048576).toFixed(0)} MB</span>
+      ${canDo("mailbox:write")?`<button class="btn" data-delmbox="${m.id}" style="padding:4px 9px"><i class="ti ti-trash"></i></button>`:""}
+    </div><div class="dom-panel hide" id="mpanel-${m.id}"></div></div>`; }).join('')
+    : '<p class="muted" style="font-size:13px;margin:8px 0 0">No inboxes on this domain yet.</p>';
+  cont.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap"><div class="muted" style="font-size:12px">Receive mail at <span class="mono">name@${esc2(domainName)}</span> — your own inboxes.</div>${canDo("mailbox:write")?`<button class="btn" data-newmbox="${esc2(domainName)}" style="padding:5px 11px;font-size:12px"><i class="ti ti-plus"></i> New inbox</button>`:""}</div>` + banner + rows;
+  bindCopy(cont);
+  cont.querySelectorAll("[data-pubmx]").forEach(b=>b.onclick=async()=>{
+    const host=b.dataset.pubmx, msg=$("pubmx_"+host.replace(/[^a-z0-9]/gi,'_')), t=b.innerHTML;
+    b.disabled=true; b.innerHTML='<span class="spin"></span> Publishing…';
+    try{ const r=await api("/app/mailboxes/publish-mx",{method:"POST",body:JSON.stringify({host})});
+      if(msg) msg.innerHTML='<span style="color:var(--ok)">'+(r.action==='unchanged'?'Already set on ':'Published to ')+esc2(r.zone)+' — re-checking as DNS propagates…</span>'; b.style.display='none'; setTimeout(()=>inboxRefresh&&inboxRefresh(), 6000); }
+    catch(e){ b.disabled=false; b.innerHTML=t; if(msg) msg.innerHTML='<span style="color:#f87171">'+esc2(e.message)+'</span>'; }
+  });
+  cont.querySelectorAll("[data-recheckmx]").forEach(b=>b.onclick=()=>{ b.disabled=true; b.innerHTML='<span class="spin"></span> Checking…'; inboxRefresh&&inboxRefresh(); });
+  cont.querySelectorAll("[data-newmbox]").forEach(b=>b.onclick=()=>newMailboxModal(b.dataset.newmbox));
+  cont.querySelectorAll("[data-mbox]").forEach(r=>r.onclick=(e)=>{ if(e.target.closest("[data-delmbox]"))return; toggleMailbox(r.dataset.mbox); });
+  cont.querySelectorAll("[data-delmbox]").forEach(b=>b.onclick=async(e)=>{ e.stopPropagation(); if(confirm("Delete this inbox and all its messages?")){ await api("/app/mailboxes/"+b.dataset.delmbox,{method:"DELETE"}); inboxRefresh&&inboxRefresh(); }});
+}
+function newMailboxModal(domainName){
+  openModal({
+    title:"New inbox", icon:"ti-inbox", sub:`Create an inbox on ${domainName}. Mail to this address lands in the webmail here.`,
+    fields:[{id:"local",label:"Address (before the @)",placeholder:"support"},{id:"displayName",label:"Display name (optional)",placeholder:"Support"}],
+    submitLabel:"Create inbox",
+    onSubmit: async({local,displayName})=>{ if(!local) throw new Error("Enter the part before the @."); const address=(local.includes('@')?local:local+'@'+domainName).toLowerCase(); await api("/app/mailboxes",{method:"POST",body:JSON.stringify({address,displayName:displayName||undefined})}); inboxRefresh&&inboxRefresh(); }
+  });
+}
+function toggleMailbox(id){
+  const panel=$("mpanel-"+id), chev=$("mchev-"+id); if(!panel)return;
+  const open=!panel.classList.contains("hide");
+  document.querySelectorAll("[id^=mpanel-]").forEach(p=>{ if(p!==panel){ p.classList.add("hide"); p.innerHTML=""; }});
+  document.querySelectorAll("[id^=mchev-]").forEach(c=>{ if(c!==chev) c.style.transform=""; });
+  if(open){ panel.classList.add("hide"); panel.innerHTML=""; chev.style.transform=""; return; }
+  panel.classList.remove("hide"); chev.style.transform="rotate(90deg)";
+  panel.innerHTML='<div class="muted" style="font-size:13px;padding:8px 0"><span class="spin"></span> Loading…</div>';
+  loadMessages(id);
+}
+const mboxFolder={};
+const MBOX_FOLDERS=[['inbox','Inbox','ti-inbox'],['sent','Sent','ti-send'],['archive','Archive','ti-archive'],['trash','Trash','ti-trash']];
+async function loadMessages(id, folder){
+  folder=folder||mboxFolder[id]||'inbox'; mboxFolder[id]=folder;
+  const p=msgPanel(id); if(!p)return;
+  const q=($("mboxSearch")&&currentView==="inbox"?$("mboxSearch").value:"").trim();
+  let data; try{ ({data}=await api("/app/mailboxes/"+id+"/messages?folder="+folder+(q?"&q="+encodeURIComponent(q):""))); }catch{ p.innerHTML='<p class="muted" style="font-size:13px">Could not load.</p>'; return; }
+  const tools=`<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;align-items:center">
+    <button class="btn pri" data-compose="${id}" style="padding:4px 10px;font-size:12px"><i class="ti ti-edit"></i> Compose</button>
+    <input id="mboxSearch" class="in" placeholder="Search" value="${esc2(q)}" style="padding:6px 10px;font-size:12px;max-width:180px;margin:0">
+    <button class="btn" data-msettings="${id}" style="padding:4px 10px;font-size:12px;margin-left:auto"><i class="ti ti-settings"></i> Settings</button>
+  </div>`;
+  const tabs=MBOX_FOLDERS.map(([k,label,icon])=>`<button class="btn" data-mfolder="${k}" style="padding:4px 10px;font-size:12px;${k===folder?'background:var(--brandsoft);border-color:var(--brand)':''}"><i class="ti ${icon}"></i> ${label}</button>`).join('');
+  const list = data.length ? data.map(m=>`<div class="keyrow" data-msg="${m.id}" style="cursor:pointer">
+    <span style="width:7px;height:7px;border-radius:50%;flex:0 0 auto;background:${m.seen?'transparent':'var(--brand2)'}"></span>
+    ${m.flagged?'<i class="ti ti-flag-filled" style="color:#f59e0b;font-size:13px;flex:0 0 auto"></i>':''}
+    <span style="${m.seen?'':'font-weight:600;'}min-width:140px;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc2(m.fromAddr)}</span>
+    <span style="${m.seen?'':'font-weight:600;'}flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc2(m.subject||'(no subject)')} <span class="muted">— ${esc2(m.snippet||'')}</span></span>
+    <span style="color:var(--tx3);font-size:11.5px;flex:0 0 auto">${ago(m.receivedAt)}</span>
+  </div>`).join('')
+    : '<p class="muted" style="font-size:13px;padding:8px 0">No messages in '+folder+'.</p>';
+  p.innerHTML=tools+`<div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:8px">${tabs}</div>${list}`;
+  p.querySelectorAll("[data-mfolder]").forEach(b=>b.onclick=()=>loadMessages(id, b.dataset.mfolder));
+  p.querySelectorAll("[data-msg]").forEach(r=>r.onclick=()=>openMessage(r.dataset.msg, id));
+  const search=$("mboxSearch");
+  if(search){ let t; search.oninput=()=>{ clearTimeout(t); t=setTimeout(()=>loadMessages(id, folder), 280); }; }
+  const compose=p.querySelector("[data-compose]");
+  if(compose) compose.onclick=()=>composeMailbox(id);
+  const settings=p.querySelector("[data-msettings]");
+  if(settings) settings.onclick=()=>openMailboxSettings(id);
+}
+function composeMailbox(id){
+  openModal({
+    title:"New message", icon:"ti-edit", sub:"Sent from this inbox through your authenticated domain.",
+    fields:[{id:"to",label:"To",placeholder:"you@example.com"},{id:"subject",label:"Subject",placeholder:"Subject"},{id:"text",label:"Message",placeholder:"Write the email…",type:"textarea"}],
+    submitLabel:"Send",
+    onSubmit: async({to,subject,text})=>{
+      if(!to||!subject||!text) throw new Error("To, subject, and a message are required.");
+      await api("/app/mailboxes/"+id+"/send",{method:"POST",body:JSON.stringify({to,subject,text})});
+      loadMessages(id,"sent");
+    }
+  });
+}
+async function openMailboxSettings(id){
+  let mb; try{ mb=await api("/app/mailboxes/"+id); }catch(e){ alert(e.message); return; }
+  const ov=$("ov");
+  $("m_title").innerHTML='<i class="ti ti-settings" style="color:var(--brand2)"></i> '+esc2(mb.address);
+  $("m_sub").style.display="block"; $("m_sub").textContent="A copy is sent from this address (so it lands). Destinations must confirm before we forward.";
+  $("m_err").textContent="";
+  const fw=(mb.forwards||[]).map(f=>`<div class="keyrow"><span class="mono">${esc2(f.destination)}</span>${f.verifiedAt?'<span class="chip c-sent">verified</span>':'<span class="chip c-q">check email</span>'}<button class="btn" data-delfw="${f.id}" style="padding:3px 8px;margin-left:auto"><i class="ti ti-trash"></i></button></div>`).join('')
+    || '<p class="muted" style="font-size:13px">No forwards yet.</p>';
+  $("m_fields").innerHTML=`
+    <label class="lbl">Display name</label><input id="mb_dn" class="in" value="${esc2(mb.displayName||"")}">
+    <label style="display:flex;align-items:center;gap:8px;margin:12px 0;font-size:13px"><input type="checkbox" id="mb_keep" ${mb.keepCopy?'checked':''}> Keep a copy in this inbox</label>
+    <label style="display:flex;align-items:center;gap:8px;margin:0 0 14px;font-size:13px"><input type="checkbox" id="mb_catch" ${mb.catchAll?'checked':''}> Catch-all — unknown addresses on this domain land here</label>
+    <div class="lbl">Forward a copy to</div>
+    ${fw}
+    <div style="display:flex;gap:8px;margin-top:10px"><input id="mb_fwd" class="in" placeholder="you@gmail.com" style="flex:1"><button id="mb_addfwd" class="btn" style="padding:8px 12px">Add</button></div>
+    <div class="muted" style="font-size:11.5px;margin-top:8px">Quota ${(mb.usedBytes/1048576).toFixed(1)} / ${(mb.quotaBytes/1048576).toFixed(0)} MB</div>`;
+  $("m_ok").textContent="Save"; $("m_ok").disabled=false; $("m_ok").style.display="";
+  ov.classList.remove("hide"); requestAnimationFrame(()=>ov.classList.add("show"));
+  const close=()=>{ ov.classList.remove("show"); setTimeout(()=>ov.classList.add("hide"),160); document.removeEventListener("keydown",onKey); ov.onclick=null; };
+  function onKey(e){ if(e.key==="Escape") close(); }
+  document.addEventListener("keydown",onKey);
+  ov.onclick=(e)=>{ if(e.target===ov) close(); };
+  $("m_cancel").onclick=close;
+  $("m_ok").onclick=async()=>{
+    $("m_ok").disabled=true;
+    try{
+      await api("/app/mailboxes/"+id,{method:"PATCH",body:JSON.stringify({displayName:$("mb_dn").value.trim()||undefined,keepCopy:$("mb_keep").checked,catchAll:$("mb_catch").checked})});
+      close(); if(currentView==="inbox") loadInbox(); else if(inboxRefresh) inboxRefresh();
+    }catch(e){ $("m_err").textContent=e.message; $("m_ok").disabled=false; }
+  };
+  $("mb_addfwd").onclick=async()=>{
+    const dest=$("mb_fwd").value.trim(); if(!dest) return;
+    try{ await api("/app/mailboxes/"+id+"/forwards",{method:"POST",body:JSON.stringify({destination:dest})}); openMailboxSettings(id); }
+    catch(e){ $("m_err").textContent=e.message; }
+  };
+  $("m_fields").querySelectorAll("[data-delfw]").forEach(b=>b.onclick=async()=>{
+    try{ await api("/app/mailboxes/"+id+"/forwards/"+b.dataset.delfw,{method:"DELETE"}); openMailboxSettings(id); }
+    catch(e){ $("m_err").textContent=e.message; }
+  });
+}
+async function openMessage(id, mboxId){
+  let m; try{ m=await api("/app/messages/"+id); }catch(e){ alert(e.message); return; }
+  const ov=$("ov");
+  $("m_title").innerHTML='<i class="ti ti-mail" style="color:var(--brand2)"></i> '+esc2(m.subject||'(no subject)');
+  $("m_sub").style.display="block"; $("m_sub").innerHTML=`<b>${esc2(m.fromAddr)}</b> · ${new Date(m.receivedAt).toLocaleString()}${m.folder!=='inbox'?' · <span class="chip c-mut">'+esc2(m.folder)+'</span>':''}`;
+  $("m_err").textContent="";
+  const thread=m.thread||[];
+  const strip = thread.length>1 ? `<div class="lbl" style="margin:0 0 5px">Conversation (${thread.length})</div><div style="display:flex;flex-direction:column;gap:2px;margin-bottom:10px;max-height:110px;overflow:auto">${thread.map(t=>`<div class="keyrow" data-tmsg="${t.id}" style="cursor:pointer;padding:6px 8px;${t.id===m.id?'background:var(--brandsoft);border-radius:7px':''}"><span class="chip c-mut" style="font-size:10px">${esc2(t.folder)}</span><span style="font-size:12px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc2(t.fromAddr)} — ${esc2(t.snippet||'')}</span><span style="color:var(--tx3);font-size:11px">${ago(t.receivedAt)}</span></div>`).join('')}</div>`:'';
+  // Untrusted email HTML is rendered in a fully sandboxed iframe (no scripts, no same-origin).
+  const body = m.html
+    ? `<iframe sandbox srcdoc="${esc2(m.html)}" style="width:100%;height:280px;border:1px solid var(--line);border-radius:8px;background:#fff"></iframe>`
+    : `<pre style="white-space:pre-wrap;font:13px/1.55 inherit;color:var(--tx);max-height:280px;overflow:auto;margin:0">${esc2(m.text||'(empty message)')}</pre>`;
+  $("m_fields").innerHTML = strip + body +
+    `<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:10px">
+      <button id="r_reply" class="btn pri" style="padding:6px 12px;font-size:13px"><i class="ti ti-corner-up-left"></i> Reply</button>
+      <button id="r_flag" class="btn" style="padding:6px 11px;font-size:13px"><i class="ti ti-flag"></i> ${m.flagged?'Unflag':'Flag'}</button>
+      ${m.folder!=='archive'?'<button id="r_archive" class="btn" style="padding:6px 11px;font-size:13px"><i class="ti ti-archive"></i> Archive</button>':''}
+      ${m.folder!=='trash'?'<button id="r_trash" class="btn" style="padding:6px 11px;font-size:13px;margin-left:auto"><i class="ti ti-trash"></i> Trash</button>':'<button id="r_restore" class="btn" style="padding:6px 11px;font-size:13px;margin-left:auto"><i class="ti ti-arrow-back-up"></i> Restore to inbox</button>'}
+    </div><div id="replybox" style="margin-top:10px"></div>`;
+  $("m_ok").textContent="Close"; $("m_ok").disabled=false; $("m_ok").style.display="";
+  ov.classList.remove("hide"); requestAnimationFrame(()=>ov.classList.add("show"));
+  const close=()=>{ ov.classList.remove("show"); setTimeout(()=>ov.classList.add("hide"),160); document.removeEventListener("keydown",onKey); ov.onclick=null; if(mboxId) loadMessages(mboxId); inboxRefresh&&inboxRefresh(); };
+  function onKey(e){ if(e.key==="Escape") close(); }
+  $("m_ok").onclick=close; $("m_cancel").onclick=close; ov.onclick=(e)=>{ if(e.target===ov) close(); }; document.addEventListener("keydown",onKey);
+  async function move(folder){ try{ await api("/app/messages/"+id,{method:"PATCH",body:JSON.stringify({folder})}); close(); }catch(e){ alert(e.message); } }
+  $("r_flag").onclick=async()=>{ try{ await api("/app/messages/"+id,{method:"PATCH",body:JSON.stringify({flagged:!m.flagged})}); m.flagged=!m.flagged; $("r_flag").innerHTML=`<i class="ti ti-flag"></i> ${m.flagged?'Unflag':'Flag'}`; }catch(e){ alert(e.message); } };
+  if($("r_archive")) $("r_archive").onclick=()=>move('archive');
+  if($("r_trash")) $("r_trash").onclick=()=>move('trash');
+  if($("r_restore")) $("r_restore").onclick=()=>move('inbox');
+  $("m_fields").querySelectorAll("[data-tmsg]").forEach(r=>r.onclick=()=>openMessage(r.dataset.tmsg, mboxId));
+  $("r_reply").onclick=()=>{
+    $("replybox").innerHTML=`<div class="card" style="background:var(--surface2);padding:10px 12px"><div class="lbl" style="margin-bottom:4px">Reply to ${esc2((m.fromAddr.match(/<([^>]+)>/)||[])[1]||m.fromAddr)}</div><textarea id="r_body" class="in" rows="4" placeholder="Type your reply…" style="resize:vertical"></textarea><div style="display:flex;gap:8px;align-items:center;margin-top:8px"><button id="r_send" class="btn pri" style="padding:6px 12px"><i class="ti ti-send"></i> Send reply</button><span id="r_msg" class="muted" style="font-size:12px"></span></div></div>`;
+    setTimeout(()=>$("r_body").focus(),40);
+    $("r_send").onclick=async()=>{ const text=$("r_body").value.trim(); if(!text){ $("r_msg").innerHTML='<span style="color:#f87171">Write a reply first.</span>'; return; }
+      $("r_send").disabled=true; $("r_msg").textContent="Sending…";
+      try{ await api("/app/messages/"+id+"/reply",{method:"POST",body:JSON.stringify({text})}); $("r_msg").innerHTML='<span style="color:var(--ok)">Reply sent ✓</span>'; setTimeout(close,900); }
+      catch(e){ $("r_send").disabled=false; $("r_msg").innerHTML=`<span style="color:#f87171">${esc2(e.message)}</span>`; }
+    };
+  };
+}
+async function loadHooks(){
+  const { data } = await api("/app/webhooks");
+  $("hooks").innerHTML = data.length ? data.map(h=>`<div class="keyrow"><span class="mono" style="word-break:break-all">${esc2(h.url)}</span>${h.enabled?'<span class="chip c-sent">on</span>':'<span class="chip c-mut">off</span>'}<span class="muted" style="font-size:11px">${(h.eventTypes&&h.eventTypes.length)?h.eventTypes.map(e=>e.replace("email.","")).join(", "):"all events"}</span><span style="margin-left:auto;color:var(--tx3)">${h._count?.deliveries||0} sent</span>${canDo("webhook:write")?`<button class="btn" data-hooktoggle="${h.id}" data-on="${h.enabled}" style="padding:4px 9px">${h.enabled?'Disable':'Enable'}</button><button class="btn" data-delhook="${h.id}" style="padding:4px 9px"><i class="ti ti-trash"></i></button>`:""}</div>`).join('')
+    : '<p class="muted" style="font-size:13px;margin:8px 0 0">No endpoints — add one to receive delivery/bounce/complaint events.</p>';
+  document.querySelectorAll("[data-hooktoggle]").forEach(b=>b.onclick=async()=>{ await api("/app/webhooks/"+b.dataset.hooktoggle,{method:"PATCH",body:JSON.stringify({enabled:b.dataset.on!=="true"})}); loadHooks(); });
+  document.querySelectorAll("[data-delhook]").forEach(b=>b.onclick=async()=>{ if(confirm("Delete this webhook?")){ await api("/app/webhooks/"+b.dataset.delhook,{method:"DELETE"}); loadHooks(); }});
+}
+async function loadSupps(){
+  const { data } = await api("/app/suppressions");
+  $("supps").innerHTML = data.length ? data.map(s=>`<div class="keyrow"><span class="mono">${esc2(s.address)}</span><span class="chip ${s.reason==='complaint'||s.reason==='hard_bounce'?'c-fail':'c-mut'}">${s.reason.replace("_"," ")}</span><span class="muted" style="font-size:11px">${esc2(s.source||"")}</span><span style="margin-left:auto;color:var(--tx3)">${ago(s.createdAt)}</span>${canDo("suppression:write")?`<button class="btn" data-delsupp="${s.id}" style="padding:4px 9px"><i class="ti ti-trash"></i></button>`:""}</div>`).join('')
+    : '<p class="muted" style="font-size:13px;margin:8px 0 0">No suppressed addresses.</p>';
+  document.querySelectorAll("[data-delsupp]").forEach(b=>b.onclick=async()=>{ if(confirm("Remove from suppression list? They'll be able to receive mail again.")){ await api("/app/suppressions/"+b.dataset.delsupp,{method:"DELETE"}); loadSupps(); }});
+}
+// When Gmail/Outlook OAuth isn't configured, the button explains the one-time
+// setup instead of being a dead disabled control.
+function connectSetupInfo(label, provider){
+  const ov=$("ov"); const redirect=location.origin+"/connect/"+provider+"/callback";
+  const steps = provider==="google" ? [
+    'Create an OAuth 2.0 Client (type: Web application) in Google Cloud Console.',
+    'On the consent screen, add the Gmail API <span class="mono">gmail.send</span> scope.',
+    'Add this authorized redirect URI: <span class="mono">'+esc2(redirect)+'</span>',
+    'Set <span class="mono">GOOGLE_OAUTH_CLIENT_ID</span> + <span class="mono">GOOGLE_OAUTH_CLIENT_SECRET</span> in your deployment, then redeploy.',
+  ] : [
+    'Register an app in Microsoft Entra (Azure AD).',
+    'Add delegated permissions <span class="mono">Mail.Send</span> + <span class="mono">offline_access</span>.',
+    'Add this redirect URI: <span class="mono">'+esc2(redirect)+'</span>',
+    'Set <span class="mono">MS_OAUTH_CLIENT_ID</span> + <span class="mono">MS_OAUTH_CLIENT_SECRET</span> in your deployment, then redeploy.',
+  ];
+  $("m_title").innerHTML='<i class="ti ti-plug-connected" style="color:var(--brand2)"></i> Connect '+esc2(label)+' — one-time setup';
+  $("m_sub").style.display="block"; $("m_sub").textContent='Lets you (or your customers) send through a '+label+' mailbox. Configure the OAuth app once, then this button connects in a click.';
+  $("m_err").textContent="";
+  $("m_fields").innerHTML='<ol style="font-size:13px;line-height:1.7;color:var(--tx2);margin:0;padding-left:18px">'+steps.map(s=>'<li>'+s+'</li>').join('')+'</ol>';
+  $("m_ok").textContent="Got it"; $("m_ok").style.display=""; $("m_ok").disabled=false;
+  ov.classList.remove("hide"); requestAnimationFrame(()=>ov.classList.add("show"));
+  const close=()=>{ ov.classList.remove("show"); setTimeout(()=>ov.classList.add("hide"),160); document.removeEventListener("keydown",onKey); ov.onclick=null; };
+  function onKey(e){ if(e.key==="Escape") close(); }
+  $("m_ok").onclick=close; $("m_cancel").onclick=close; ov.onclick=(e)=>{ if(e.target===ov) close(); }; document.addEventListener("keydown",onKey);
+}
+async function loadAccounts(){
+  const r = await api("/app/connected-accounts");
+  const av = r.available||{}, accts = r.accounts||[];
+  const g=$("connGoogle"), m=$("connMs");
+  if(g){ g.disabled=false; g.innerHTML='<i class="ti ti-brand-google"></i> Connect Gmail'+(av.google?'':' <span class="chip c-q" style="font-size:10px;padding:1px 6px;margin-left:2px">needs setup</span>'); g.onclick=()=> av.google ? (location.href="/connect/google") : connectSetupInfo("Gmail","google"); }
+  if(m){ m.disabled=false; m.innerHTML='<i class="ti ti-brand-windows"></i> Connect Outlook'+(av.microsoft?'':' <span class="chip c-q" style="font-size:10px;padding:1px 6px;margin-left:2px">needs setup</span>'); m.onclick=()=> av.microsoft ? (location.href="/connect/microsoft") : connectSetupInfo("Outlook","microsoft"); }
+  $("accounts").innerHTML = accts.length ? accts.map(a=>`<div class="keyrow"><span class="mono">${esc2(a.email)}</span><span class="chip c-mut">${a.provider==="google"?"Gmail":"Outlook"}</span>${a.status==="active"?'<span class="chip c-sent">active</span>':`<span class="chip c-fail">${esc2(a.status)}</span>`}<span style="margin-left:auto;color:var(--tx3)">${ago(a.createdAt)}</span>${canDo("mailbox:write")?`<button class="btn" data-delacct="${a.id}" style="padding:4px 9px"><i class="ti ti-trash"></i></button>`:""}</div>`).join('')
+    : '<p class="muted" style="font-size:13px;margin:8px 0 0">No connected mailboxes — connect Gmail or Outlook to send from your own account.</p>';
+  document.querySelectorAll("[data-delacct]").forEach(b=>b.onclick=async()=>{ if(confirm("Disconnect this mailbox? Sending from it will stop.")){ await api("/app/connected-accounts/"+b.dataset.delacct,{method:"DELETE"}); loadAccounts(); }});
+}
+// --- Email template builder ---
+const TPL_DEFAULTS={heading:{text:'Heading',level:'h1',align:'left'},text:{text:'Write your message here. Use {{data.firstName}} to personalize.',align:'left'},button:{text:'Get started',href:'https://',align:'center'},image:{src:'',alt:'',align:'center'},divider:{},spacer:{height:24}};
+const TPL_ICON={heading:'ti-heading',text:'ti-align-left',button:'ti-click',image:'ti-photo',divider:'ti-separator-horizontal',spacer:'ti-arrows-vertical'};
+const ALIGN=[['left','Left'],['center','Center'],['right','Right']];
+const TPL_FIELDS={
+  heading:[['text','Text','text'],['level','Level','select',[['h1','H1'],['h2','H2'],['h3','H3']]],['align','Align','select',ALIGN],['fontSize','Font size (px)','number'],['color','Text color','text']],
+  text:[['text','Text','textarea'],['align','Align','select',ALIGN],['fontSize','Font size (px)','number'],['color','Text color','text']],
+  button:[['text','Label','text'],['href','Link URL','text'],['align','Align','select',ALIGN],['backgroundColor','Button color','text'],['textColor','Text color','text']],
+  image:[['src','Image URL','text'],['alt','Alt text','text'],['width','Max width (px)','number'],['align','Align','select',ALIGN]],
+  divider:[['color','Color','text'],['thickness','Thickness (px)','number']],
+  spacer:[['height','Height (px)','number']],
+};
+let tpl=null, tplTimer=null;
+function tplNewBlock(type){ return {id:'b_'+Math.random().toString(36).slice(2,9),type,props:{...TPL_DEFAULTS[type]}}; }
+function loadTemplatesSection(){ $("tpl_list_mode").classList.remove("hide"); $("tpl_edit_mode").classList.add("hide"); return loadTemplates(); }
+async function loadTemplates(){
+  let data; try{ ({data}=await api("/app/templates")); }catch{ return; }
+  $("tpl_list").innerHTML = data.length ? data.map(t=>`<div class="keyrow" data-tpl="${t.id}" style="cursor:pointer">
+    <i class="ti ti-template" style="color:var(--brand2)"></i><span style="font-weight:500">${esc2(t.name)}</span>
+    <span class="muted" style="font-size:12px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc2(t.subject||'(no subject)')}</span>
+    <span class="muted" style="font-size:11.5px">${t.usageCount} sent</span>
+    <button class="btn" data-tpldel="${t.id}" style="padding:4px 9px"><i class="ti ti-trash"></i></button></div>`).join('')
+    : '<p class="muted" style="font-size:13px;margin:8px 0 0">No templates yet — create one to reuse and send by template_id.</p>';
+  $("tpl_list").querySelectorAll("[data-tpl]").forEach(r=>r.onclick=(e)=>{ if(e.target.closest("[data-tpldel]"))return; editTemplate(r.dataset.tpl); });
+  $("tpl_list").querySelectorAll("[data-tpldel]").forEach(b=>b.onclick=async(e)=>{ e.stopPropagation(); if(confirm("Delete this template?")){ await api("/app/templates/"+b.dataset.tpldel,{method:"DELETE"}); loadTemplates(); }});
+}
+function startEditor(t){ tpl=t; tpl.sel=tpl.blocks[0]?.id||null; $("tpl_name").value=tpl.name; $("tpl_subject").value=tpl.subject; $("tpl_msg").textContent=""; renderPalette(); renderBlockList(); renderProps(); tplPreview(); $("tpl_list_mode").classList.add("hide"); $("tpl_edit_mode").classList.remove("hide"); }
+function newTemplate(){ startEditor({id:null,name:'Untitled template',subject:'Hi {{data.firstName}}',blocks:[tplNewBlock('heading'),tplNewBlock('text'),tplNewBlock('button')]}); }
+async function editTemplate(id){ let t; try{ t=await api("/app/templates/"+id); }catch(e){ alert(e.message); return; } const blocks=(t.content&&Array.isArray(t.content.blocks))?t.content.blocks:(Array.isArray(t.content)?t.content:[]); startEditor({id:t.id,name:t.name,subject:t.subject,blocks}); }
+function renderPalette(){ $("tpl_palette").innerHTML=Object.keys(TPL_DEFAULTS).map(type=>`<button class="btn" data-add="${type}" style="padding:5px 9px;font-size:12px;text-transform:capitalize"><i class="ti ${TPL_ICON[type]}"></i> ${type}</button>`).join('');
+  $("tpl_palette").querySelectorAll("[data-add]").forEach(b=>b.onclick=()=>{ const blk=tplNewBlock(b.dataset.add); tpl.blocks.push(blk); tpl.sel=blk.id; renderBlockList(); renderProps(); tplPreview(); }); }
+function renderBlockList(){ $("tpl_blocks").innerHTML=tpl.blocks.length?tpl.blocks.map((b,i)=>`<div class="keyrow" data-sel="${b.id}" style="cursor:pointer;${b.id===tpl.sel?'background:var(--brandsoft);border-radius:8px;padding:9px 8px':''}">
+    <i class="ti ${TPL_ICON[b.type]}" style="color:var(--brand2)"></i><span style="text-transform:capitalize">${b.type}</span>
+    <span class="muted" style="font-size:11.5px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc2((b.props&&(b.props.text||b.props.alt||b.props.src))||'')}</span>
+    <button class="btn" data-up="${i}" style="padding:2px 7px" ${i===0?'disabled':''}><i class="ti ti-chevron-up"></i></button>
+    <button class="btn" data-down="${i}" style="padding:2px 7px" ${i===tpl.blocks.length-1?'disabled':''}><i class="ti ti-chevron-down"></i></button>
+    <button class="btn" data-rm="${b.id}" style="padding:2px 7px"><i class="ti ti-x"></i></button></div>`).join('') : '<p class="muted" style="font-size:12.5px">Add a block above to begin.</p>';
+  $("tpl_blocks").querySelectorAll("[data-sel]").forEach(r=>r.onclick=(e)=>{ if(e.target.closest("button"))return; tpl.sel=r.dataset.sel; renderBlockList(); renderProps(); });
+  $("tpl_blocks").querySelectorAll("[data-up]").forEach(b=>b.onclick=()=>{ const i=+b.dataset.up; [tpl.blocks[i-1],tpl.blocks[i]]=[tpl.blocks[i],tpl.blocks[i-1]]; renderBlockList(); tplPreview(); });
+  $("tpl_blocks").querySelectorAll("[data-down]").forEach(b=>b.onclick=()=>{ const i=+b.dataset.down; [tpl.blocks[i+1],tpl.blocks[i]]=[tpl.blocks[i],tpl.blocks[i+1]]; renderBlockList(); tplPreview(); });
+  $("tpl_blocks").querySelectorAll("[data-rm]").forEach(b=>b.onclick=()=>{ tpl.blocks=tpl.blocks.filter(x=>x.id!==b.dataset.rm); if(tpl.sel===b.dataset.rm)tpl.sel=tpl.blocks[0]?.id||null; renderBlockList(); renderProps(); tplPreview(); });
+}
+function renderProps(){ const b=tpl.blocks.find(x=>x.id===tpl.sel); if(!b){ $("tpl_props").innerHTML=''; return; }
+  $("tpl_props").innerHTML=`<div class="card" style="background:var(--surface2);padding:12px 14px"><div class="lbl" style="margin-bottom:8px;text-transform:capitalize">${b.type} properties</div>`+(TPL_FIELDS[b.type]||[]).map(f=>{ const [key,label,type,opts]=f, val=b.props[key]??'';
+    if(type==='select') return `<div style="margin-bottom:8px"><label class="lbl">${label}</label><select class="in" data-prop="${key}">${opts.map(o=>`<option value="${o[0]}" ${String(val)===o[0]?'selected':''}>${o[1]}</option>`).join('')}</select></div>`;
+    if(type==='textarea') return `<div style="margin-bottom:8px"><label class="lbl">${label}</label><textarea class="in" data-prop="${key}" rows="3" style="resize:vertical">${esc2(String(val))}</textarea></div>`;
+    return `<div style="margin-bottom:8px"><label class="lbl">${label}</label><input class="in" data-prop="${key}" type="${type==='number'?'number':'text'}" value="${esc2(String(val))}"></div>`;
+  }).join('')+`</div>`;
+  $("tpl_props").querySelectorAll("[data-prop]").forEach(el=>el.oninput=()=>{ let v=el.value; if(el.type==='number') v=v===''?undefined:Number(v); b.props[el.dataset.prop]=v; renderBlockList(); tplPreview(); });
+}
+function tplPreview(){ clearTimeout(tplTimer); tplTimer=setTimeout(async()=>{ try{ const r=await api("/app/templates/preview",{method:"POST",body:JSON.stringify({content:{blocks:tpl.blocks}})}); $("tpl_preview").srcdoc=r.html; }catch{} },300); }
+// Branded transactional starters — buttons inherit the org brand colour at render.
+const STARTER_TEMPLATES={
+  welcome:{name:'Welcome',subject:'Welcome to {{organization.name}}!',blocks:[
+    {type:'heading',props:{text:'Welcome, {{data.firstName|\'there\'}}! 👋',level:'h1',align:'left'}},
+    {type:'text',props:{text:'Thanks for joining {{organization.name}}. We\'re glad you\'re here — here\'s how to get started.',align:'left'}},
+    {type:'button',props:{text:'Get started',href:'{{data.url}}',align:'left'}}]},
+  verify:{name:'Verify email',subject:'Confirm your email',blocks:[
+    {type:'heading',props:{text:'Confirm your email',level:'h1'}},
+    {type:'text',props:{text:'Tap below to verify {{data.email}} and finish setting up your {{organization.name}} account.'}},
+    {type:'button',props:{text:'Verify email',href:'{{data.verifyUrl}}',align:'left'}},
+    {type:'text',props:{text:'If you didn\'t create an account, you can safely ignore this email.',fontSize:13,color:'#6b7280'}}]},
+  reset:{name:'Password reset',subject:'Reset your password',blocks:[
+    {type:'heading',props:{text:'Reset your password',level:'h1'}},
+    {type:'text',props:{text:'We received a request to reset your password. Choose a new one below — this link expires in 1 hour.'}},
+    {type:'button',props:{text:'Reset password',href:'{{data.resetUrl}}',align:'left'}},
+    {type:'text',props:{text:'Didn\'t request this? Ignore this email and your password stays the same.',fontSize:13,color:'#6b7280'}}]},
+  magic:{name:'Magic sign-in link',subject:'Your sign-in link',blocks:[
+    {type:'heading',props:{text:'Sign in to {{organization.name}}',level:'h1'}},
+    {type:'text',props:{text:'Tap the button to sign in. The link expires in 10 minutes and works once.'}},
+    {type:'button',props:{text:'Sign in',href:'{{data.loginUrl}}',align:'left'}}]},
+  receipt:{name:'Receipt',subject:'Your receipt from {{organization.name}}',blocks:[
+    {type:'heading',props:{text:'Thanks for your purchase',level:'h1'}},
+    {type:'text',props:{text:'Hi {{data.firstName|\'there\'}}, here\'s your receipt.'}},
+    {type:'divider',props:{}},
+    {type:'text',props:{text:'Amount paid: {{data.amount|currency}}\nOrder: #{{data.orderId}}\nDate: {{data.date|date}}'}},
+    {type:'button',props:{text:'View receipt',href:'{{data.receiptUrl}}',align:'left'}}]},
+  inquiry:{name:'Inquiry received',subject:'We received your inquiry — {{organization.name}}',blocks:[
+    {type:'heading',props:{text:'We received your inquiry',level:'h1'}},
+    {type:'text',props:{text:'Hi {{data.firstName|\'there\'}},'}},
+    {type:'text',props:{text:'Thanks for contacting {{organization.name}}. We have your request. Someone will get back to you shortly.'}},
+    {type:'text',props:{text:'If you need us sooner, call {{data.phone}}.'}},
+    {type:'button',props:{text:'Call {{data.phone}}',href:'tel:{{data.phoneHref}}',align:'left'}},
+    {type:'text',props:{text:'You received this because you submitted an inquiry on {{organization.name}}.',fontSize:13,color:'#6b7280'}}]},
+};
+const STARTER_META=[['welcome','Welcome','ti-confetti'],['verify','Verify email','ti-mail-check'],['reset','Password reset','ti-lock'],['magic','Magic link','ti-wand'],['receipt','Receipt','ti-receipt'],['inquiry','Inquiry received','ti-message-check']];
+function tplFromStarter(s){ return { id:null, name:s.name, subject:s.subject, blocks:s.blocks.map(b=>({id:'b_'+Math.random().toString(36).slice(2,9),type:b.type,props:{...b.props}})) }; }
+function tplPicker(){
+  const ov=$("ov");
+  $("m_title").innerHTML='<i class="ti ti-template" style="color:var(--brand2)"></i> New template';
+  $("m_sub").style.display="block"; $("m_sub").textContent="Start blank, or from a branded transactional template.";
+  $("m_err").textContent="";
+  $("m_fields").innerHTML='<div style="display:grid;gap:6px">'+
+    `<button class="btn" data-starter="blank" style="justify-content:flex-start;padding:10px 12px"><i class="ti ti-file"></i> Blank template</button>`+
+    STARTER_META.map(([k,label,icon])=>`<button class="btn" data-starter="${k}" style="justify-content:flex-start;padding:10px 12px"><i class="ti ${icon}" style="color:var(--brand2)"></i> ${label}</button>`).join('')+'</div>';
+  $("m_ok").style.display="none";
+  ov.classList.remove("hide"); requestAnimationFrame(()=>ov.classList.add("show"));
+  const close=()=>{ ov.classList.remove("show"); setTimeout(()=>ov.classList.add("hide"),160); $("m_ok").style.display=""; document.removeEventListener("keydown",onKey); ov.onclick=null; };
+  function onKey(e){ if(e.key==="Escape") close(); }
+  $("m_cancel").onclick=close; ov.onclick=(e)=>{ if(e.target===ov) close(); }; document.addEventListener("keydown",onKey);
+  $("m_fields").querySelectorAll("[data-starter]").forEach(b=>b.onclick=()=>{ const k=b.dataset.starter; close(); if(k==='blank') newTemplate(); else startEditor(tplFromStarter(STARTER_TEMPLATES[k])); });
+}
+// Pop the current rendered email into a wide (640px) overlay so it can be judged
+// at true email width, beyond the dashboard's 1200px shell cap.
+function tplFullPreview(){
+  const html=$("tpl_preview").srcdoc||'';
+  const ov=document.createElement('div');
+  ov.style.cssText='position:fixed;inset:0;background:rgba(2,6,20,.72);z-index:1000;display:flex;align-items:flex-start;justify-content:center;padding:32px 16px;overflow:auto';
+  ov.innerHTML=`<div style="width:100%;max-width:640px"><div style="display:flex;justify-content:flex-end;margin-bottom:8px"><button class="btn" id="fp_close" style="padding:6px 12px"><i class="ti ti-x"></i> Close</button></div><iframe sandbox style="width:100%;height:82vh;border:0;border-radius:10px;background:#fff" srcdoc="${esc2(html)}"></iframe></div>`;
+  document.body.appendChild(ov);
+  const close=()=>{ ov.remove(); document.removeEventListener('keydown',onKey); };
+  function onKey(e){ if(e.key==='Escape') close(); }
+  ov.querySelector('#fp_close').onclick=close; ov.onclick=(e)=>{ if(e.target===ov) close(); }; document.addEventListener('keydown',onKey);
+}
+if($("tpl_new")) $("tpl_new").onclick=tplPicker;
+if($("tpl_fullpreview")) $("tpl_fullpreview").onclick=tplFullPreview;
+if($("tpl_back")) $("tpl_back").onclick=loadTemplatesSection;
+if($("tpl_save")) $("tpl_save").onclick=async()=>{ tpl.name=$("tpl_name").value.trim()||'Untitled template'; tpl.subject=$("tpl_subject").value;
+  const body={name:tpl.name,subject:tpl.subject,content:{blocks:tpl.blocks}}; $("tpl_save").disabled=true; $("tpl_msg").innerHTML='<span class="muted">Saving…</span>';
+  try{ if(tpl.id){ await api("/app/templates/"+tpl.id,{method:"PUT",body:JSON.stringify(body)}); } else { const r=await api("/app/templates",{method:"POST",body:JSON.stringify(body)}); tpl.id=r.id; } $("tpl_msg").innerHTML='<span style="color:var(--ok)">Saved ✓</span>'; }
+  catch(e){ $("tpl_msg").innerHTML=`<span style="color:#f87171">${esc2(e.message)}</span>`; }
+  finally{ $("tpl_save").disabled=false; }
+};
+// --- Account settings ---
+async function loadSettings(){
+  const me = await api("/auth/me");
+  const u = me.user||{};
+  $("set_email").textContent = u.email||"—";
+  $("set_name").textContent = u.name||"—";
+  $("set_since").textContent = u.createdAt ? new Date(u.createdAt).toLocaleDateString() : "—";
+  $("set_verify").innerHTML = me.emailVerified
+    ? '<span class="chip c-sent"><i class="ti ti-rosette-discount-check-filled"></i> verified</span>'
+    : '<span class="chip c-q">unverified</span> <button id="set_resend" class="btn" style="padding:3px 10px;font-size:12px;margin-left:6px">Resend</button>';
+  if($("set_resend")) $("set_resend").onclick=async(e)=>{ const b=e.target; b.disabled=true; b.textContent="Sending…"; try{ await api("/auth/resend-verification",{method:"POST"}); b.textContent="Sent ✓"; }catch(err){ alert(err.message); b.disabled=false; b.textContent="Resend"; } };
+  const br = me.branding||{};
+  if($("br_color")) $("br_color").value = br.primaryColor||"";
+  if($("br_logo")) $("br_logo").value = br.logoUrl||"";
+  if($("br_powered")) $("br_powered").checked = br.poweredBy!==false;
+  // Gate owner/admin-only controls in the UI (the server still enforces every op).
+  const canManageOrg = me.role==='owner'||me.role==='admin';
+  ['br_color','br_logo','br_powered','br_save'].forEach(id=>{ const el=$(id); if(el) el.disabled=!canManageOrg; });
+  if($("br_save")) $("br_save").style.display = canManageOrg?'':'none';
+  loadPlan().catch(()=>{});
+  loadTeam().catch(()=>{});
+}
+// --- Team / RBAC ---
+let TEAM=null;
+const cap=s=>String(s||"").charAt(0).toUpperCase()+String(s||"").slice(1);
+function roleBadge(role){ const m={owner:'c-sent',admin:'c-q',developer:'c-mut',viewer:'c-mut'}; return `<span class="chip ${m[role]||'c-mut'}" style="text-transform:capitalize">${esc2(role)}</span>`; }
+function initials(s){ s=String(s||'').trim(); if(!s) return '?'; const p=s.split(/\s+/); return ((p[0]&&p[0][0]||'')+(p[1]&&p[1][0]||'')).toUpperCase()||s[0].toUpperCase(); }
+function avatar(txt,icon){ return `<span style="width:30px;height:30px;border-radius:50%;background:${icon?'var(--surface2)':'var(--brandsoft)'};color:${icon?'var(--tx3)':'var(--brand2)'};display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;flex:0 0 auto">${icon?'<i class="ti ti-mail"></i>':esc2(txt)}</span>`; }
+async function loadTeam(){
+  if(!$("teambox")) return;
+  let t; try{ t=await api("/app/team"); }catch(e){ $("teambox").innerHTML=`<span class="muted" style="font-size:13px">${esc2(e.message)}</span>`; return; }
+  TEAM=t;
+  $("team_seats").textContent = `${t.seats.used} / ${t.seats.limit<0?'∞':t.seats.limit} seats`;
+  const ib=$("team_invite");
+  if(t.canManage){ ib.style.display=''; ib.onclick=inviteModal; } else { ib.style.display='none'; }
+  const rows = t.members.map(m=>{
+    const name=m.name||m.email.split('@')[0];
+    const ctrl = m.canManage
+      ? `<select class="in" data-role-for="${esc2(m.userId)}" style="width:auto;padding:5px 8px;font-size:12.5px">${t.assignableRoles.map(r=>`<option value="${r}" ${r===m.role?'selected':''}>${cap(r)}</option>`).join('')}</select><button class="btn" data-remove-mem="${esc2(m.userId)}" data-remove-name="${esc2(name)}" style="padding:5px 9px;font-size:12px" title="Remove from team"><i class="ti ti-user-minus"></i></button>`
+      : roleBadge(m.role)+(m.isYou&&t.canManage?'':'');
+    return `<div class="keyrow" style="align-items:center;gap:10px">${avatar(initials(name))}<span style="min-width:0"><span style="display:block;font-weight:500">${esc2(name)} ${m.isYou?'<span class="muted" style="font-weight:400">(you)</span>':''}</span><span class="muted mono" style="font-size:12px">${esc2(m.email)}</span></span><span style="margin-left:auto;display:flex;align-items:center;gap:8px">${ctrl}</span></div>`;
+  }).join('');
+  const inv = t.invites.length ? `<div style="margin-top:14px"><div class="muted" style="font-size:12px;font-weight:600;margin-bottom:6px">Pending invites</div>${t.invites.map(i=>`<div class="keyrow" style="align-items:center;gap:10px">${avatar('',true)}<span style="min-width:0"><span class="mono" style="font-size:12.5px">${esc2(i.email)}</span> ${roleBadge(i.role)}</span><span style="margin-left:auto;display:flex;align-items:center;gap:8px"><span class="muted" style="font-size:11.5px">invited ${ago(i.invitedAt)}</span>${t.canManage?`<button class="btn" data-revoke="${esc2(i.id)}" style="padding:5px 9px;font-size:12px">Revoke</button>`:''}</span></div>`).join('')}</div>` : '';
+  $("teambox").innerHTML = rows + inv;
+  $("teambox").querySelectorAll("[data-role-for]").forEach(sel=>{ sel._prev=sel.value; sel.onchange=async()=>{ sel.disabled=true; try{ await api(`/app/team/${sel.dataset.roleFor}/role`,{method:"PATCH",body:JSON.stringify({role:sel.value})}); loadTeam(); }catch(e){ alert(e.message); sel.value=sel._prev; sel.disabled=false; } }; });
+  $("teambox").querySelectorAll("[data-remove-mem]").forEach(b=>{ b.onclick=async()=>{ if(!confirm(`Remove ${b.dataset.removeName} from the team?`))return; b.disabled=true; try{ await api(`/app/team/${b.dataset.removeMem}`,{method:"DELETE"}); loadTeam(); }catch(e){ alert(e.message); b.disabled=false; } }; });
+  $("teambox").querySelectorAll("[data-revoke]").forEach(b=>{ b.onclick=async()=>{ b.disabled=true; try{ await api(`/app/team/invites/${b.dataset.revoke}`,{method:"DELETE"}); loadTeam(); }catch(e){ alert(e.message); b.disabled=false; } }; });
+}
+function inviteModal(){
+  if(!TEAM) return;
+  const roles=(TEAM.assignableRoles||[]).filter(r=>r!=='owner');
+  openModal({
+    title:"Invite a teammate", icon:"ti-user-plus",
+    sub:"They'll get an email with a secure link to join this account.",
+    fields:[
+      {id:"email",label:"Email",placeholder:"teammate@company.com",type:"email"},
+      {id:"role",label:"Role",type:"select",options:roles.map(r=>[r,cap(r)]),value:roles.indexOf('developer')>=0?'developer':roles[0],hint:"Admins manage team, domains & branding · Developers send & manage keys · Viewers are read-only."},
+    ],
+    submitLabel:"Send invite",
+    onSubmit: async ({email,role})=>{ if(!email) throw new Error("Enter an email address."); await api("/app/team/invite",{method:"POST",body:JSON.stringify({email,role})}); loadTeam(); }
+  });
+}
+// --- Sub-accounts (agency layer) + org switcher ---
+let SUBA=null;
+async function loadSubaccounts(){
+  if(!$("subacctbox")) return;
+  let r; try{ r=await api("/app/subaccounts"); }catch(e){ $("subacctbox").innerHTML=`<span class="muted" style="font-size:13px">${esc2(e.message)}</span>`; return; }
+  SUBA=r;
+  const nb=$("newSubacct"); if(nb){ nb.style.display=r.canCreate?'':'none'; nb.onclick=newSubaccountModal; }
+  if(!r.data.length){ $("subacctbox").innerHTML='<p class="muted" style="font-size:13px;margin:6px 0 0">No sub-accounts yet'+(r.canCreate?' — create one to manage a client as its own isolated account.':'.')+'</p>'; return; }
+  $("subacctbox").innerHTML = r.data.map(s=>`<div class="keyrow" style="align-items:center;gap:12px">
+    <span style="width:34px;height:34px;border-radius:9px;background:var(--brandsoft);color:var(--brand2);display:inline-flex;align-items:center;justify-content:center;font-weight:600;flex:0 0 auto">${esc2(initials(s.name))}</span>
+    <span style="min-width:0"><span style="display:block;font-weight:500">${esc2(s.name)}</span><span class="muted" style="font-size:12px">${s.members} member${s.members===1?'':'s'} · ${s.domains} domain${s.domains===1?'':'s'} · ${Number(s.sends).toLocaleString()} sent this month</span></span>
+    <span style="margin-left:auto;display:flex;align-items:center;gap:8px"><span class="chip c-mut" style="text-transform:capitalize">${esc2(String(s.plan).replace(/-/g,' '))}</span><button class="btn pri" data-open-suba="${esc2(s.id)}" style="padding:5px 12px;font-size:12.5px"><i class="ti ti-arrow-right"></i> Open</button></span>
+  </div>`).join('');
+  $("subacctbox").querySelectorAll("[data-open-suba]").forEach(b=>{ b.onclick=()=>switchOrg(b.dataset.openSuba); });
+  loadSubBilling();
+  loadPayments();
+  loadSubAudit();
+}
+async function startConnect(){ try{ const r=await api("/app/billing/connect",{method:"POST"}); if(r.url){ location.href=r.url; } else { alert("Could not start onboarding."); } }catch(e){ alert(e.message); } }
+async function loadPayments(){
+  if(!$("paybox")) return;
+  let s; try{ s=await api("/app/billing/connect"); }catch(e){ $("paybox").innerHTML=`<span class="muted" style="font-size:13px">${esc2(e.message)}</span>`; return; }
+  const st=$("payStatus"), box=$("paybox");
+  const connectBtn=label=>s.canManage?`<button class="btn pri" id="payConnect" style="padding:6px 14px;font-size:13px"><i class="ti ti-brand-stripe"></i> ${esc2(label)}</button>`:'<span class="muted" style="font-size:12.5px">Ask an owner to connect a payout account.</span>';
+  if(!s.configured){
+    st.innerHTML='<span class="chip c-mut">not available</span>';
+    box.innerHTML='<p class="muted" style="font-size:13px;margin:6px 0 0">Payments aren\'t enabled on this instance yet. Once Stripe is configured, you can connect your account here.</p>';
+    return;
+  }
+  if(s.connected && s.chargesEnabled){
+    st.innerHTML='<span class="chip c-sent"><i class="ti ti-rosette-discount-check-filled"></i> connected</span>';
+    box.innerHTML='<p style="font-size:13px;margin:6px 0 8px">Your Stripe account is connected and ready to accept charges.</p>'+connectBtn('Update details');
+  } else if(s.connected){
+    st.innerHTML='<span class="chip c-q">onboarding incomplete</span>';
+    box.innerHTML='<p class="muted" style="font-size:13px;margin:6px 0 8px">Stripe needs a few more details before you can accept charges.</p>'+connectBtn('Continue onboarding');
+  } else {
+    st.innerHTML='<span class="chip c-mut">not connected</span>';
+    box.innerHTML=connectBtn('Connect Stripe');
+  }
+  if($("payConnect")) $("payConnect").onclick=startConnect;
+}
+const money=n=>'$'+Number(n||0).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
+async function loadSubBilling(){
+  if(!$("billbox")) return;
+  let b; try{ b=await api("/app/subaccounts/billing"); }catch(e){ $("billbox").innerHTML=`<span class="muted" style="font-size:13px">${esc2(e.message)}</span>`; return; }
+  $("billPeriod").textContent = b.period;
+  $("billTotal").textContent = money(b.totals.totalUsd)+(b.hasCustom?' + custom':'')+' /mo';
+  if(!b.children.length){ $("billbox").innerHTML='<p class="muted" style="font-size:13px;margin:6px 0 0">No client accounts to bill yet.</p>'; return; }
+  const planChip=p=>`<span class="chip c-mut" style="text-transform:capitalize">${esc2(String(p).replace(/-/g,' '))}</span>`;
+  const row=l=>`<tr>
+    <td>${esc2(l.name)}</td>
+    <td>${planChip(l.plan)}</td>
+    <td style="text-align:right;white-space:nowrap">${Number(l.usedSends).toLocaleString()}${l.includedSends>=0?'<span class="muted"> / '+Number(l.includedSends).toLocaleString()+'</span>':''}</td>
+    <td style="text-align:right">${l.custom?'<span class="muted">custom</span>':money(l.monthlyUsd)}</td>
+    <td style="text-align:right">${l.overageUsd>0?money(l.overageUsd):'<span class="muted">—</span>'}</td>
+    <td style="text-align:right;font-weight:600">${l.custom?'<span class="muted">quote</span>':money(l.totalUsd)}</td>
+  </tr>`;
+  $("billbox").innerHTML = `<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:13px">
+    <thead><tr><th>Client</th><th>Plan</th><th style="text-align:right">Sends</th><th style="text-align:right">Base</th><th style="text-align:right">Overage</th><th style="text-align:right">Total</th></tr></thead>
+    <tbody>${b.children.map(row).join('')}</tbody>
+    <tfoot><tr><td colspan="5" style="text-align:right;font-weight:600;border-bottom:none">Total / month</td><td style="text-align:right;font-weight:700;border-bottom:none">${money(b.totals.totalUsd)}</td></tr></tfoot>
+  </table></div>${b.hasCustom?'<p class="muted" style="font-size:11.5px;margin:8px 0 0">Enterprise accounts are billed by custom quote and excluded from the total.</p>':''}`;
+}
+async function loadSubAudit(){
+  if(!$("subauditbox")) return;
+  let r; try{ r=await api("/app/subaccounts/audit"); }catch(e){ $("subauditbox").innerHTML=`<span class="muted" style="font-size:13px">${esc2(e.message)}</span>`; return; }
+  if(!r.data.length){ $("subauditbox").innerHTML='<p class="muted" style="font-size:13px;margin:6px 0 0">No activity yet.</p>'; return; }
+  const verb={ "subaccount.open":"opened", "subaccount.create":"created" };
+  $("subauditbox").innerHTML = r.data.map(a=>`<div class="keyrow" style="align-items:center;gap:10px;font-size:13px">
+    <i class="ti ${a.action==='subaccount.create'?'ti-plus':'ti-arrow-right'}" style="color:var(--tx3);width:16px;flex:0 0 auto"></i>
+    <span style="min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"><span class="mono">${esc2(a.actor)}</span> ${esc2(verb[a.action]||a.action)} <strong>${esc2(a.target||'—')}</strong></span>
+    <span class="muted" style="margin-left:auto;font-size:12px;flex:0 0 auto">${ago(a.createdAt)}</span>
+  </div>`).join('');
+}
+function newSubaccountModal(){
+  openModal({ title:"New sub-account", icon:"ti-building-store", sub:"Creates an isolated client account you can manage. You'll be added as its owner.",
+    fields:[{id:"name",label:"Account name",placeholder:"Client Inc"}], submitLabel:"Create",
+    onSubmit: async ({name})=>{ if(!name) throw new Error("Enter a name."); const s=await api("/app/subaccounts",{method:"POST",body:JSON.stringify({name})}); await loadSubaccounts(); if(confirm(`Created “${s.name}”. Open it now?`)) switchOrg(s.id); } });
+}
+async function switchOrg(orgId){ try{ await api("/app/subaccounts/switch",{method:"POST",body:JSON.stringify({orgId})}); location.href="/dashboard"; }catch(e){ alert(e.message); } }
+async function exitSubaccount(){ try{ await api("/app/subaccounts/exit",{method:"POST"}); location.href="/dashboard"; }catch(e){ alert(e.message); } }
+function toggleOrgMenu(force){ const m=$("orgswMenu"); if(!m) return; const show = force===undefined ? m.classList.contains("hide") : force; m.classList.toggle("hide", !show); }
+function renderOrgSwitcher(me){
+  const a=me.account, sw=$("orgsw"); if(!a||!sw) return;
+  const memberships=a.memberships||[];
+  if(memberships.length<=1 && !a.canManageSubaccounts && !a.isSubAccount){ sw.classList.add("hide"); return; }
+  sw.classList.remove("hide");
+  $("orgswName").textContent = a.name || "Account";
+  const item=(inner,attrs)=>`<div class="osw-item" ${attrs} style="display:flex;align-items:center;gap:9px;padding:8px 9px;border-radius:8px;cursor:pointer;font-size:13px">${inner}</div>`;
+  const rows = memberships.map(m=>item(
+    `<i class="ti ${m.orgId===a.activeOrgId?'ti-check':'ti-point'}" style="color:${m.orgId===a.activeOrgId?'var(--brand2)':'var(--tx3)'};width:16px"></i><span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc2(m.name)}</span>${m.isSubAccount?'<span class="chip c-mut" style="font-size:10px">sub</span>':''}`,
+    `data-switch="${esc2(m.orgId)}"`)).join('');
+  const manage = a.canManageSubaccounts ? `<div style="border-top:1px solid var(--line);margin:5px 0"></div>`+item('<i class="ti ti-building-store" style="width:16px"></i> Manage sub-accounts','data-go-suba="1" data-accent="1"') : '';
+  const back = a.isSubAccount ? item('<i class="ti ti-arrow-back-up" style="width:16px;color:var(--tx3)"></i> Back to my account','data-exit="1"') : '';
+  $("orgswMenu").innerHTML = `<div style="font-size:11px;color:var(--tx3);padding:4px 9px 6px">Switch account</div>${rows}${manage}${back}`;
+  $("orgswMenu").querySelectorAll(".osw-item").forEach(el=>{ if(el.dataset.accent) el.style.color='var(--brand2)'; el.onmouseenter=()=>el.style.background='var(--surface2)'; el.onmouseleave=()=>el.style.background=''; });
+  $("orgswMenu").querySelectorAll("[data-switch]").forEach(el=>el.onclick=()=>{ const id=el.dataset.switch; if(id!==a.activeOrgId) switchOrg(id); else toggleOrgMenu(false); });
+  $("orgswMenu").querySelectorAll("[data-go-suba]").forEach(el=>el.onclick=()=>{ toggleOrgMenu(false); showSection("subaccounts"); });
+  $("orgswMenu").querySelectorAll("[data-exit]").forEach(el=>el.onclick=()=>exitSubaccount());
+}
+if($("orgswBtn")) $("orgswBtn").onclick=(e)=>{ e.stopPropagation(); toggleOrgMenu(); };
+document.addEventListener("click",(e)=>{ const sw=$("orgsw"); if(sw && !sw.contains(e.target)) toggleOrgMenu(false); });
+function usageBar(label, used, limit){
+  const unl = limit < 0, over = !unl && used >= limit;
+  const pct = unl ? 8 : Math.min(100, Math.round(used/Math.max(1,limit)*100));
+  return `<div style="margin-bottom:10px">
+    <div style="display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:3px"><span>${esc2(label)}</span><span class="${over?'':'muted'}" style="${over?'color:#f87171':''}">${used.toLocaleString()}${unl?' / ∞':' / '+limit.toLocaleString()}</span></div>
+    <div class="prog"><i style="width:${pct}%;${over?'background:#f87171':''}"></i></div>
+  </div>`;
+}
+async function loadPlan(){
+  let p; try{ p=await api("/app/plan"); }catch{ return; }
+  const L=p.limits, u=p.usage;
+  // Top-bar chip reflects the real plan rather than a hardcoded "production" label.
+  const chipTop=$("planChipTop");
+  const planLabel=String(p.plan).replace(/-/g,' ');
+  const operator=Boolean(p.operator) || p.plan==="enterprise";
+  if(chipTop){ chipTop.textContent = planLabel; chipTop.className = operator ? "chip c-gold" : "chip c-mut"; }
+  $("planbox").innerHTML = `
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+      <span class="chip ${operator?'c-gold':'c-q'}" style="text-transform:capitalize">${esc2(planLabel)} plan</span>
+      <span class="muted" style="font-size:12px">${L.monthlySends<0?'unlimited':`sends reset monthly · ${esc2(u.period)}`}</span>
+    </div>
+    ${usageBar('Emails sent this month', u.sends, L.monthlySends)}
+    ${usageBar('Sending domains', u.domains, L.sendingDomains)}
+    ${usageBar('Webhook endpoints', u.webhooks, L.webhookEndpoints)}
+    ${usageBar('Team seats', u.seats, L.teamSeats)}
+    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px">
+      <span class="chip ${L.customBranding?'c-sent':'c-mut'}">${L.customBranding?'':'no '}custom branding</span>
+      ${L.customDomain?'<span class="chip c-sent">custom domain</span>':''}
+      ${L.dedicatedIp?'<span class="chip c-sent">dedicated IP</span>':''}
+    </div>`;
+}
+// Apply per-tenant white-label branding: drive the existing CSS vars from one
+// brand colour, and swap the wordmark for the tenant logo (https only).
+function applyBranding(b){
+  if(!b) return;
+  const s=document.documentElement.style;
+  const hex=/^#[0-9a-f]{6}$/i.test(b.primaryColor||"")?b.primaryColor:null;
+  if(hex){
+    const r=parseInt(hex.slice(1,3),16), g=parseInt(hex.slice(3,5),16), bl=parseInt(hex.slice(5,7),16), li=x=>Math.round(x+(255-x)*0.30);
+    s.setProperty('--brand',hex); s.setProperty('--brand2',`rgb(${li(r)},${li(g)},${li(bl)})`); s.setProperty('--brandsoft',`rgba(${r},${g},${bl},.14)`);
+  } else { s.removeProperty('--brand'); s.removeProperty('--brand2'); s.removeProperty('--brandsoft'); }
+  const brand=document.querySelector('.brand');
+  if(brand){
+    brand.innerHTML = (b.logoUrl && /^https:\/\//i.test(b.logoUrl))
+      ? `<img src="${esc2(b.logoUrl)}" alt="${esc2(b.name||'brand')}" style="height:24px;max-width:160px;object-fit:contain;display:block">`
+      : '<i class="ti ti-mail-fast"></i>EMS';
+  }
+}
+if($("br_save")) $("br_save").onclick = async () => {
+  const color=$("br_color").value.trim(), logo=$("br_logo").value.trim(), powered=$("br_powered").checked, msg=$("br_msg");
+  if(color && !/^#[0-9a-f]{6}$/i.test(color)){ msg.innerHTML='<span style="color:#f87171">Colour must be a 6-digit hex like #6d5efc.</span>'; return; }
+  if(logo && !/^https:\/\//i.test(logo)){ msg.innerHTML='<span style="color:#f87171">Logo URL must start with https://.</span>'; return; }
+  $("br_save").disabled=true; msg.innerHTML='<span class="muted">Saving…</span>';
+  try{
+    const b=await api("/app/branding",{method:"PUT",body:JSON.stringify({primaryColor:color||null,logoUrl:logo||null,poweredBy:powered})});
+    applyBranding(b);
+    msg.innerHTML='<span style="color:var(--ok)">Branding saved — applied across the console.</span>';
+  }catch(e){ msg.innerHTML=`<span style="color:#f87171">${esc2(e.message)}</span>`; }
+  finally{ $("br_save").disabled=false; }
+};
+$("cpw_submit").onclick = async () => {
+  const cur=$("cpw_cur").value, nw=$("cpw_new").value, cf=$("cpw_confirm").value, msg=$("cpw_msg");
+  if(!cur){ msg.innerHTML='<span style="color:#f87171">Enter your current password.</span>'; return; }
+  if(nw.length<8){ msg.innerHTML='<span style="color:#f87171">New password must be at least 8 characters.</span>'; return; }
+  if(nw!==cf){ msg.innerHTML='<span style="color:#f87171">New passwords don\'t match.</span>'; return; }
+  $("cpw_submit").disabled=true; msg.innerHTML='<span class="muted">Updating…</span>';
+  try{
+    await api("/auth/change-password",{method:"POST",body:JSON.stringify({currentPassword:cur,newPassword:nw})});
+    msg.innerHTML='<span style="color:var(--ok)">Password updated — other sessions signed out.</span>';
+    $("cpw_cur").value=$("cpw_new").value=$("cpw_confirm").value="";
+  }catch(e){ msg.innerHTML=`<span style="color:#f87171">${esc2(e.message)}</span>`; }
+  finally{ $("cpw_submit").disabled=false; }
+};
+$("signoutOthers").onclick = async () => {
+  if(!confirm("Sign out of all other sessions? You'll stay signed in on this device."))return;
+  const b=$("signoutOthers"); b.disabled=true;
+  try{ await api("/auth/signout-others",{method:"POST"}); alert("Signed out of all other sessions."); }
+  catch(e){ alert(e.message); }
+  finally{ b.disabled=false; }
+};
+if($("priv_export")) $("priv_export").onclick = async () => {
+  const b=$("priv_export"); const msg=$("priv_msg");
+  b.disabled=true; if(msg) msg.textContent="Preparing…";
+  try{
+    const data=await api("/app/privacy/export");
+    const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});
+    const a=document.createElement("a");
+    a.href=URL.createObjectURL(blob);
+    a.download=`ems-export-${new Date().toISOString().slice(0,10)}.json`;
+    a.click();
+    URL.revokeObjectURL(a.href);
+    if(msg) msg.innerHTML='<span style="color:var(--ok)">Downloaded ✓</span>';
+  }catch(e){ if(msg) msg.innerHTML=`<span style="color:#f87171">${esc2(e.message)}</span>`; }
+  finally{ b.disabled=false; }
+};
+if($("priv_delete")) $("priv_delete").onclick = () => openModal({
+  title:"Delete account", icon:"ti-trash",
+  sub:"This signs you out and removes your user. Organizations you solely own are deleted with you. Organizations with other members are not — transfer ownership first.",
+  fields:[{id:"password",label:"Confirm with your password",type:"password",placeholder:"Your password"}],
+  submitLabel:"Delete my account",
+  onSubmit: async ({password})=>{
+    if(!password) throw new Error("Enter your password.");
+    await api("/app/privacy/delete",{method:"POST",body:JSON.stringify({password})});
+    location.href="/dashboard";
+  }
+});
+const esc2=s=>String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const esc=s=>String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+// Wire every [data-copy] button inside `root` to the clipboard. Function declaration
+// (not const) so it's hoisted for callers defined earlier in this script.
+function bindCopy(root){
+  (root||document).querySelectorAll("[data-copy]").forEach(b=>b.onclick=async(e)=>{
+    e.stopPropagation();
+    try{
+      await navigator.clipboard.writeText(decodeURIComponent(b.dataset.copy));
+      const t=b.textContent; b.textContent="Copied"; setTimeout(()=>b.textContent=t,1200);
+    }catch{}
+  });
+}
+let openDom=null, domTimer=null;
+const REC_META={dkim:{icon:"ti-shield-lock",label:"DKIM",note:"Cryptographically signs your mail — required to send."},spf:{icon:"ti-server-bolt",label:"SPF",note:"Authorizes our servers to send for your domain."},dmarc:{icon:"ti-clipboard-check",label:"DMARC",note:"Alignment + reporting policy (recommended)."}};
+function domStatusChip(s){return s==="verified"?'<span class="chip c-sent"><i class="ti ti-rosette-discount-check-filled"></i> verified</span>':s==="failed"?'<span class="chip c-fail">action needed</span>':'<span class="chip c-q">pending</span>';}
+
+async function loadDnsToken(){
+  let s; try{ s=await api("/app/dns-provider-token"); }catch{ return; }
+  const el=$("dnsconn"); if(!el) return;
+  if(s.connected){
+    el.innerHTML=`<span class="chip c-sent"><i class="ti ti-cloud-check"></i> DNS provider connected</span> <span class="muted">one-click publishing uses your own DNS account.</span> <button class="btn" id="dnsDisc" style="padding:3px 9px;font-size:12px">Disconnect</button>`;
+    $("dnsDisc").onclick=async()=>{ if(confirm("Disconnect your DNS provider token?")){ await api("/app/dns-provider-token",{method:"DELETE"}); loadDnsToken(); } };
+  } else {
+    const fb='';
+    el.innerHTML=`<span class="muted"><i class="ti ti-cloud"></i> Connect your DNS provider to publish DNS to your own zones with one click${fb}.</span> <button class="btn" id="dnsConn" style="padding:3px 9px;font-size:12px">Connect</button>`;
+    $("dnsConn").onclick=()=>openModal({ title:"Connect DNS provider", icon:"ti-cloud", sub:"Paste a managed-DNS API token (Zone:Read + DNS:Edit). It's encrypted at rest and never shown again.", fields:[{id:"token",label:"API token",placeholder:"your DNS provider API token",type:"password"}], submitLabel:"Connect", onSubmit: async ({token})=>{ if(!token) throw new Error("Paste a token."); await api("/app/dns-provider-token",{method:"POST",body:JSON.stringify({token})}); loadDnsToken(); } });
+  }
+}
+async function loadDomains(){
+  await loadDnsToken();
+  const { data } = await api("/app/domains");
+  if(!data.length){ $("domains").innerHTML='<p class="muted" style="font-size:13px;margin:8px 0 0">No domains yet — add one to send from your own domain.</p>'; return; }
+  $("domains").innerHTML = data.map(d=>`<div class="dom">
+    <div class="dom-row" data-open="${d.id}">
+      <i class="ti ti-chevron-right" id="chev-${d.id}" style="color:var(--tx3);transition:.15s"></i>
+      <span class="dom-name">${esc(d.name)}</span>${domStatusChip(d.status)}
+      <span style="margin-left:auto;color:var(--tx3);font-size:12px">${d.verifiedAt?"verified "+ago(d.verifiedAt):"added "+ago(d.createdAt)}</span>
+    </div>
+    <div class="dom-panel hide" id="panel-${d.id}"></div>
+  </div>`).join("");
+  document.querySelectorAll("[data-open]").forEach(r=>r.onclick=()=>toggleDomain(r.dataset.open));
+  if(openDom && data.some(d=>d.id===openDom)){ const id=openDom; openDom=null; toggleDomain(id, true); }
+}
+
+function stopPoll(){ if(domTimer){ clearInterval(domTimer); domTimer=null; } }
+function toggleDomain(id, force){
+  const panel=$("panel-"+id), chev=$("chev-"+id); if(!panel) return;
+  const isOpen=!panel.classList.contains("hide");
+  stopPoll();
+  document.querySelectorAll(".dom-panel").forEach(p=>{ if(p!==panel){ p.classList.add("hide"); p.innerHTML=""; }});
+  document.querySelectorAll("[id^=chev-]").forEach(c=>{ if(c!==chev) c.style.transform=""; });
+  if(isOpen && !force){ panel.classList.add("hide"); panel.innerHTML=""; chev.style.transform=""; openDom=null; return; }
+  panel.classList.remove("hide"); chev.style.transform="rotate(90deg)"; openDom=id;
+  panel.innerHTML='<div class="muted" style="font-size:13px;padding:8px 0"><span class="spin"></span> Loading DNS status…</div>';
+  openDomainPanel(id);
+}
+async function openDomainPanel(id){
+  try{
+    const [cf, st] = await Promise.all([
+      api("/app/domains/"+id+"/dns-provider").catch(()=>({configured:false,available:false,zone:null})),
+      api("/app/domains/"+id+"/status"),
+    ]);
+    if(openDom!==id) return;
+    renderDomainPanel(id, st, cf);
+    stopPoll();
+    if(!st.verified) domTimer=setInterval(()=>pollDomain(id, cf), 6000);
+  }catch(e){ if($("panel-"+id)) $("panel-"+id).innerHTML='<p class="muted" style="font-size:13px">Could not load status: '+esc(e.message)+'</p>'; }
+}
+async function pollDomain(id, cf){
+  if(openDom!==id){ stopPoll(); return; }
+  try{ const st=await api("/app/domains/"+id+"/status"); if(openDom!==id) return; renderDomainPanel(id, st, cf);
+    if(st.verified){ stopPoll(); load(); } }catch{}
+}
+function recCard(r){
+  const m=REC_META[r.key]||{icon:"ti-file-text",label:r.type,note:""};
+  const dot = r.status==="verified"?'<span class="dot ok"><i class="ti ti-check"></i></span>'
+    : r.status==="mismatch"?'<span class="dot wait"><i class="ti ti-alert-triangle"></i></span>'
+    : '<span class="dot miss"><span class="spin"></span></span>';
+  const state = r.status==="verified"?'<span style="color:var(--ok)">Verified</span>'
+    : r.status==="mismatch"?'<span style="color:var(--warn)">Value differs — re-publish</span>'
+    : '<span class="muted">Waiting for DNS…</span>';
+  return `<div class="rec">${dot}<div class="body">
+    <div class="h"><i class="ti ${m.icon}" style="color:var(--brand2)"></i> ${m.label} <span class="chip c-mut">${r.type}</span><span style="margin-left:auto;font-size:12px">${state}</span></div>
+    ${m.note?`<div class="muted" style="font-size:12px;margin-top:3px">${m.note}</div>`:""}
+    <div class="kv">Name / host</div><div class="copybox"><code>${esc(r.host)}</code><button class="copybtn" data-copy="${encodeURIComponent(r.host)}">Copy</button></div>
+    <div class="kv">Value</div><div class="copybox"><code>${esc(r.value)}</code><button class="copybtn" data-copy="${encodeURIComponent(r.value)}">Copy</button></div>
+  </div></div>`;
+}
+function renderDomainPanel(id, st, cf){
+  const total=st.records.length, done=st.records.filter(r=>r.status==="verified").length;
+  const pct=total?Math.round(done/total*100):0;
+  let head="";
+  if(st.verified){
+    head=`<div style="background:var(--okbg);border:1px solid var(--ok);border-radius:11px;padding:12px 15px;margin-bottom:14px"><b style="color:var(--ok)"><i class="ti ti-circle-check-filled"></i> Domain verified.</b> <span class="muted">You can now send from <span class="mono">@${esc(st.name)}</span>.</span></div>`;
+  } else if(cf.available && canDo("domain:write")){
+    head=`<div style="display:flex;align-items:center;gap:11px;flex-wrap:wrap;margin-bottom:10px"><button class="btn pri" data-publish="${id}"><i class="ti ti-cloud-bolt"></i> Publish DNS automatically</button><span class="muted" style="font-size:12.5px">One click adds every record to <b style="color:var(--tx)">${esc(cf.zone)}</b> and we verify automatically.</span></div>`;
+  } else if(cf.configured){
+    head=`<p class="muted" style="font-size:12.5px;margin:0 0 10px;line-height:1.55"><i class="ti ti-info-circle"></i> <span class="mono">${esc(st.name)}</span> isn't a zone in your connected DNS account, so we can't publish it automatically. <b style="color:var(--tx)">Add the domain to your DNS provider</b> (e.g. Cloudflare) to enable one-click publishing — or add the records below manually and we'll detect them.</p>`;
+  } else {
+    head=`<p class="muted" style="font-size:12.5px;margin:0 0 10px">Add these records at your DNS provider; we'll detect them automatically.</p>`;
+  }
+  const dnsPane = `
+    <div style="display:flex;align-items:center;gap:10px;font-size:12.5px;color:var(--tx2)">
+      <span><b style="color:var(--tx)">${done}/${total}</b> records ${st.verified?"verified":"detected"}</span>
+      ${st.verified?"":'<span class="pulsing"><span class="spin"></span> checking every 6s</span>'}
+      <span style="margin-left:auto">updated just now</span>
+    </div>
+    <div class="prog"><i style="width:${pct}%"></i></div>
+    ${st.records.map(recCard).join("")}
+    <div style="display:flex;gap:8px;margin-top:10px">
+      ${canDo("domain:write")?`<button class="btn" data-recheck="${id}" style="padding:6px 12px"><i class="ti ti-refresh"></i> Recheck now</button>
+      <button class="btn" data-deldom="${id}" style="padding:6px 12px;margin-left:auto"><i class="ti ti-trash"></i> Remove</button>`:""}
+    </div>`;
+  const trackPane = `
+    <div class="lbl" style="margin-bottom:6px"><i class="ti ti-chart-dots"></i> Email tracking <span class="muted" style="font-weight:400">— off by default; applies to mail sent from this domain</span></div>
+    <label style="display:flex;align-items:center;gap:8px;font-size:13px;margin-bottom:4px;cursor:pointer"><input type="checkbox" class="trk" data-trk="open" ${st.openTracking?"checked":""} ${canDo("domain:write")?"":"disabled"}> Open tracking <span class="muted" style="font-size:11.5px">(1×1 pixel)</span></label>
+    <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer"><input type="checkbox" class="trk" data-trk="click" ${st.clickTracking?"checked":""} ${canDo("domain:write")?"":"disabled"}> Click tracking <span class="muted" style="font-size:11.5px">(link rewrite)</span></label>
+    <span id="trkmsg-${id}" class="muted" style="font-size:11.5px;margin-left:4px"></span>`;
+  const inboxPane = st.verified
+    ? `<div id="dominbox-${id}"><div class="muted" style="font-size:13px;padding:8px 0"><span class="spin"></span> Loading inboxes…</div></div>`
+    : `<p class="muted" style="font-size:13px;padding:8px 0">Verify this domain first, then create inboxes (mailboxes) here.</p>`;
+  const DOMTABS=[['dns','DNS','ti-server-bolt'],['tracking','Tracking','ti-chart-dots'],['inboxes','Inboxes','ti-inbox']];
+  const tabBar=`<div style="display:flex;gap:2px;border-bottom:1px solid var(--line);margin:12px 0 14px">${DOMTABS.map(([k,label,icon])=>`<button data-domtab="${k}" style="padding:7px 14px;font-size:13px;font-weight:500;border:0;border-bottom:2px solid ${k==='dns'?'var(--brand)':'transparent'};background:none;color:${k==='dns'?'var(--tx)':'var(--tx2)'};cursor:pointer;font-family:inherit"><i class="ti ${icon}"></i> ${label}</button>`).join('')}</div>`;
+  $("panel-"+id).innerHTML = head + tabBar +
+    `<div data-pane="dns">${dnsPane}</div>` +
+    `<div data-pane="tracking" class="hide">${trackPane}</div>` +
+    `<div data-pane="inboxes" class="hide">${inboxPane}</div>`;
+  document.querySelectorAll("#panel-"+id+" [data-domtab]").forEach(b=>b.onclick=()=>{
+    const tab=b.dataset.domtab;
+    document.querySelectorAll("#panel-"+id+" [data-domtab]").forEach(x=>{ const on=x.dataset.domtab===tab; x.style.borderBottomColor=on?'var(--brand)':'transparent'; x.style.color=on?'var(--tx)':'var(--tx2)'; });
+    document.querySelectorAll("#panel-"+id+" [data-pane]").forEach(p=>p.classList.toggle("hide", p.dataset.pane!==tab));
+    if(tab==='inboxes' && st.verified){ const c=$("dominbox-"+id); if(c && !c.dataset.loaded){ c.dataset.loaded="1"; renderDomainInboxes(id, st.name); } }
+  });
+  bindCopy(document.getElementById("panel-"+id));
+  document.querySelectorAll("#panel-"+id+" .trk").forEach(cb=>cb.onchange=async()=>{
+    const key=cb.dataset.trk==="open"?"openTracking":"clickTracking", m=$("trkmsg-"+id);
+    if(m) m.textContent="Saving…";
+    try{ await api("/app/domains/"+id+"/tracking",{method:"PATCH",body:JSON.stringify({[key]:cb.checked})}); if(m){ m.textContent="Saved ✓"; setTimeout(()=>m.textContent="",1200);} }
+    catch(e){ cb.checked=!cb.checked; if(m) m.textContent=e.message; }
+  });
+  const pub=document.querySelector("#panel-"+id+" [data-publish]");
+  if(pub) pub.onclick=async()=>{ pub.disabled=true; pub.innerHTML='<span class="spin"></span> Publishing…'; try{ const r=await api("/app/domains/"+id+"/dns-provider/publish",{method:"POST"}); pub.innerHTML='<i class="ti ti-check"></i> Published to '+esc(r.zone); setTimeout(()=>openDomainPanel(id),1400);}catch(e){ alert(e.message); pub.disabled=false; pub.innerHTML='<i class="ti ti-cloud-bolt"></i> Publish DNS automatically'; } };
+  const rc=document.querySelector("#panel-"+id+" [data-recheck]");
+  if(rc) rc.onclick=async()=>{ rc.disabled=true; rc.innerHTML='<span class="spin"></span> Checking…'; try{ const st2=await api("/app/domains/"+id+"/verify",{method:"POST"}); if(openDom===id){ renderDomainPanel(id, st2, cf); if(st2.verified){ stopPoll(); load(); } } }catch(e){ alert(e.message); if(openDom===id) openDomainPanel(id); } };
+  const del=document.querySelector("#panel-"+id+" [data-deldom]");
+  if(del) del.onclick=async()=>{ if(confirm("Remove this domain?")){ stopPoll(); openDom=null; try{ await api("/app/domains/"+id,{method:"DELETE"}); }catch(e){ alert(e.message); } loadDomains(); } };
+}
+$("newDomain").onclick = () => openModal({
+  title:"Add sending domain", icon:"ti-world",
+  sub:"Enter the domain or subdomain you'll send from — e.g. mail.acme.com",
+  fields:[{id:"domain",label:"Domain",placeholder:"mail.acme.com",type:"text"}],
+  submitLabel:"Add domain",
+  onSubmit: async({domain})=>{
+    if(!domain) throw new Error("Enter a domain.");
+    const d=await api("/app/domains",{method:"POST",body:JSON.stringify({name:domain.trim().toLowerCase()})});
+    openDom=d.id; await loadDomains();
+  }
+});
+
+// Sync from Cloudflare: pull every zone in the connected DNS account and bulk add +
+// auto-publish the selected ones in one click. Reuses the modal shell with a custom
+// checkbox body (openModal is input-only).
+async function syncFromCloudflare(){
+  let res;
+  try{ res=await api("/app/domains/dns-provider/zones"); }
+  catch(e){ alert(e.message||"Could not reach your DNS provider."); return; }
+  if(!res.configured){ alert("Connect your Cloudflare DNS provider first (the Connect button under Sending domains), then sync."); return; }
+  const zones=res.zones||[];
+  if(!zones.length){ alert("No zones found in your connected DNS account."); return; }
+  const available=zones.filter(z=>!z.added);
+  const ov=$("ov");
+  $("m_title").innerHTML='<i class="ti ti-cloud-download" style="color:var(--brand2)"></i> Sync from Cloudflare';
+  $("m_sub").style.display="block";
+  $("m_sub").textContent=available.length?"Select the domains to add — records publish to Cloudflare and verify automatically.":"Every Cloudflare zone is already added.";
+  $("m_err").textContent="";
+  $("m_fields").innerHTML='<div style="max-height:300px;overflow:auto;display:grid;gap:2px">'+zones.map(z=>
+    `<label style="display:flex;align-items:center;gap:9px;padding:7px 2px;font-size:13.5px;${z.added?'opacity:.5':''}">`+
+    `<input type="checkbox" class="zk" value="${esc(z.name)}" ${z.added?'disabled':'checked'}>`+
+    `<span>${esc(z.name)}</span>${z.added?'<span class="muted" style="font-size:11px;margin-left:auto">added</span>':''}</label>`
+  ).join("")+'</div>';
+  $("m_ok").textContent="Add & verify selected"; $("m_ok").disabled=available.length===0;
+  ov.classList.remove("hide"); requestAnimationFrame(()=>ov.classList.add("show"));
+  const close=()=>{ ov.classList.remove("show"); setTimeout(()=>ov.classList.add("hide"),160); document.removeEventListener("keydown",onKey); ov.onclick=null; };
+  function onKey(e){ if(e.key==="Escape") close(); }
+  $("m_cancel").onclick=close; ov.onclick=(e)=>{ if(e.target===ov) close(); }; document.addEventListener("keydown",onKey);
+  $("m_ok").onclick=async()=>{
+    const names=[...document.querySelectorAll(".zk:checked:not([disabled])")].map(i=>i.value);
+    if(!names.length){ $("m_err").textContent="Select at least one domain."; return; }
+    const lbl=$("m_ok").textContent; $("m_ok").disabled=true; $("m_ok").innerHTML='<span class="spin"></span> Adding '+names.length+'…'; $("m_err").textContent="";
+    try{
+      // /domains/bulk caps at 50 per call — batch so large Cloudflare accounts work.
+      let results=[];
+      for(let i=0;i<names.length;i+=50){
+        const r=await api("/app/domains/bulk",{method:"POST",body:JSON.stringify({names:names.slice(i,i+50)})});
+        results=results.concat(r.results||[]);
+      }
+      close();
+      const pub=results.filter(x=>x.status==="published").length;
+      const errs=results.filter(x=>x.status==="error");
+      // Auto-verify after publishing so statuses flip without opening each domain.
+      let verified=0; try{ const rc=await api("/app/domains/recheck-all",{method:"POST"}); verified=rc.verified||0; }catch{}
+      await loadDomains();
+      if(errs.length) alert("Added "+(results.length-errs.length)+" of "+names.length+". Published "+pub+", verified "+verified+". Issues: "+errs.slice(0,10).map(e=>e.name).join(", ")+(errs.length>10?"…":""));
+      else alert("Added "+results.length+" domain(s). Published "+pub+", verified "+verified+". (Re-run “Verify all” in a moment for any still propagating.)");
+    }catch(e){ $("m_err").textContent=e.message||String(e); $("m_ok").disabled=false; $("m_ok").textContent=lbl; }
+  };
+}
+$("syncDomains").onclick=syncFromCloudflare;
+if($("verifyAll")) $("verifyAll").onclick=async()=>{
+  const b=$("verifyAll"), t=b.innerHTML; b.disabled=true; b.innerHTML='<span class="spin"></span> Verifying…';
+  try{ const r=await api("/app/domains/recheck-all",{method:"POST"}); await loadDomains();
+    alert("Re-checked "+r.checked+" pending domain(s): "+r.verified+" now verified"+(r.pending?", "+r.pending+" still pending (DNS may be propagating — try again shortly)":"")+"."); }
+  catch(e){ alert(e.message); }
+  finally{ b.disabled=false; b.innerHTML=t; }
+};
+function renderBanner(me){
+  const bars=[];
+  if(me.impersonating){
+    bars.push(`<div style="background:linear-gradient(90deg,#f59e0b,#f3b257);color:#1a1205;padding:9px 18px;font-size:13.5px;font-weight:600;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+      <i class="ti ti-user-bolt"></i> Impersonating <span class="mono">${me.user?.email||"user"}</span> · started by ${me.impersonating.by}
+      <button id="exitImp" style="margin-left:auto;background:#1a1205;color:#f3b257;border:none;border-radius:7px;padding:5px 12px;font-weight:600;cursor:pointer;font-family:inherit"><i class="ti ti-logout"></i> Exit impersonation</button></div>`);
+  }
+  if(me.emailVerified===false && !me.impersonating){
+    bars.push(`<div style="background:rgba(243,178,87,.12);border-bottom:1px solid #f3b257;color:#f3b257;padding:8px 18px;font-size:13px;font-weight:600;display:flex;align-items:center;gap:10px">
+      <i class="ti ti-mail-exclamation"></i> Please verify your email (${me.user?.email||""}) — check your inbox.
+      <button id="resendVerify" style="margin-left:auto;background:transparent;color:#f3b257;border:1px solid #f3b257;border-radius:7px;padding:4px 11px;font-weight:600;cursor:pointer;font-family:inherit">Resend</button></div>`);
+  }
+  const sim=(document.cookie.match(/(?:^|; )um_simplan=([^;]+)/)||[])[1];
+  if(sim && !me.impersonating){
+    bars.push(`<div style="background:var(--brandsoft);border-bottom:1px solid var(--brand);color:var(--brand2);padding:8px 18px;font-size:13px;font-weight:600;display:flex;align-items:center;gap:10px">
+      <i class="ti ti-switch-3"></i> Simulating <b style="text-transform:capitalize">${sim.replace(/-/g," ")}</b> plan (God Mode preview)
+      <button id="exitSim" style="margin-left:auto;background:transparent;color:var(--brand2);border:1px solid var(--brand);border-radius:7px;padding:4px 11px;font-weight:600;cursor:pointer;font-family:inherit">Stop</button></div>`);
+  }
+  $("banner").innerHTML=bars.join("");
+  if($("exitImp")) $("exitImp").onclick=async()=>{ try{ await api("/auth/stop-impersonate",{method:"POST"}); }catch{} location.href="/god"; };
+  if($("exitSim")) $("exitSim").onclick=()=>{ document.cookie="um_simplan=;path=/;max-age=0"; location.reload(); };
+  if($("resendVerify")) $("resendVerify").onclick=async(e)=>{ const b=e.target; b.textContent="Sending…"; try{ await api("/auth/resend-verification",{method:"POST"}); b.textContent="Sent ✓"; }catch(err){ alert(err.message); b.textContent="Resend"; } };
+}
+$("forgotLink").onclick = () => openModal({
+  title:"Reset your password", icon:"ti-lock", sub:"Enter your account email — we'll send a reset link.",
+  fields:[{id:"email",label:"Email",placeholder:"you@company.com",type:"email"}], submitLabel:"Send reset link",
+  onSubmit: async ({email}) => { if(!email) throw new Error("Enter your email."); await api("/auth/forgot",{method:"POST",body:JSON.stringify({email:email.toLowerCase()})}); $("a_msg").innerHTML='<span style="color:var(--ok)">If an account exists for that email, a reset link is on its way.</span>'; }
+});
+async function boot(){
+  const params = new URLSearchParams(location.search);
+  // Password-reset flow: the emailed link lands here as /dashboard?reset=<token>.
+  const resetToken = params.get("reset");
+  if(resetToken){
+    $("gate").classList.add("hide"); $("app").classList.add("hide"); $("resetView").classList.remove("hide");
+    setTimeout(()=>$("r_pw").focus(),60);
+    $("r_submit").onclick = async () => {
+      const pw = $("r_pw").value;
+      if(pw.length<8){ $("r_msg").innerHTML='<span style="color:#f87171">Use at least 8 characters.</span>'; return; }
+      $("r_submit").disabled=true;
+      try{ await api("/auth/reset",{method:"POST",body:JSON.stringify({token:resetToken,password:pw})});
+        $("r_msg").innerHTML='<span style="color:var(--ok)">Password updated — redirecting to sign in…</span>';
+        setTimeout(()=>{ location.href="/dashboard"; },1400);
+      }catch(e){ $("r_msg").innerHTML=`<span style="color:#f87171">${e.message}</span>`; $("r_submit").disabled=false; }
+    };
+    return;
+  }
+  // Team-invite flow: /dashboard?invite=<token>. Fetch its details up front so we
+  // can accept it (if already signed in) or tailor the gate (if not).
+  const inviteToken = params.get("invite");
+  let invite=null;
+  if(inviteToken){ try{ invite=await api("/auth/invite?token="+encodeURIComponent(inviteToken)); }catch{ invite={valid:false}; } }
+  try {
+    const me = await api("/auth/me");
+    // Signed in with a valid invite → accept it before showing the app.
+    if(inviteToken && invite && invite.valid){
+      try{ const r=await api("/auth/accept-invite",{method:"POST",body:JSON.stringify({token:inviteToken})});
+        alert(r.alreadyMember ? `You're already a member of ${invite.orgName}.` : `You've joined ${invite.orgName}.`);
+      }catch(e){ alert("Couldn't accept that invite: "+e.message); }
+      history.replaceState({}, "", location.pathname);
+    }
+    $("gate").classList.add("hide"); $("app").classList.remove("hide");
+    $("signout").classList.remove("hide"); $("who").classList.remove("hide");
+    $("who").textContent = me.user?.email || "signed in";
+    ME = me;
+    applyRoleGates();
+    applyBranding(me.branding);
+    renderBanner(me);
+    renderOrgSwitcher(me);
+    $("nav-subaccounts").classList.toggle("hide", !me.account?.canManageSubaccounts);
+    // Show the God Mode entry point only to platform admins (silent 403 otherwise).
+    // Await it so auto-promote + operator-plan grant land before we paint usage.
+    if(!me.impersonating){
+      try{ await api("/god/me"); $("godlink").classList.remove("hide"); }catch{}
+    }
+    loadPlan().catch(()=>{});
+    await load();
+    const cp = params.get("connected");
+    if(cp){ history.replaceState({}, "", location.pathname); alert(cp==="error" ? "Could not connect that mailbox — please try again." : "Connected "+cp+" — you can now send from it."); }
+    const vf = params.get("verified");
+    if(vf!==null){ history.replaceState({}, "", location.pathname); alert(vf==="1" ? "Email verified — thanks!" : "That verification link was invalid or expired — use Resend to get a new one."); }
+    const bl = params.get("billing");
+    if(bl){ history.replaceState({}, "", location.pathname); alert("Returned from Stripe — your payment status has been refreshed."); }
+  } catch {
+    $("app").classList.add("hide"); $("gate").classList.remove("hide");
+    // Logged out: if the invite is valid, prefill + frame the gate around it.
+    if(inviteToken && invite && invite.valid) setupInviteGate(inviteToken, invite);
+    else if(inviteToken) { const b=$("inviteBanner"); if(b){ b.classList.remove("hide"); b.innerHTML='<i class="ti ti-alert-triangle" style="color:#f59e0b"></i> This invite link is invalid or has expired. Ask for a new one.'; } }
+  }
+}
+boot();
+</script>
+</body>
+</html>

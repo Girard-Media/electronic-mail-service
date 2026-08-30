@@ -1,0 +1,559 @@
+// ems control-plane schema.
+// Multi-tenant from the first migration: Organization -> Project scopes everything.
+// High-volume email_events/logs are mirrored to our analytics event store for reporting.
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ---------- Identity & tenancy ----------
+
+model User {
+  id              String         @id @default(cuid())
+  email           String         @unique
+  name            String?
+  passwordHash    String?
+  tokenVersion    Int            @default(0)
+  // Email-ownership verification (anti-abuse; gates God Mode auto-promote)
+  emailVerifiedAt DateTime?
+  verifyToken     String?
+  memberships     Membership[]
+  platformAdmin   PlatformAdmin?
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+}
+
+// ---------- Platform (God Mode) admin — orthogonal to tenant roles ----------
+
+enum PlatformRole {
+  superadmin
+  admin
+}
+
+model PlatformAdmin {
+  id          String       @id @default(cuid())
+  userId      String       @unique
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role        PlatformRole @default(admin)
+  // Granular capabilities for sub-admins; superadmin implicitly has all.
+  scopes      String[]
+  createdById String?
+  // Encrypted TOTP seed. totpEnabledAt is set only after a valid confirm.
+  totpSecret    String?
+  totpEnabledAt DateTime?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+}
+
+model PlatformAuditLog {
+  id          String   @id @default(cuid())
+  actorUserId String
+  action      String
+  targetType  String?
+  targetId    String?
+  meta        Json?
+  createdAt   DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([actorUserId])
+}
+
+// Org-scoped audit trail (reseller compliance, FR-081). One row per privileged
+// action an agency member takes on a client sub-account — opening (switching into)
+// a child org or creating one. Scoped to the agency `orgId`; `targetId` is the
+// child org. Distinct from PlatformAuditLog, which is platform-admin (God Mode)
+// scoped — this one belongs to the tenant so an agency can read its own trail.
+model OrgAuditLog {
+  id          String       @id @default(cuid())
+  orgId       String
+  org         Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  actorUserId String
+  action      String
+  targetType  String?
+  targetId    String?
+  meta        Json?
+  createdAt   DateTime     @default(now())
+
+  @@index([orgId, createdAt])
+}
+
+enum Role {
+  owner
+  admin
+  developer
+  viewer
+}
+
+model Organization {
+  id           String         @id @default(cuid())
+  name         String
+  slug         String         @unique
+  plan         String         @default("free")
+  // White-label foundations (FR-080)
+  // Tenant subdomain for the white-label surface (tenant.electronicmailservices.com). Null = no
+  // subdomain yet. Reserved/invalid labels are rejected at assignment + by proxy.ts.
+  subdomain    String?        @unique
+  customDomain String?        @unique
+  logoUrl      String?
+  primaryColor String?
+  poweredBy    Boolean        @default(true)
+  // Stripe Connect (Standard) account id — set when an agency connects its own
+  // Stripe to charge clients. Null = payments not connected. See packages/core/billing.ts.
+  stripeConnectAccountId String?
+  // Reseller sub-tenancy (FR-081): a sub-tenant org points at its parent
+  parentOrgId  String?
+  parentOrg    Organization?  @relation("OrgHierarchy", fields: [parentOrgId], references: [id])
+  subTenants   Organization[] @relation("OrgHierarchy")
+  memberships  Membership[]
+  invites      Invite[]
+  projects     Project[]
+  usageRecords UsageRecord[]
+  auditLogs    OrgAuditLog[]
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+
+  @@index([parentOrgId])
+}
+
+model Membership {
+  id        String       @id @default(cuid())
+  orgId     String
+  org       Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role      Role         @default(developer)
+  createdAt DateTime     @default(now())
+
+  @@unique([orgId, userId])
+}
+
+// Pending team invite. A row exists only until accepted (acceptedAt set) or
+// revoked (row deleted). The emailed link carries a stateless HMAC token
+// (packages/core/invites.ts); this row is the revocable, single-use record.
+model Invite {
+  id          String       @id @default(cuid())
+  orgId       String
+  org         Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  email       String
+  role        Role         @default(developer)
+  invitedById String?
+  acceptedAt  DateTime?
+  createdAt   DateTime     @default(now())
+
+  @@unique([orgId, email])
+  @@index([orgId])
+}
+
+model Project {
+  id        String       @id @default(cuid())
+  orgId     String
+  org       Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  name      String
+  slug      String
+  // Optional per-project managed-DNS API token (encrypted at rest) for BYO-DNS
+  // one-click publishing to a customer's own zone.
+  dnsToken  String?
+  domains   Domain[]
+  apiKeys   ApiKey[]
+  emails    Email[]
+  suppressions Suppression[]
+  webhooks  WebhookEndpoint[]
+  connectedAccounts ConnectedAccount[]
+  mailboxes Mailbox[]
+  emailTemplates EmailTemplate[]
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+
+  @@unique([orgId, slug])
+}
+
+// ---------- Connected sending accounts (send from a client's own mailbox) ----------
+
+enum SendProvider {
+  mta
+  google
+  microsoft
+}
+
+enum ConnectedAccountStatus {
+  active
+  expired
+  revoked
+  error
+}
+
+model ConnectedAccount {
+  id             String                 @id @default(cuid())
+  projectId      String
+  project        Project                @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  provider       SendProvider
+  // The address this account sends as (must match the email's From).
+  email          String
+  displayName    String?
+  // OAuth tokens — AES-256-GCM encrypted at rest (NFR-004), same as DKIM keys.
+  accessToken    String
+  refreshToken   String
+  tokenExpiresAt DateTime?
+  scopes         String[]
+  status         ConnectedAccountStatus @default(active)
+  lastError      String?
+  // Provider's stable user id (google sub / microsoft object id).
+  externalId     String?
+  emails         Email[]
+  createdAt      DateTime               @default(now())
+  updatedAt      DateTime               @updatedAt
+
+  @@unique([projectId, email])
+  @@index([projectId])
+}
+
+// ---------- Domains & sender auth (FR-010..012) ----------
+
+enum DomainStatus {
+  pending
+  verified
+  failed
+}
+
+model Domain {
+  id              String       @id @default(cuid())
+  projectId       String
+  project         Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  name            String
+  region          String       @default("primary")
+  status          DomainStatus @default(pending)
+  dkimSelector    String?
+  dkimPublicKey   String?
+  // Stored encrypted at rest (NFR-004)
+  dkimPrivateKey  String?
+  trackingDomain  String?
+  // Open/click tracking is opt-in per domain (default off) so transactional mail
+  // is never silently pixel-tracked. The worker injects/rewrites only when set.
+  openTracking    Boolean      @default(false)
+  clickTracking   Boolean      @default(false)
+  // Derived SPF/DKIM/DMARC/MAIL FROM records presented to the user
+  dnsRecords      Json?
+  verifiedAt      DateTime?
+  emails          Email[]
+  mailboxes       Mailbox[]
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  @@unique([projectId, name])
+  @@index([name])
+}
+
+// ---------- API keys (FR-020,021) ----------
+
+// What an API key is allowed to do. `sending_access` can send mail and read its
+// own project's data but can NEVER mint keys or manage domains — otherwise a key
+// leaked into a client bundle could escalate to full control of the project.
+enum ApiKeyPermission {
+  full_access
+  sending_access
+}
+
+model ApiKey {
+  id          String    @id @default(cuid())
+  projectId   String
+  project     Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  name        String
+  // Public prefix shown in UI; full secret shown once, only the hash is stored.
+  prefix      String    @unique
+  hashedKey   String
+  // Existing keys predate scoping, so they default to full_access to stay working.
+  permission  ApiKeyPermission @default(full_access)
+  rateLimitRps Int      @default(10)
+  lastUsedAt  DateTime?
+  revokedAt   DateTime?
+  createdAt   DateTime  @default(now())
+
+  @@index([projectId])
+}
+
+// ---------- Email + events (FR-030..051) ----------
+
+enum EmailStatus {
+  queued
+  scheduled
+  sent
+  delivered
+  bounced
+  complained
+  failed
+  canceled
+}
+
+model Email {
+  id               String        @id @default(cuid())
+  projectId        String
+  project          Project       @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  domainId         String?
+  // SetNull: deleting a sending domain detaches the email (preserving the send
+  // log) instead of blocking the delete. Matches migration 0006.
+  domain           Domain?       @relation(fields: [domainId], references: [id], onDelete: SetNull)
+  // Set when the From matches a connected mailbox; routedVia records the path taken.
+  connectedAccountId String?
+  connectedAccount   ConnectedAccount? @relation(fields: [connectedAccountId], references: [id])
+  routedVia          SendProvider      @default(mta)
+  from             String
+  to               String[]
+  cc               String[]
+  bcc              String[]
+  replyTo          String[]
+  subject          String
+  html             String?
+  text             String?
+  headers          Json?
+  tags             Json?
+  // [{ filename, content?(base64), path?, content_type? }] — passed to the provider at send.
+  attachments      Json?
+  status           EmailStatus   @default(queued)
+  providerMessageId String?
+  idempotencyKey   String?
+  scheduledAt      DateTime?
+  sentAt           DateTime?
+  events           EmailEvent[]
+  createdAt        DateTime      @default(now())
+
+  @@unique([projectId, idempotencyKey])
+  @@index([projectId, status, createdAt])
+  @@index([providerMessageId])
+}
+
+enum EmailEventType {
+  queued
+  sent
+  delivered
+  bounced
+  complained
+  rejected
+  opened
+  clicked
+  delivery_delayed
+}
+
+model EmailEvent {
+  id         String         @id @default(cuid())
+  emailId    String
+  email      Email          @relation(fields: [emailId], references: [id], onDelete: Cascade)
+  type       EmailEventType
+  payload    Json?
+  occurredAt DateTime       @default(now())
+
+  @@index([emailId, occurredAt])
+}
+
+// ---------- Suppression (FR-042) ----------
+
+enum SuppressionReason {
+  hard_bounce
+  complaint
+  manual
+  invalid
+}
+
+model Suppression {
+  id        String            @id @default(cuid())
+  projectId String
+  project   Project           @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  address   String
+  reason    SuppressionReason
+  source    String?
+  createdAt DateTime          @default(now())
+
+  @@unique([projectId, address])
+  @@index([projectId])
+}
+
+// ---------- Webhooks (FR-060,061) ----------
+
+model WebhookEndpoint {
+  id         String            @id @default(cuid())
+  projectId  String
+  project    Project           @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  url        String
+  secret     String
+  eventTypes String[]
+  enabled    Boolean           @default(true)
+  deliveries WebhookDelivery[]
+  createdAt  DateTime          @default(now())
+
+  @@index([projectId])
+}
+
+enum WebhookDeliveryStatus {
+  pending
+  succeeded
+  failed
+  dead_letter
+}
+
+model WebhookDelivery {
+  id             String                @id @default(cuid())
+  endpointId     String
+  endpoint       WebhookEndpoint       @relation(fields: [endpointId], references: [id], onDelete: Cascade)
+  eventType      String
+  payload        Json
+  status         WebhookDeliveryStatus @default(pending)
+  attempts       Int                   @default(0)
+  lastAttemptAt  DateTime?
+  responseStatus Int?
+  createdAt      DateTime              @default(now())
+
+  @@index([endpointId, status])
+}
+
+// ---------- Usage / metering (reseller rollups, billing) ----------
+
+model UsageRecord {
+  id         String       @id @default(cuid())
+  orgId      String
+  org        Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  projectId  String?
+  period     String // e.g. "2026-06"
+  sends      Int          @default(0)
+  delivered  Int          @default(0)
+  bounced    Int          @default(0)
+  complained Int          @default(0)
+  createdAt  DateTime     @default(now())
+
+  @@unique([orgId, projectId, period])
+}
+
+// ---------- Email templates (block-based builder) ----------
+
+model EmailTemplate {
+  id         String   @id @default(cuid())
+  projectId  String
+  project    Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  name       String
+  subject    String   @default("")
+  // { blocks: EmailBlock[], settings?: EmailSettings } — see packages/core/email-template.ts
+  content    Json
+  usageCount Int      @default(0)
+  lastUsedAt DateTime?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([projectId, updatedAt])
+}
+
+// ---------- Native mailboxes (the moat: receive + host name@yourdomain.com) ----------
+// See planning/NATIVE_MAILBOXES.md. P1 = receive + read. Raw RFC822 lives in
+// object storage (rawKey); Postgres keeps only metadata + snippet so rows stay small.
+
+enum MailboxStatus {
+  active
+  suspended
+}
+
+model Mailbox {
+  id           String        @id @default(cuid())
+  projectId    String
+  project      Project       @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  // Custom-domain inbox: a verified sending Domain of the same project.
+  // NULL = shared-domain agent inbox on the platform's AGENT_INBOX_DOMAIN
+  // (instant, no customer DNS; catch-all is impossible without a Domain row).
+  domainId     String?
+  domain       Domain?       @relation(fields: [domainId], references: [id], onDelete: Cascade)
+  address      String        // full address, lowercased (e.g. hi@acme.com)
+  displayName  String?
+  // For IMAP / SMTP-submission / webmail auth (argon2, like User). Null until set.
+  passwordHash String?
+  quotaBytes   BigInt        @default(1073741824) // 1 GiB
+  usedBytes    BigInt        @default(0)
+  status       MailboxStatus @default(active)
+  // Hosted-inbox product: keep a copy in webmail (default), optionally catch-all
+  // for unknown local-parts on this domain (at most one per domainId — enforced
+  // in SQL as a partial unique index).
+  keepCopy     Boolean       @default(true)
+  catchAll     Boolean       @default(false)
+  messages     Message[]
+  forwards     MailForward[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  @@unique([address])
+  @@index([projectId])
+}
+
+// Forward a copy of inbound mail from this mailbox (sent FROM the mailbox so
+// DKIM aligns). Destination must be verified before we send — otherwise this
+// is an open relay onto a victim address.
+model MailForward {
+  id          String    @id @default(cuid())
+  mailboxId   String
+  mailbox     Mailbox   @relation(fields: [mailboxId], references: [id], onDelete: Cascade)
+  destination String    // lowercased email
+  verifiedAt  DateTime?
+  verifyToken String?   @unique
+  createdAt   DateTime  @default(now())
+
+  @@unique([mailboxId, destination])
+  @@index([mailboxId])
+}
+
+model Message {
+  id         String   @id @default(cuid())
+  mailboxId  String
+  mailbox    Mailbox  @relation(fields: [mailboxId], references: [id], onDelete: Cascade)
+  messageId  String?  // RFC822 Message-ID
+  inReplyTo  String?
+  threadId   String?
+  fromAddr   String
+  toAddrs    String[]
+  subject    String?
+  snippet    String?  // first ~200 chars for list views
+  // P1 stores the parsed body in Postgres so read works without object storage.
+  // rawKey (full RFC822 in R2) is added later for IMAP fidelity.
+  text       String?
+  html       String?
+  rawKey     String?  // object-storage key for the raw RFC822 (P3)
+  sizeBytes  Int      @default(0)
+  seen       Boolean  @default(false)
+  flagged    Boolean  @default(false)
+  folder     String   @default("inbox") // inbox | sent | archive | spam | trash
+  receivedAt DateTime @default(now())
+
+  @@index([mailboxId, folder, receivedAt])
+}
+
+// ---------- Programmatic SEO (platform-owned content) ----------
+// Platform-owned marketing/SEO blog posts rendered by apps/web at the ROOT domain
+// (NOT tenant-scoped — this is decoupled from the Organization hierarchy). A content
+// pipeline (bootspring SEO skills) fills this table; Next renders + SSGs it on-demand
+// (top-N prebuilt, the long tail via ISR). See planning/NEXTJS_FRONTEND.md Phase 2.
+model Blog {
+  id          String    @id @default(cuid())
+  slug        String    @unique
+  title       String
+  excerpt     String? // short summary for cards + meta description fallback
+  bodyMd      String // markdown source of truth (rendered to HTML at request/build time)
+  bodyHtml    String? // optional pre-rendered HTML (pipeline may fill; preferred if present)
+  status      String    @default("draft") // draft | published
+  publishedAt DateTime?
+  // SEO
+  seoTitle       String?
+  seoDescription String?
+  canonicalUrl   String? // override canonical (e.g. syndicated content); else self-canonical
+  coverImageUrl  String?
+  noindex        Boolean @default(false) // manual quality override (thin content auto-noindexed too)
+  // Taxonomy + quality signals (hub-spoke linking + thin-content gate)
+  category   String?
+  tags       String[] @default([])
+  authorName String?
+  wordCount  Int      @default(0)
+  readingMin Int      @default(0)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([status, publishedAt])
+  @@index([category, status])
+}

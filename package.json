@@ -1,0 +1,37 @@
+{
+  "name": "electronic-mail-service",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Electronic Mail Services \u2014 cold B2B outreach infrastructure. Multi-domain / multi-mailbox sending, deliverability control plane, AI sequencing. electronicmailservices.com",
+  "packageManager": "pnpm@10.30.3",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "pnpm -r --parallel dev",
+    "dev:api": "pnpm --filter @ems/api dev",
+    "dev:workers": "pnpm --filter @ems/workers dev",
+    "build": "pnpm -r build",
+    "start": "pnpm --filter @ems/db generate && pnpm --filter @ems/db migrate:deploy && pnpm --filter @ems/api start",
+    "typecheck": "pnpm -r typecheck",
+    "lint": "pnpm -r lint",
+    "test": "tsx scripts/ssrf-test.mts && tsx scripts/abuse-test.mts && tsx scripts/privacy-test.mts && tsx scripts/unsub-test.mts && tsx scripts/mime-test.mts && tsx scripts/inbound-test.mts && tsx scripts/mailbox-receiving-test.mts && tsx scripts/health-test.mts && tsx scripts/forwarding-test.mts && tsx scripts/tracking-test.mts && tsx scripts/plans-test.mts && tsx scripts/template-test.mts && tsx scripts/team-rbac-test.mts && tsx scripts/app-rbac-test.mts && tsx scripts/billing-test.mts && tsx scripts/scheduled-at-test.mts && tsx scripts/cancel-test.mts && tsx scripts/maillog-bridge-test.mts && tsx scripts/webhook-verify-test.mts && tsx scripts/inbox-api-test.mts && tsx scripts/migrate-smoke.mts && tsx scripts/security-headers-test.mts && tsx scripts/totp-test.mts",
+    "test:e2e": "tsx scripts/e2e-trust.mts",
+    "db:generate": "pnpm --filter @ems/db generate",
+    "db:migrate": "pnpm --filter @ems/db migrate",
+    "db:deploy": "pnpm --filter @ems/db migrate:deploy",
+    "infra:up": "docker compose -f infra/docker-compose.yml up -d",
+    "infra:down": "docker compose -f infra/docker-compose.yml down"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "playwright": "^1.61.1",
+    "tsx": "^4.19.0",
+    "typescript": "^5.6.0"
+  },
+  "pnpm": {
+    "overrides": {
+      "ioredis": "5.11.1"
+    }
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "id": "fact_01489b5f149e46f7",
+  "revision": 1,
+  "createdAt": "2026-08-23T22:33:02.939Z",
+  "updatedAt": "2026-08-23T22:33:02.939Z",
+  "name": "a1-deploy-handover-2026-08-23",
+  "title": "A1 deployed, hostssh API-root gate trap, remaining A1 work",
+  "description": "A1 deployed, hostssh API-root gate trap, remaining A1 work",
+  "type": "project",
+  "scope": "project",
+  "activation": "relevant",
+  "body": "A1 agent-inbox is DEPLOYED (git push hostssh main, 2026-08-23) but not done.\n\nWhat landed: two commits. First bundled A1 with the Phase A backlog (hosted mailbox receiving, abuse screening, privacy endpoints, health probes, SSRF/MIME hardening, RBAC, maillog bridge, marketing honesty pass) as one batch because files interleaved. Second: API GET / JSON descriptor (not 302 to marketing).\n\nRebase: origin/main lint-fix escaped apostrophes on OLD copy of five marketing pages (dedicated-IP add-on, seed-list tests, 5k free tier). Honesty pass already rewrote that. All 18 hunks resolved for honesty pass. lint clean, typecheck 11/11, gates 21/21.\n\nDeploy trap: API / used to 302 to electronicmailservices.com. hostssh blue-green asset gate followed it, then resolved /_next/* against the API container → five 404s, rollback, set -e so web/workers never deployed. Would block EVERY future deploy. Live site was fine. Fix is in-repo JSON at /. Marketing sub-path redirects and no-second-copy-of-marketing rule untouched. After fix: \"assets skipped — / is application, not a page.\"\n\nLive: api.electronicmailservices.com/ JSON; /readyz Postgres+Redis green (migration 0019); /inboxes and /inboxes/domains 401 unauth; electronicmailservices.com 200.\n\nOpen: /readyz degraded — 67 failed send-queue jobs, static, zero waiting, leftover stub-mode. Clear them.\n\nA1 remaining: MX/SPF/DKIM on shared domains (inbox.electronicmailservices.com MX maybe live since June), e2e dogfood, dev docs, SDK methods."
+}

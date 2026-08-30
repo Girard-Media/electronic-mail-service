@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Features — EMS</title>
+<meta name="description" content="A drop-in Resend-compatible email API, one-click sender authentication, scoped API keys, a durable send pipeline, signed webhooks, message logs, list verification, and white-label multi-tenancy — on a mail server we operate.">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="stylesheet" href="/assets/site.css">
+</head>
+<body>
+<header class="nav"><div class="wrap">
+  <a class="brand" href="/"><i class="ti ti-mail-fast"></i>EMS</a>
+  <nav><a href="/features">Features</a><a href="/deliverability">Deliverability</a><a href="/pricing">Pricing</a><a href="/docs">Docs</a></nav>
+  <div class="right"><a href="/dashboard" style="color:var(--tx2);font-size:14.5px;font-weight:500">Dashboard</a><a class="btn pri" href="/dashboard">Start free</a></div>
+</div></header>
+
+<section class="hero">
+  <div class="wrap">
+    <span class="eyebrow"><i class="ti ti-stack-2"></i> Platform features</span>
+    <h2>Everything you need to send application email — and trust the status</h2>
+    <p class="muted">A Resend-compatible API your existing code already speaks, plus authentication, suppression, and delivery events from a mail server we operate. White-label tenancy from the schema up — not a reseller layer on someone else's pool.</p>
+    <p>
+      <a class="btn pri lg" href="/dashboard"><i class="ti ti-rocket"></i> Start free</a>
+      <a class="btn lg" href="/docs"><i class="ti ti-book"></i> Read the docs</a>
+    </p>
+    <p><span class="pill"><i class="ti ti-plug-connected"></i> Drop-in compatible API</span> <span class="pill"><i class="ti ti-mail-check"></i> Delivered from the MTA</span> <span class="pill"><i class="ti ti-building-store"></i> White-label multi-tenancy</span></p>
+  </div>
+</section>
+
+<section class="wrap">
+  <div class="section-head">
+    <span class="eyebrow"><i class="ti ti-api"></i> Sending API</span>
+    <h3>A drop-in compatible API</h3>
+    <p class="muted">Point your existing transactional client at our base URL and your code keeps working — same payloads, same response shapes. Migrate in one line, then grow into the superset.</p>
+  </div>
+  <div class="grid g3">
+    <div class="card"><div class="ic"><i class="ti ti-send"></i></div><h3>POST /emails</h3><p>Send with the exact Resend payload: <span class="mono">from</span>, <span class="mono">to</span>, <span class="mono">cc</span>, <span class="mono">bcc</span>, <span class="mono">reply_to</span>, <span class="mono">subject</span>, <span class="mono">html</span>, <span class="mono">text</span>, attachments, headers, and tags. Validation returns actionable errors, not 500s.</p></div>
+    <div class="card"><div class="ic"><i class="ti ti-stack-2"></i></div><h3>Batch sending</h3><p><span class="mono">POST /emails/batch</span> accepts up to a hundred messages in a single request — distinct recipients, subjects, and tags per entry — so high-volume jobs stay one round trip instead of a hundred.</p></div>
+    <div class="card"><div class="ic"><i class="ti ti-clock-hour-4"></i></div><h3>Scheduling</h3><p>Pass <span class="mono">scheduled_at</span> — an ISO 8601 timestamp with an explicit UTC offset — to queue a send for later. Cancel it with <span class="mono">POST /emails/:id/cancel</span> while it is still queued. Past or ambiguous times are rejected up front.</p></div>
+    <div class="card"><div class="ic"><i class="ti ti-fingerprint"></i></div><h3>Idempotency keys</h3><p>Send the same <span class="mono">Idempotency-Key</span> header twice and the second request returns the first result instead of a duplicate email. Safe retries through any flaky network.</p></div>
+    <div class="card"><div class="ic"><i class="ti ti-bolt"></i></div><h3>Durable accept</h3><p>We enqueue the message and return an id immediately. Your request thread never waits on the receiving server. Status then moves queued → sent → delivered, bounced, or complained.</p></div>
+    <div class="card"><div class="ic"><i class="ti ti-brackets"></i></div><h3>Drop-in path</h3><p>Keep the <span class="mono">resend</span> SDK and set <span class="mono">RESEND_BASE_URL=https://api.electronicmailservices.com</span>. A typed EMS SDK ships in this repo; it is not on npm yet.</p></div>
+  </div>
+  <div class="code" style="margin-top:26px">
+<span class="c">// Keep your existing client. Change the base URL.</span>
+<span class="k">import</span> { Resend } <span class="k">from</span> <span class="s">"resend"</span>;
+
+<span class="k">const</span> resend = <span class="k">new</span> Resend(process.env.EMS_API_KEY);
+<span class="c">// resend v6+: RESEND_BASE_URL=https://api.electronicmailservices.com</span>
+
+<span class="k">await</span> resend.emails.send({
+  from:    <span class="s">"noreply@acme.com"</span>,
+  to:      <span class="s">"user@example.com"</span>,
+  subject: <span class="s">"Reset your password"</span>,
+  html:    <span class="s">"&lt;strong&gt;Click to reset&lt;/strong&gt;"</span>,
+});
+  </div>
+  <p class="note"><i class="ti ti-info-circle"></i> Resend compatibility is a contract, not a one-time port. Features ship as a superset — your existing payloads never break.</p>
+</section>
+
+<section class="band"><div class="wrap">
+  <div class="section-head center">
+    <span class="eyebrow"><i class="ti ti-certificate"></i> Domains &amp; identity</span>
+    <h3>Sender authentication that takes one click</h3>
+    <p class="muted">Add a domain and we generate the keys and records that decide whether you reach the inbox — then verify them live.</p>
+  </div>
+  <div class="grid g3">
+    <div class="card"><div class="ic"><i class="ti ti-world-check"></i></div><h3>SPF, DKIM &amp; DMARC</h3><p>We generate DKIM keys and derive the SPF, DMARC, and optional MAIL FROM records every authenticated sender needs — no guesswork.</p></div>
+    <div class="card"><div class="ic"><i class="ti ti-cloud-cog"></i></div><h3>One-click DNS</h3><p>Publish records straight to supported DNS providers, or copy-paste them into any registrar. Live re-verification shows pending, verified, or failed per record.</p></div>
+    <div class="card"><div class="ic"><i class="ti ti-shield-lock"></i></div><h3>Alignment as a gate</h3><p>You cannot send from a domain this project has not verified. DMARC policy guidance walks you from <span class="mono">none</span> toward enforcement.</p></div>
+  </div>
+</div></section>
+
+<section class="wrap">
+  <div class="section-head">
+    <span class="eyebrow"><i class="ti ti-key"></i> Keys &amp; pipeline</span>
+    <h3>Scoped keys and a send pipeline that doesn't lose mail</h3>
+    <p class="muted">Credentials scoped to a single project, and a delivery path engineered so an accepted send is a kept promise.</p>
+  </div>
+  <div class="grid g2">
+    <div class="card"><div class="ic"><i class="ti ti-key"></i></div><h3>Scoped, hashed API keys</h3><p>Create and revoke keys per project, each scoped to sending or full access. Keys are shown once and stored only as hashes — we can never reveal them back. Per-key rate limits are enforced.</p></div>
+    <div class="card"><div class="ic"><i class="ti ti-route-2"></i></div><h3>Durable send pipeline</h3><p>Every send enters a durable queue before it leaves, with retries for transient failures. Accepted means queued; delivered means the receiving server returned 250.</p></div>
+    <div class="card"><div class="ic"><i class="ti ti-ban"></i></div><h3>Pre-send suppression</h3><p>Per-project suppression lists are enforced before a message is ever queued, so you can't re-mail an address that already hard-bounced or complained.</p></div>
+    <div class="card"><div class="ic"><i class="ti ti-list-check"></i></div><h3>List verification</h3><p><span class="mono">POST /verify</span> flags invalid syntax, dead domains, disposable and role addresses, and Spamhaus DBL hits before you send.</p></div>
+  </div>
+</section>
+
+<section class="band"><div class="wrap">
+  <div class="section-head">
+    <span class="eyebrow"><i class="ti ti-webhook"></i> Events &amp; observability</span>
+    <h3>Signed webhooks and a timeline per message</h3>
+    <p class="muted">Delivery, bounce, and complaint are captured from the mail server — pushed to you signed, and shown on the message.</p>
+  </div>
+  <div class="grid g3">
+    <div class="card"><div class="ic"><i class="ti ti-webhook"></i></div><h3>Signed webhooks</h3><p>Register endpoints per project. Payloads are HMAC-signed (<span class="mono">ems-signature: sha256=…</span>) for <span class="mono">email.sent</span>, <span class="mono">delivered</span>, <span class="mono">bounced</span>, <span class="mono">complained</span>, and inbound mail.</p></div>
+    <div class="card"><div class="ic"><i class="ti ti-refresh-alert"></i></div><h3>Retries</h3><p>At-least-once delivery with exponential backoff on failure. Manual one-click replay is not in the dashboard yet.</p></div>
+    <div class="card"><div class="ic"><i class="ti ti-timeline-event"></i></div><h3>Per-message timeline</h3><p>Open any message to see queued → sent → delivered / bounced / complained. Optional open and click events when tracking is enabled on that domain.</p></div>
+    <div class="card"><div class="ic"><i class="ti ti-chart-line"></i></div><h3>Accepted vs delivered</h3><p>Dashboard tiles count accepted, delivered, bounced, and complained separately. Delivery rate is hidden until real feedback exists — we never imply inbox placement we cannot prove.</p></div>
+    <div class="card"><div class="ic"><i class="ti ti-click"></i></div><h3>Open &amp; click tracking</h3><p>Opt-in per domain. A tracking pixel and rewritten links write <span class="mono">opened</span> / <span class="mono">clicked</span> onto the message timeline. Those events are not webhooked yet.</p></div>
+    <div class="card"><div class="ic"><i class="ti ti-mail-off"></i></div><h3>One-click unsubscribe</h3><p><span class="mono">List-Unsubscribe</span> and RFC 8058 one-click headers are injected on sends we relay. Honored immediately.</p></div>
+  </div>
+</div></section>
+
+<section class="wrap">
+  <div class="section-head center">
+    <span class="eyebrow"><i class="ti ti-building-store"></i> White-label multi-tenancy</span>
+    <h3>Resell email under your own brand</h3>
+    <p class="muted">Multi-tenant from the schema up — organizations contain projects, projects scope every key, domain, log, and send. Isolation is enforced at the data layer, not the interface.</p>
+  </div>
+  <div class="grid g3">
+    <div class="card"><div class="ic"><i class="ti ti-sitemap"></i></div><h3>Orgs → projects → keys</h3><p>Role-based access — owner, admin, developer, viewer — per org. Every resource belongs to exactly one project; dashboard writes are gated by permission.</p></div>
+    <div class="card"><div class="ic"><i class="ti ti-palette"></i></div><h3>Custom domains &amp; branding</h3><p>Logo, colors, and a custom dashboard domain on plans that include branding. Your customers see your brand.</p></div>
+    <div class="card"><div class="ic"><i class="ti ti-report-money"></i></div><h3>Sub-accounts &amp; usage</h3><p>White-label orgs create child accounts, switch into them, and see per-tenant send rollups. Stripe invoicing of those rollups is not live yet.</p></div>
+  </div>
+</section>
+
+<section class="band"><div class="wrap">
+  <div class="section-head center">
+    <span class="eyebrow"><i class="ti ti-sparkles"></i> On the roadmap</span>
+    <h3>Shipped vs coming — labeled, not implied</h3>
+    <p class="muted">Transactional sending works today. These are real next steps, not hidden in the product copy.</p>
+  </div>
+  <div class="grid g3">
+    <div class="card"><div class="ic"><i class="ti ti-network"></i></div><h3>Dedicated IP pools <span class="soon-tag">Coming</span></h3><p>Per-tenant or per-stream IPs with a warmup ramp. Today every tenant sends through the mail server we operate.</p></div>
+    <div class="card"><div class="ic"><i class="ti ti-inbox"></i></div><h3>Inbox-placement tests <span class="soon-tag">Coming</span></h3><p>Seed-list folder placement (inbox / spam / missing) per mailbox provider. Today we report whether the receiving server accepted the message.</p></div>
+    <div class="card"><div class="ic"><i class="ti ti-alert-triangle"></i></div><h3>Explain the failure <span class="soon-tag">Coming</span></h3><p>Plain-language bounce and auth-gap diagnosis on the log row, the API, and MCP. Bounce reason is already stored on the event.</p></div>
+    <div class="card"><div class="ic"><i class="ti ti-users"></i></div><h3>Contacts &amp; segments <span class="soon-tag">Coming</span></h3><p>A first-class contact store built from the same activity your transactional sends already produce.</p></div>
+    <div class="card"><div class="ic"><i class="ti ti-mail-bolt"></i></div><h3>Broadcasts <span class="soon-tag">Coming</span></h3><p>One-off and recurring campaigns on the same authenticated infrastructure. Not an SMTP relay product, and not shipping with transactional.</p></div>
+    <div class="card"><div class="ic"><i class="ti ti-route"></i></div><h3>Automations <span class="soon-tag">Coming</span></h3><p>Journeys triggered by the same event stream — welcome series, win-backs — without a second vendor.</p></div>
+  </div>
+  <p class="note" style="margin-top:24px"><i class="ti ti-calendar"></i> Phased on purpose: a developer can fully migrate off Resend today, then turn on marketing when it ships — without re-platforming.</p>
+</div></section>
+
+<section class="cta"><div class="wrap">
+  <div class="card center">
+    <div class="ic"><i class="ti ti-rocket"></i></div>
+    <h3>Send your first email in five minutes</h3>
+    <p>Create a project, verify a domain, drop in a key, and change one base URL. Free to start, no card required.</p>
+    <p style="margin-top:18px">
+      <a class="btn pri lg" href="/dashboard"><i class="ti ti-player-play"></i> Start free</a>
+      <a class="btn lg" href="/docs"><i class="ti ti-book-2"></i> Read the docs</a>
+    </p>
+  </div>
+</div></section>
+
+<footer><div class="wrap">
+  <div class="cols">
+    <div style="max-width:300px"><a class="brand" href="/"><i class="ti ti-mail-fast"></i>EMS</a><p class="muted" style="margin-top:14px">Application email on infrastructure you control.</p></div>
+    <div><b>Product</b><a href="/features">Features</a><a href="/deliverability">Deliverability</a><a href="/pricing">Pricing</a><a href="/dashboard">Dashboard</a></div>
+    <div><b>Developers</b><a href="/docs">Docs</a><a href="/docs/dev">Quickstart</a><a href="/docs/dev">API reference</a></div>
+    <div><b>Company</b><a href="/status">Status</a><a href="mailto:hello@electronicmailservices.com">Contact</a></div>
+  </div>
+  <div class="bot"><span>© 2026 EMS</span><span class="muted">Built on independent, self-hosted infrastructure.</span></div>
+</div></footer>
+</body>
+</html>

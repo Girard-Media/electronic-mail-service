@@ -1,0 +1,11 @@
+# Build context is the monorepo root (apps/web/Dockerfile). Docker reads the
+# .dockerignore from the context root, so this is the one that applies — the
+# apps/web/.dockerignore is NOT consulted for root-context builds.
+# Keep node_modules out of `COPY . .` so the installed trees from the deps stage
+# (root + per-workspace node_modules) are not overwritten by an empty/foreign copy.
+**/node_modules
+**/.next
+.git
+**/.env*.local
+**/*.tsbuildinfo
+.bootspring

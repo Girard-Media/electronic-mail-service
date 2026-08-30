@@ -1,0 +1,31 @@
+# deps
+node_modules/
+.pnpm-store/
+
+# build
+dist/
+build/
+*.tsbuildinfo
+
+# env / secrets
+.env
+.env.*
+!.env.example
+
+# prisma
+packages/db/src/generated/
+
+# logs / os
+*.log
+.DS_Store
+coverage/
+.turbo/
+
+# vendored reference apps under .bootspring/ — keep source, exclude npm
+# dependency manifests so they stay out of GitHub's dependency graph
+# (reference-only; never built, imported, or deployed by ems)
+.bootspring/**/package.json
+.bootspring/**/package-lock.json
+
+# Claude Code local overrides (machine-specific; launch.json is shared)
+.claude/settings.local.json

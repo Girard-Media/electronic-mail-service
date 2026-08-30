@@ -1,0 +1,21 @@
+{
+  "name": "@ems/feedback-ingest",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "start": "tsx src/index.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "smtp-server": "^3.13.6",
+    "tsx": "^4.19.0",
+    "@ems/core": "workspace:*",
+    "@ems/providers": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/smtp-server": "^3.5.10",
+    "typescript": "^5.6.0"
+  }
+}

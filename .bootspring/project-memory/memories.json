@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "records": [
+    {
+      "id": "mem-44c9523f5ee5e478",
+      "projectId": "ems",
+      "scope": "project",
+      "kind": "finding",
+      "content": "hostssh asset gate follows redirects from API /. A 302 from api / to electronicmailservices.com makes the gate parse marketing HTML and request /_next/* against the API container, failing every deploy with five 404s even when production is healthy. Permanent fix: JSON descriptor at API GET /. Do not restore a marketing redirect at API root. After the 2026-08-23 A1 deploy, /readyz is degraded solely because of 67 historical failed send jobs (static, zero waiting, stub-mode leftover) — clear them or real failures hide. A1 remaining after deploy: MX/SPF/DKIM on shared domains, e2e dogfood, dev docs, SDK methods.",
+      "tags": [
+        "a1",
+        "hostssh",
+        "deploy",
+        "readyz",
+        "inboxes"
+      ],
+      "source": "chat-close-handover-2026-08-23",
+      "createdAt": "2026-08-23T22:33:02.942Z",
+      "expiresAt": "2027-08-23T22:33:02.942Z",
+      "contentHash": "7387387de728103d"
+    }
+  ]
+}
