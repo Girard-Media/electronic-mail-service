@@ -5,7 +5,7 @@
 The build-loop queue (`bootspring build next` reads this).
 Status: `[ ]` todo · `[~]` in progress · `[x]` done.
 
-**447 / 2502 complete.**
+**460 / 2502 complete.**
 
 Governing documents — read before taking a task:
 
@@ -2205,21 +2205,21 @@ Stripe is the one unavoidable third party, isolated behind a BillingProvider sea
 
 ---
 
-<!-- source: planning/backlog/20-api-sdk.md · 0/95 -->
+<!-- source: planning/backlog/20-api-sdk.md · 13/95 -->
 # Epic 20 — Public API, SDK, Webhooks & MCP
 
-- [ ] E20-001 — Design the EMS REST surface and freeze the resource naming
-- [ ] E20-002 — Version the API from day one under /v1
+- [x] E20-001 — Design the EMS REST surface and freeze the resource naming
+- [x] E20-002 — Version the API from day one under /v1
 - [ ] E20-003 — Implement API key authentication with scoped permissions
-- [ ] E20-004 — Scope keys per workspace, never per org by default
+- [x] E20-004 — Scope keys per workspace, never per org by default
 - [ ] E20-005 — Implement key rotation with an overlap window
 - [ ] E20-006 — Show the key only once at creation and store a hash
 - [ ] E20-007 — Implement per-key rate limiting with clear headers
-- [ ] E20-008 — Implement idempotency keys on every mutating endpoint
-- [ ] E20-009 — Return consistent error shapes with a machine-readable code
-- [ ] E20-010 — Never leak internal identifiers or stack traces in an error
-- [ ] E20-011 — Implement cursor pagination on every list endpoint
-- [ ] E20-012 — Implement filtering and sorting consistently across resources
+- [x] E20-008 — Implement idempotency keys on every mutating endpoint
+- [x] E20-009 — Return consistent error shapes with a machine-readable code
+- [x] E20-010 — Never leak internal identifiers or stack traces in an error
+- [x] E20-011 — Implement cursor pagination on every list endpoint
+- [x] E20-012 — Implement filtering and sorting consistently across resources
 - [ ] E20-013 — Implement leads CRUD and bulk import endpoints
 - [ ] E20-014 — Enforce the provenance requirement on API imports
 - [ ] E20-015 — Implement lists CRUD and the compliance report endpoint
@@ -2230,15 +2230,15 @@ Stripe is the one unavoidable third party, isolated behind a BillingProvider sea
 - [ ] E20-020 — Implement suppression list read and write endpoints
 - [ ] E20-021 — Implement the unsubscribe endpoint honouring RFC 8058 POST
 - [ ] E20-022 — Implement fleet read endpoints for nodes, IPs, domains, and mailboxes
-- [ ] E20-023 — Gate fleet write endpoints behind an operator scope
+- [x] E20-023 — Gate fleet write endpoints behind an operator scope
 - [ ] E20-024 — Implement deliverability read endpoints for placement, reputation, and listings
 - [ ] E20-025 — Implement the message journey endpoint
 - [ ] E20-026 — Implement inbox thread read and reply endpoints
 - [ ] E20-027 — Implement the policy decision lookup endpoint for compliance evidence
 - [ ] E20-028 — Implement the usage endpoint
 - [ ] E20-029 — Implement the export and erasure request endpoints
-- [ ] E20-030 — Publish an OpenAPI specification generated from the route definitions
-- [ ] E20-031 — Fail CI when the spec drifts from the implementation
+- [x] E20-030 — Publish an OpenAPI specification generated from the route definitions
+- [x] E20-031 — Fail CI when the spec drifts from the implementation
 - [ ] E20-032 — Publish an interactive API reference built from the spec
 - [ ] E20-033 — Add a copy-paste example in curl and TypeScript for every endpoint
 - [ ] E20-034 — Add a Postman or equivalent collection generated from the spec
@@ -2295,9 +2295,9 @@ Stripe is the one unavoidable third party, isolated behind a BillingProvider sea
 - [ ] E20-085 — Test each importer against a real export file
 - [ ] E20-086 — Document the migration path per source platform
 - [ ] E20-087 — Add API integration tests covering every endpoint
-- [ ] E20-088 — Add contract tests asserting the OpenAPI spec matches responses
+- [x] E20-088 — Add contract tests asserting the OpenAPI spec matches responses
 - [ ] E20-089 — Add rate-limit tests
-- [ ] E20-090 — Add authentication and authorisation tests per scope
+- [x] E20-090 — Add authentication and authorisation tests per scope
 - [ ] E20-091 — Add a cross-tenant access test asserting isolation on every endpoint
 - [ ] E20-092 — Load-test the API at the target request rate
 - [ ] E20-093 — Measure and publish API latency percentiles
