@@ -48,7 +48,7 @@ inherited subsystem is consciously kept, retargeted, or deleted.
 - [ ] E01-041 — Update pnpm-workspace.yaml if any new app lives outside apps/*
 - [ ] E01-042 — Update Dockerfile to build the new apps in the single-image pipeline
 - [ ] E01-043 — Update Procfile / start script for the new sibling processes
-- [ ] E01-044 — Update .env.example with every new EMS variable, grouped and commented
+- [x] E01-044 — Update .env.example with every new EMS variable, grouped and commented
 - [ ] E01-045 — Add packages/core/src/env.ts entries for all new variables with zod validation
 - [ ] E01-046 — Fail fast at boot on any missing required env var, with the variable name in the error
 - [ ] E01-047 — Add a git remote for the EMS hostssh deploy target (do not push yet)
@@ -79,8 +79,8 @@ inherited subsystem is consciously kept, retargeted, or deleted.
 - [ ] E01-072 — Write ADR-0005 (OpenRouter as the single inference dependency)
 - [ ] E01-073 — Write ADR-0006 (Stripe behind a BillingProvider seam)
 - [ ] E01-074 — Write ADR-0007 (registrar behind a RegistrarProvider seam)
-- [ ] E01-075 — Set up the local docker-compose to include ClickHouse alongside postgres and valkey
-- [ ] E01-076 — Add pnpm infra:up smoke check that all three stores answer
+- [x] E01-075 — Set up the local docker-compose to include ClickHouse alongside postgres and valkey
+- [x] E01-076 — Add pnpm infra:up smoke check that all three stores answer
 - [ ] E01-077 — Add a seed script that creates a dev org, workspace, and admin user
 - [ ] E01-078 — Add a dev fixture script that fabricates a node, IP, domain, and two mailboxes
 - [ ] E01-079 — Verify the whole repo boots locally end to end with the fixtures

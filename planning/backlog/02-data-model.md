@@ -7,7 +7,7 @@ Valkey holds nothing that cannot be rebuilt.
 - [x] E02-002 — Add EMS back-relations to Organization
 - [x] E02-003 — Run prisma validate and fix every relation error
 - [x] E02-004 — Run prisma format and commit the canonical schema
-- [ ] E02-005 — Generate the initial EMS migration and review the SQL by hand before applying
+- [x] E02-005 — Generate the initial EMS migration and review the SQL by hand before applying
 - [ ] E02-006 — Verify every tenant-scoped model carries orgId and an index on it
 - [ ] E02-007 — Add a partial unique index on FleetDomain.name where status <> BURNED
 - [ ] E02-008 — Add a covering index on SendIntent(state, dueAt) sized for the scheduler claim query
@@ -31,19 +31,19 @@ Valkey holds nothing that cannot be rebuilt.
 - [ ] E02-026 — Write the expand/contract migration playbook for send-path tables
 - [ ] E02-027 — Add a migration lint that rejects a DROP COLUMN in the same migration as its code removal
 - [ ] E02-028 — Add migration timing instrumentation; fail CI on a migration estimated over 30s on prod volume
-- [ ] E02-029 — Provision ClickHouse on the .211 data box
-- [ ] E02-030 — Create the ClickHouse database and a dedicated EMS user with least privilege
-- [ ] E02-031 — Design the smtp_transactions table with a MergeTree ordered by (nodeId, ts)
-- [ ] E02-032 — Add a TTL to smtp_transactions (hot 90d, then R2 archive)
-- [ ] E02-033 — Design the email_events table (queued, submitted, delivered, deferred, bounced, opened, clicked, replied, unsubscribed, complained)
-- [ ] E02-034 — Design the reputation_series table keyed by (subject, subjectId, ts)
-- [ ] E02-035 — Design the placement_observations table for seed probe results
-- [ ] E02-036 — Design the dmarc_rows table for per-source-IP aggregate rows
-- [ ] E02-037 — Design the ai_calls table mirroring the Postgres AiCall for cheap aggregation
-- [ ] E02-038 — Write the ClickHouse migration runner (plain SQL files, forward-only, checksummed)
-- [ ] E02-039 — Add materialized views for hourly rollups per domain, per mailbox, per IP
-- [ ] E02-040 — Add a materialized view for per-ESP deferral rate over 15-minute buckets
-- [ ] E02-041 — Add a materialized view for campaign funnel counts
+- [x] E02-029 — Provision ClickHouse on the .211 data box
+- [x] E02-030 — Create the ClickHouse database and a dedicated EMS user with least privilege
+- [x] E02-031 — Design the smtp_transactions table with a MergeTree ordered by (nodeId, ts)
+- [x] E02-032 — Add a TTL to smtp_transactions (hot 90d, then R2 archive)
+- [x] E02-033 — Design the email_events table (queued, submitted, delivered, deferred, bounced, opened, clicked, replied, unsubscribed, complained)
+- [x] E02-034 — Design the reputation_series table keyed by (subject, subjectId, ts)
+- [x] E02-035 — Design the placement_observations table for seed probe results
+- [x] E02-036 — Design the dmarc_rows table for per-source-IP aggregate rows
+- [x] E02-037 — Design the ai_calls table mirroring the Postgres AiCall for cheap aggregation
+- [x] E02-038 — Write the ClickHouse migration runner (plain SQL files, forward-only, checksummed)
+- [x] E02-039 — Add materialized views for hourly rollups per domain, per mailbox, per IP
+- [x] E02-040 — Add a materialized view for per-ESP deferral rate over 15-minute buckets
+- [x] E02-041 — Add a materialized view for campaign funnel counts
 - [ ] E02-042 — Write packages/db/src/clickhouse.ts with a typed query helper and connection pooling
 - [ ] E02-043 — Add a batching writer that buffers events and flushes on size or interval
 - [ ] E02-044 — Make the ClickHouse writer fail-soft: buffer to disk, never block a send

@@ -22,7 +22,9 @@
     "db:deploy": "pnpm --filter @ems/db migrate:deploy",
     "infra:up": "docker compose -f infra/docker-compose.yml up -d",
     "infra:down": "docker compose -f infra/docker-compose.yml down",
-    "todo:compile": "tsx scripts/compile-todo.mts"
+    "todo:compile": "tsx scripts/compile-todo.mts",
+    "ch:migrate": "tsx scripts/clickhouse-migrate.mts",
+    "ip:diligence": "tsx scripts/ip-diligence.mts"
   },
   "devDependencies": {
     "@types/node": "^22.10.0",

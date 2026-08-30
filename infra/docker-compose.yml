@@ -1,35 +1,81 @@
-# Local dev dependencies for ems (Postgres + Redis).
-# In production these map to the Hostinger/Coolify fleet (see .bootspring/context/ARCHITECTURE.md).
+# Local dev dependencies for EMS.
+#
+# Store rule (planning/ARCHITECTURE.md §10):
+#   Postgres   — decisions and configuration
+#   ClickHouse — observations (smtp transactions, events, reputation series)
+#   Valkey     — nothing that cannot be rebuilt (token buckets, suppression, locks)
+#
+# In production these map to the shared data box .211. Blast nodes are NOT here:
+# they are provisioned by infra/blast-node/ and are not part of the app image.
 services:
   postgres:
-    image: postgres:16-alpine
+    image: postgres:18-alpine
     environment:
       POSTGRES_USER: ems
       POSTGRES_PASSWORD: ems
       POSTGRES_DB: ems
     ports:
-      - "5432:5432"
+      # High host ports on purpose: this machine already runs a system Postgres
+      # and Redis on the default ports, plus usermails' own stack. EMS must not
+      # fight them for a socket.
+      - "55432:5432"
     volumes:
-      - ems_pg:/var/lib/postgresql/data
+      # Postgres 18+ wants a single mount at /var/lib/postgresql and places the
+      # cluster in a version subdirectory, so pg_upgrade --link works without
+      # crossing a mount boundary. Mounting .../data is the pre-18 convention
+      # and 18 refuses to start on it.
+      - ems_pg:/var/lib/postgresql
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ems"]
       interval: 5s
       timeout: 5s
-      retries: 5
+      retries: 10
 
-  redis:
-    image: redis:7-alpine
-    command: ["redis-server", "--appendonly", "yes"]
+  valkey:
+    image: valkey/valkey:8-alpine
+    command: ["valkey-server", "--appendonly", "yes"]
     ports:
-      - "6379:6379"
+      - "56379:6379"
     volumes:
-      - ems_redis:/data
+      - ems_valkey:/data
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test: ["CMD", "valkey-cli", "ping"]
       interval: 5s
       timeout: 5s
-      retries: 5
+      retries: 10
+
+  clickhouse:
+    image: clickhouse/clickhouse-server:25.3-alpine
+    environment:
+      CLICKHOUSE_DB: ems
+      CLICKHOUSE_USER: ems
+      CLICKHOUSE_PASSWORD: ems
+      CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT: "1"
+    ports:
+      - "8123:8123"   # HTTP
+      - "9000:9000"   # native
+    volumes:
+      - ems_ch:/var/lib/clickhouse
+    ulimits:
+      nofile: { soft: 262144, hard: 262144 }
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:8123/ping || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  # A local SMTP sink so dev never sends real mail. apps/workers points
+  # SMTP_URL here unless EMS_ALLOW_REAL_SEND is explicitly set.
+  mailsink:
+    image: axllent/mailpit:latest
+    ports:
+      - "1025:1025"   # SMTP
+      - "8025:8025"   # web UI
+    environment:
+      MP_SMTP_AUTH_ACCEPT_ANY: "1"
+      MP_SMTP_AUTH_ALLOW_INSECURE: "1"
 
 volumes:
   ems_pg:
-  ems_redis:
+  ems_valkey:
+  ems_ch:

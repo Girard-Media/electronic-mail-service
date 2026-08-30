@@ -13,35 +13,35 @@ no manual step, and cannot become routable until it proves it is safe.
 - [ ] E03-008 — Run diligence on the assigned IP before any other step
 - [ ] E03-009 — Set rDNS/PTR to mta01.<sending-domain> via the Hostinger API
 - [ ] E03-010 — Confirm forward-confirmed reverse DNS resolves both directions
-- [ ] E03-011 — Write infra/blast-node/00-preflight.sh (diligence, egress, rDNS assertions)
-- [ ] E03-012 — Write infra/blast-node/10-base.sh (users, ufw, fail2ban, chrony, unattended-upgrades)
-- [ ] E03-013 — Restrict SSH to key-only, non-standard port, and the operator allowlist
-- [ ] E03-014 — Disable IPv6 for outbound mail on the node
-- [ ] E03-015 — Write infra/blast-node/20-postfix.sh with a templated main.cf
-- [ ] E03-016 — Template master.cf with per-transport smtp_bind_address support
-- [ ] E03-017 — Configure sender_dependent_default_transport_maps for per-domain transports
-- [ ] E03-018 — Configure smtp_destination_concurrency_limit per receiving ESP
-- [ ] E03-019 — Configure smtp_destination_rate_delay per receiving ESP
-- [ ] E03-020 — Set soft_bounce=no and a short maximal_queue_lifetime; our scheduler owns retries
-- [ ] E03-021 — Configure mynetworks to loopback plus the workers' private IP only
-- [ ] E03-022 — Configure smtpd_recipient_restrictions to reject relaying explicitly
-- [ ] E03-023 — Configure the VERP return-path envelope rewriting
+- [x] E03-011 — Write infra/blast-node/00-preflight.sh (diligence, egress, rDNS assertions)
+- [x] E03-012 — Write infra/blast-node/10-base.sh (users, ufw, fail2ban, chrony, unattended-upgrades)
+- [x] E03-013 — Restrict SSH to key-only, non-standard port, and the operator allowlist
+- [x] E03-014 — Disable IPv6 for outbound mail on the node
+- [x] E03-015 — Write infra/blast-node/20-postfix.sh with a templated main.cf
+- [x] E03-016 — Template master.cf with per-transport smtp_bind_address support
+- [x] E03-017 — Configure sender_dependent_default_transport_maps for per-domain transports
+- [x] E03-018 — Configure smtp_destination_concurrency_limit per receiving ESP
+- [x] E03-019 — Configure smtp_destination_rate_delay per receiving ESP
+- [x] E03-020 — Set soft_bounce=no and a short maximal_queue_lifetime; our scheduler owns retries
+- [x] E03-021 — Configure mynetworks to loopback plus the workers' private IP only
+- [x] E03-022 — Configure smtpd_recipient_restrictions to reject relaying explicitly
+- [x] E03-023 — Configure the VERP return-path envelope rewriting
 - [ ] E03-024 — Configure the bounce subdomain MX to the node
-- [ ] E03-025 — Write infra/blast-node/30-opendkim.sh with key dirs and the signing table
-- [ ] E03-026 — Support multiple domains and selectors in one OpenDKIM instance
-- [ ] E03-027 — Write infra/blast-node/40-rspamd.sh for local content scoring only
-- [ ] E03-028 — Disable every rspamd module that phones home to an external service
-- [ ] E03-029 — Expose a local rspamd HTTP scoring endpoint for the pre-send gate
-- [ ] E03-030 — Write infra/blast-node/50-dmarc.sh for inbound OpenDMARC checks
-- [ ] E03-031 — Write infra/blast-node/70-tls.sh for a Let's Encrypt cert on the PTR hostname
-- [ ] E03-032 — Configure outbound smtp_tls_security_level=may with DANE where available
-- [ ] E03-033 — Configure inbound smtpd TLS with the real certificate
-- [ ] E03-034 — Write infra/blast-node/90-verify.sh: relay test, DKIM sign test, loopback delivery, egress
-- [ ] E03-035 — Make 90-verify.sh exit non-zero on any failure and refuse to mark the node ACTIVE
-- [ ] E03-036 — Make every provisioning script idempotent and safe to re-run
-- [ ] E03-037 — Add a single infra/blast-node/provision.sh that runs all stages in order
-- [ ] E03-038 — Add a --dry-run mode that prints every change without applying it
-- [ ] E03-039 — Scaffold apps/fleet-agent as a systemd service
+- [x] E03-025 — Write infra/blast-node/30-opendkim.sh with key dirs and the signing table
+- [x] E03-026 — Support multiple domains and selectors in one OpenDKIM instance
+- [x] E03-027 — Write infra/blast-node/40-rspamd.sh for local content scoring only
+- [x] E03-028 — Disable every rspamd module that phones home to an external service
+- [x] E03-029 — Expose a local rspamd HTTP scoring endpoint for the pre-send gate
+- [x] E03-030 — Write infra/blast-node/50-dmarc.sh for inbound OpenDMARC checks
+- [x] E03-031 — Write infra/blast-node/70-tls.sh for a Let's Encrypt cert on the PTR hostname
+- [x] E03-032 — Configure outbound smtp_tls_security_level=may with DANE where available
+- [x] E03-033 — Configure inbound smtpd TLS with the real certificate
+- [x] E03-034 — Write infra/blast-node/90-verify.sh: relay test, DKIM sign test, loopback delivery, egress
+- [x] E03-035 — Make 90-verify.sh exit non-zero on any failure and refuse to mark the node ACTIVE
+- [x] E03-036 — Make every provisioning script idempotent and safe to re-run
+- [x] E03-037 — Add a single infra/blast-node/provision.sh that runs all stages in order
+- [x] E03-038 — Add a --dry-run mode that prints every change without applying it
+- [x] E03-039 — Scaffold apps/fleet-agent as a systemd service
 - [ ] E03-040 — Implement fleet-agent registration: node announces itself to the API with a signed payload
 - [ ] E03-041 — Implement mTLS or Ed25519 request signing between agent and API
 - [ ] E03-042 — Make the API refuse any unsigned node health report
