@@ -5,7 +5,7 @@
 The build-loop queue (`bootspring build next` reads this).
 Status: `[ ]` todo · `[~]` in progress · `[x]` done.
 
-**322 / 2502 complete.**
+**340 / 2502 complete.**
 
 Governing documents — read before taking a task:
 
@@ -1371,7 +1371,7 @@ Self-hosted, five stages, on a dedicated IP that never sends campaigns.
 
 ---
 
-<!-- source: planning/backlog/14-compliance.md · 30/120 -->
+<!-- source: planning/backlog/14-compliance.md · 34/120 -->
 # Epic 14 — Policy Engine, Consent, Suppression, Trust
 
 `packages/policy` sits between the scheduler and the MTA and can block anything.
@@ -1434,10 +1434,10 @@ Blocked is the default for whatever we cannot resolve.
 - [ ] E14-055 — Show a plain confirmation page after an unsubscribe
 - [ ] E14-056 — Never ask a reason before honouring an unsubscribe
 - [ ] E14-057 — Offer an optional reason after the unsubscribe has already taken effect
-- [ ] E14-058 — Implement reply-based unsubscribe detection from the AI classifier
-- [ ] E14-059 — Suppress immediately on an unsubscribe classification without corroboration
-- [ ] E14-060 — Default an ambiguous reply to suppressing rather than continuing
-- [ ] E14-061 — Queue ambiguous cases for human review after suppressing
+- [x] E14-058 — Implement reply-based unsubscribe detection from the AI classifier
+- [x] E14-059 — Suppress immediately on an unsubscribe classification without corroboration
+- [x] E14-060 — Default an ambiguous reply to suppressing rather than continuing
+- [x] E14-061 — Queue ambiguous cases for human review after suppressing
 - [x] E14-062 — Implement the message validator for CAN-SPAM mandatory elements
 - [x] E14-063 — Block on a missing postal address with a specific actionable error
 - [x] E14-064 — Block on a missing or non-functional unsubscribe mechanism
@@ -1744,21 +1744,21 @@ Replies are the product's success metric. Inbound is not an afterthought.
 
 ---
 
-<!-- source: planning/backlog/17-ai.md · 34/130 -->
+<!-- source: planning/backlog/17-ai.md · 48/130 -->
 # Epic 17 — AI Gateway on OpenRouter
 
 One entry point, versioned prompts, validated output, metered cost, CI evals.
 
 - [x] E17-001 — Create packages/ai with the single ai.run entry point
-- [ ] E17-002 — Implement the OpenRouter client with timeout, retry, and cancellation
+- [x] E17-002 — Implement the OpenRouter client with timeout, retry, and cancellation
 - [x] E17-003 — Never call an inference API from a route handler; enqueue instead
 - [ ] E17-004 — Add a CI rule failing any AI import outside a worker or the ai package
 - [x] E17-005 — Implement AiTaskConfig lookup with model, temperature, tokens, and timeout
 - [x] E17-006 — Implement the fallback chain when the primary model errors or times out
 - [x] E17-007 — Let an operator re-route a task to a different model without a deploy
 - [x] E17-008 — Handle model deprecation as a config change with an alert
-- [ ] E17-009 — Implement prompt loading from versioned files under packages/ai/prompts
-- [ ] E17-010 — Refuse to run a task whose promptVersion file is missing
+- [x] E17-009 — Implement prompt loading from versioned files under packages/ai/prompts
+- [x] E17-010 — Refuse to run a task whose promptVersion file is missing
 - [x] E17-011 — Record promptVersion, model, tokens, cost, and latency on every call
 - [x] E17-012 — Implement Zod output schemas for all eleven tasks
 - [x] E17-013 — Retry once with a repair prompt on a schema failure
@@ -1803,16 +1803,16 @@ One entry point, versioned prompts, validated output, metered cost, CI evals.
 - [ ] E17-052 — Implement similar-reply clustering to surface recurring objections
 - [ ] E17-053 — Surface the top objections per campaign as a coaching signal
 - [ ] E17-054 — Implement content-fingerprint neighbour search for placement prediction
-- [ ] E17-055 — Build the eval harness with fixtures per task
-- [ ] E17-056 — Implement labelled-fixture scoring for classification tasks
-- [ ] E17-057 — Report a confusion matrix per classification task
-- [ ] E17-058 — Gate CI at 92% accuracy with no class below 80% recall
-- [ ] E17-059 — Implement rubric scoring by a judge model for generation tasks
-- [ ] E17-060 — Add hard assertions to generation evals: no banned phrases, has CTA, under length
-- [ ] E17-061 — Add an assertion that generated copy contains no unverifiable claim about the recipient
+- [x] E17-055 — Build the eval harness with fixtures per task
+- [x] E17-056 — Implement labelled-fixture scoring for classification tasks
+- [x] E17-057 — Report a confusion matrix per classification task
+- [x] E17-058 — Gate CI at 92% accuracy with no class below 80% recall
+- [x] E17-059 — Implement rubric scoring by a judge model for generation tasks
+- [x] E17-060 — Add hard assertions to generation evals: no banned phrases, has CTA, under length
+- [x] E17-061 — Add an assertion that generated copy contains no unverifiable claim about the recipient
 - [ ] E17-062 — Implement root-cause assertions for reasoning-task fixtures
-- [ ] E17-063 — Fail the build on any eval regression
-- [ ] E17-064 — Grow the fixture set from production low-confidence and corrected cases
+- [x] E17-063 — Fail the build on any eval regression
+- [x] E17-064 — Grow the fixture set from production low-confidence and corrected cases
 - [ ] E17-065 — Build the labelling queue for operators to grade production cases
 - [ ] E17-066 — Add a weekly eval run reported to the team regardless of code changes
 - [ ] E17-067 — Track model drift by re-running evals against the same model over time
@@ -1831,7 +1831,7 @@ One entry point, versioned prompts, validated output, metered cost, CI evals.
 - [ ] E17-080 — Replace any task that cannot meet its cost target with rules
 - [ ] E17-081 — Build the per-org AI usage view for the customer
 - [ ] E17-082 — Show the customer which features consumed their AI allowance
-- [ ] E17-083 — Implement the AI kill switch per task and platform-wide
+- [x] E17-083 — Implement the AI kill switch per task and platform-wide
 - [ ] E17-084 — Test that every task degrades correctly when killed
 - [ ] E17-085 — Implement structured streaming for long generation tasks in the UI
 - [x] E17-086 — Cancel an in-flight generation when the user navigates away
@@ -1847,7 +1847,7 @@ One entry point, versioned prompts, validated output, metered cost, CI evals.
 - [ ] E17-096 — Document the AI subsystem in planning/specs/ai/
 - [ ] E17-097 — Publish the customer-facing statement on how their data is used with inference
 - [ ] E17-098 — Publish the AI opt-out mechanism and what it disables
-- [ ] E17-099 — Add OpenRouter as a named subprocessor in the subprocessor list
+- [x] E17-099 — Add OpenRouter as a named subprocessor in the subprocessor list
 - [ ] E17-100 — Add an AI incident runbook for a provider outage
 - [ ] E17-101 — Add an AI incident runbook for a cost spike
 - [ ] E17-102 — Add spend anomaly detection on the AI ledger

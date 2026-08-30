@@ -60,10 +60,10 @@ Blocked is the default for whatever we cannot resolve.
 - [ ] E14-055 — Show a plain confirmation page after an unsubscribe
 - [ ] E14-056 — Never ask a reason before honouring an unsubscribe
 - [ ] E14-057 — Offer an optional reason after the unsubscribe has already taken effect
-- [ ] E14-058 — Implement reply-based unsubscribe detection from the AI classifier
-- [ ] E14-059 — Suppress immediately on an unsubscribe classification without corroboration
-- [ ] E14-060 — Default an ambiguous reply to suppressing rather than continuing
-- [ ] E14-061 — Queue ambiguous cases for human review after suppressing
+- [x] E14-058 — Implement reply-based unsubscribe detection from the AI classifier
+- [x] E14-059 — Suppress immediately on an unsubscribe classification without corroboration
+- [x] E14-060 — Default an ambiguous reply to suppressing rather than continuing
+- [x] E14-061 — Queue ambiguous cases for human review after suppressing
 - [x] E14-062 — Implement the message validator for CAN-SPAM mandatory elements
 - [x] E14-063 — Block on a missing postal address with a specific actionable error
 - [x] E14-064 — Block on a missing or non-functional unsubscribe mechanism

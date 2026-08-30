@@ -28,7 +28,15 @@ export interface ClassifyReplyInput {
 
 /** Deterministic rules used when inference is unavailable (E17-022). */
 const RULES: Array<[RegExp, ReplyIntent]> = [
-  [/\b(unsubscribe|remove me|take me off|opt.?out|stop email)/i, "UNSUBSCRIBE"],
+  // Broad on purpose. Over-matching costs one lead; under-matching is illegal,
+  // so the eval gate requires 100% recall on this class.
+  [/\b(unsubscribe|un-?subscribe)\b/i, "UNSUBSCRIBE"],
+  [/\b(remove|take)\s+(me|us)\s+(off|from)\b/i, "UNSUBSCRIBE"],
+  [/\bopt\s+(me|us)?\s*-?\s*out\b/i, "UNSUBSCRIBE"],
+  [/\b(stop|cease)\s+(email|contact|messag|sending)/i, "UNSUBSCRIBE"],
+  [/\b(do ?n[o']?t|please don'?t)\s+(email|contact|message)\s+(me|us)\b/i, "UNSUBSCRIBE"],
+  [/\bno longer wish(es)? to (receive|be contacted)\b/i, "UNSUBSCRIBE"],
+  [/\b(delete|erase)\s+(my|our)\s+(email|address|details|data)\b/i, "UNSUBSCRIBE"],
   [/\b(out of (the )?office|on (annual )?leave|on holiday|maternity|paternity|returning on)\b/i, "OUT_OF_OFFICE"],
   [/\b(automatic reply|auto.?reply|do not reply to this)/i, "AUTO_REPLY"],
   [/\b(undeliverable|delivery status notification|mail delivery (failed|subsystem))/i, "BOUNCE"],

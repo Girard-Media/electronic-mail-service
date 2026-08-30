@@ -87,3 +87,6 @@ export function wrapUntrusted(content: string, label = "UNTRUSTED_CONTENT"): str
 export * from "./gateway.js";
 export * from "./tasks/classify-reply.js";
 export * from "./tasks/subjects.js";
+
+export * from "./openrouter.js";
+export * from "./evals.js";
