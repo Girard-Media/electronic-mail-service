@@ -1,3 +1,4 @@
+import { hash32 } from "./schedule.js";
 /**
  * @ems/sequence — the durable per-enrolment state machine.
  *
@@ -31,15 +32,12 @@ export interface SendWindow {
  * stable and results stay attributable (E15-011, E15-012).
  */
 export function assignVariant(leadId: string, stepId: string, weights: number[]): number {
-  let h = 2166136261;
-  const key = `${leadId}:${stepId}`;
-  for (let i = 0; i < key.length; i++) {
-    h ^= key.charCodeAt(i);
-    h = Math.imul(h, 16777619);
-  }
+  // Same finalised hash as the scheduler's jitter — unfinalised FNV-1a clusters
+  // badly on short, similar keys, and lead ids are exactly that.
+  const h = hash32(`${leadId}:${stepId}`);
   const total = weights.reduce((a, b) => a + b, 0);
   if (total <= 0) return 0;
-  let point = (h >>> 0) % total;
+  let point = h % total;
   for (let i = 0; i < weights.length; i++) {
     point -= weights[i] ?? 0;
     if (point < 0) return i;
@@ -53,3 +51,5 @@ const DECEPTIVE_PREFIX = /^\s*(re|fw|fwd)\s*:/i;
 export function isDeceptiveFirstTouch(subject: string, isFirstTouch: boolean): boolean {
   return isFirstTouch && DECEPTIVE_PREFIX.test(subject);
 }
+
+export * from "./schedule.js";

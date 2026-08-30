@@ -50,11 +50,11 @@ Deferral is a first-class success (ARCHITECTURE §3.2).
 - [ ] E07-045 — Implement claim expiry so a crashed worker's intents return to the pool
 - [ ] E07-046 — Measure and record scheduler claim latency; target p95 under 50ms
 - [ ] E07-047 — Load-test the scheduler at one million pending intents
-- [ ] E07-048 — Implement the send-window evaluator using the lead's resolved timezone
-- [ ] E07-049 — Implement the business-day evaluator using the campaign's sendDays
-- [ ] E07-050 — Implement the holiday calendar per country and honour it when configured
-- [ ] E07-051 — Defer rather than send outside the window; never clamp into the boundary minute
-- [ ] E07-052 — Spread sends across the window rather than firing at the opening minute
+- [x] E07-048 — Implement the send-window evaluator using the lead's resolved timezone
+- [x] E07-049 — Implement the business-day evaluator using the campaign's sendDays
+- [x] E07-050 — Implement the holiday calendar per country and honour it when configured
+- [x] E07-051 — Defer rather than send outside the window; never clamp into the boundary minute
+- [x] E07-052 — Spread sends across the window rather than firing at the opening minute
 - [ ] E07-053 — Implement send-time optimisation from historical reply-time data, behind a flag
 - [ ] E07-054 — Never let send-time optimisation override the compliance or pacing gates
 - [ ] E07-055 — Implement the composition stage: variable interpolation with a strict unknown-token policy

@@ -5,7 +5,7 @@
 The build-loop queue (`bootspring build next` reads this).
 Status: `[ ]` todo · `[~]` in progress · `[x]` done.
 
-**226 / 2502 complete.**
+**242 / 2502 complete.**
 
 Governing documents — read before taking a task:
 
@@ -547,7 +547,7 @@ no manual step, and cannot become routable until it proves it is safe.
 
 ---
 
-<!-- source: planning/backlog/06-warmup.md · 8/80 -->
+<!-- source: planning/backlog/06-warmup.md · 10/80 -->
 # Epic 06 — Warmup Engine
 
 Two mechanisms, both required: ramp scheduling and our own peer network.
@@ -557,8 +557,8 @@ No cross-customer warmup pool, ever (ADR-0003).
 - [x] E06-002 — Implement the daily-cap curve: startPerDay, incrementWeek, plateau
 - [ ] E06-003 — Support a per-plan and per-domain-age override of the curve
 - [ ] E06-004 — Implement weekday-only ramping when the plan requires it
-- [ ] E06-005 — Implement jittered hourly distribution so sends do not burst on the hour
-- [ ] E06-006 — Never allow two mailboxes on one domain to fire in the same second
+- [x] E06-005 — Implement jittered hourly distribution so sends do not burst on the hour
+- [x] E06-006 — Never allow two mailboxes on one domain to fire in the same second
 - [ ] E06-007 — Implement the warmup day counter advancing only on days with actual sends
 - [x] E06-008 — Implement the hold condition: pause the ramp when bounce rate exceeds the plan max
 - [x] E06-009 — Implement the hold condition on defer rate
@@ -636,7 +636,7 @@ No cross-customer warmup pool, ever (ADR-0003).
 
 ---
 
-<!-- source: planning/backlog/07-router.md · 42/105 -->
+<!-- source: planning/backlog/07-router.md · 47/105 -->
 # Epic 07 — Router, Pacing & the Send Path
 
 The router is the only package permitted to make a final send decision.
@@ -689,11 +689,11 @@ Deferral is a first-class success (ARCHITECTURE §3.2).
 - [ ] E07-045 — Implement claim expiry so a crashed worker's intents return to the pool
 - [ ] E07-046 — Measure and record scheduler claim latency; target p95 under 50ms
 - [ ] E07-047 — Load-test the scheduler at one million pending intents
-- [ ] E07-048 — Implement the send-window evaluator using the lead's resolved timezone
-- [ ] E07-049 — Implement the business-day evaluator using the campaign's sendDays
-- [ ] E07-050 — Implement the holiday calendar per country and honour it when configured
-- [ ] E07-051 — Defer rather than send outside the window; never clamp into the boundary minute
-- [ ] E07-052 — Spread sends across the window rather than firing at the opening minute
+- [x] E07-048 — Implement the send-window evaluator using the lead's resolved timezone
+- [x] E07-049 — Implement the business-day evaluator using the campaign's sendDays
+- [x] E07-050 — Implement the holiday calendar per country and honour it when configured
+- [x] E07-051 — Defer rather than send outside the window; never clamp into the boundary minute
+- [x] E07-052 — Spread sends across the window rather than firing at the opening minute
 - [ ] E07-053 — Implement send-time optimisation from historical reply-time data, behind a flag
 - [ ] E07-054 — Never let send-time optimisation override the compliance or pacing gates
 - [ ] E07-055 — Implement the composition stage: variable interpolation with a strict unknown-token policy
@@ -1250,7 +1250,7 @@ Self-hosted, five stages, on a dedicated IP that never sends campaigns.
 
 ---
 
-<!-- source: planning/backlog/13-leads.md · 0/115 -->
+<!-- source: planning/backlog/13-leads.md · 2/115 -->
 # Epic 13 — Leads: Import, Normalise, Dedupe, Segment, Enrich
 
 - [ ] E13-001 — Create packages/leads with the import pipeline
@@ -1283,8 +1283,8 @@ Self-hosted, five stages, on a dedicated IP that never sends campaigns.
 - [ ] E13-028 — Resolve the lead's country per COMPLIANCE §2 precedence order
 - [ ] E13-029 — Record countrySource and countryConfidence on every lead
 - [ ] E13-030 — Never let a weak signal loosen the jurisdiction; only tighten
-- [ ] E13-031 — Resolve the lead's timezone from the country and city where known
-- [ ] E13-032 — Fall back to the campaign's fixed timezone when the lead's is unknown
+- [x] E13-031 — Resolve the lead's timezone from the country and city where known
+- [x] E13-032 — Fall back to the campaign's fixed timezone when the lead's is unknown
 - [ ] E13-033 — Surface how many leads lack a resolvable timezone before launch
 - [ ] E13-034 — Implement the list compliance gate before a list can reach READY
 - [ ] E13-035 — Require sourceType, sourceDetail, and an attestation on every list
@@ -1500,7 +1500,7 @@ Blocked is the default for whatever we cannot resolve.
 
 ---
 
-<!-- source: planning/backlog/15-campaigns.md · 3/125 -->
+<!-- source: planning/backlog/15-campaigns.md · 10/125 -->
 # Epic 15 — Campaigns & the Sequence Engine
 
 - [ ] E15-001 — Create packages/sequence with the durable per-enrolment state machine
@@ -1508,14 +1508,14 @@ Blocked is the default for whatever we cannot resolve.
 - [ ] E15-003 — Implement enrolment: lead plus campaign creates a CampaignLead
 - [ ] E15-004 — Run the compliance gate at enrolment as well as at send
 - [ ] E15-005 — Mark an enrolment BLOCKED_BY_POLICY with the reason rather than silently skipping
-- [ ] E15-006 — Implement step materialisation into SendIntent with a computed dueAt
-- [ ] E15-007 — Compute dueAt from the previous step, the delay, the window, and the timezone
+- [x] E15-006 — Implement step materialisation into SendIntent with a computed dueAt
+- [x] E15-007 — Compute dueAt from the previous step, the delay, the window, and the timezone
 - [ ] E15-008 — Never materialise more than the next step per enrolment
 - [ ] E15-009 — Implement step conditions: no reply, opened, clicked, custom field match
 - [ ] E15-010 — Evaluate conditions at materialisation, not at creation
 - [x] E15-011 — Implement variant assignment deterministically from hash(leadId, stepId)
 - [x] E15-012 — Keep variant assignment stable across re-runs
-- [ ] E15-013 — Implement weighted variant selection
+- [x] E15-013 — Implement weighted variant selection
 - [ ] E15-014 — Track per-variant sent, replied, and bounced counters
 - [ ] E15-015 — Compute variant significance and refuse to declare a winner too early
 - [ ] E15-016 — Show the confidence interval on every variant comparison
@@ -1556,12 +1556,12 @@ Blocked is the default for whatever we cannot resolve.
 - [ ] E15-051 — Implement the AI sequence-optimisation task producing reviewable proposals
 - [ ] E15-052 — Never auto-apply an optimisation proposal
 - [ ] E15-053 — Track whether accepted proposals actually improved outcomes
-- [ ] E15-054 — Build the campaign schedule editor: window, days, timezone mode, daily cap
+- [x] E15-054 — Build the campaign schedule editor: window, days, timezone mode, daily cap
 - [ ] E15-055 — Show the projected send curve for the configured schedule
 - [ ] E15-056 — Show the projected completion date before launch
 - [ ] E15-057 — Explain the binding constraint when the projection is slower than the user expects
 - [ ] E15-058 — Offer the specific action that would speed it up
-- [ ] E15-059 — Implement the holiday calendar per country and honour it
+- [x] E15-059 — Implement the holiday calendar per country and honour it
 - [ ] E15-060 — Let the customer add their own blackout dates
 - [ ] E15-061 — Implement the pre-launch checklist covering compliance, capacity, content, and placement
 - [ ] E15-062 — Make every checklist item link to the thing that fixes it
@@ -1606,8 +1606,8 @@ Blocked is the default for whatever we cannot resolve.
 - [ ] E15-101 — Test that a blocked jurisdiction produces BLOCKED_BY_POLICY, not a silent skip
 - [ ] E15-102 — Test the soft-launch gate blocks a full send until confirmed
 - [ ] E15-103 — Test the auto-pause breaker with injected bounces
-- [ ] E15-104 — Test timezone handling across a daylight-saving boundary
-- [ ] E15-105 — Test the holiday calendar against a real national holiday
+- [x] E15-104 — Test timezone handling across a daylight-saving boundary
+- [x] E15-105 — Test the holiday calendar against a real national holiday
 - [ ] E15-106 — Fuzz the template renderer with adversarial variable content
 - [ ] E15-107 — Assert the renderer cannot be used to inject headers
 - [ ] E15-108 — Document the sequence engine in planning/specs/sequence/

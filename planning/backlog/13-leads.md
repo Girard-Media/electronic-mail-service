@@ -30,8 +30,8 @@
 - [ ] E13-028 — Resolve the lead's country per COMPLIANCE §2 precedence order
 - [ ] E13-029 — Record countrySource and countryConfidence on every lead
 - [ ] E13-030 — Never let a weak signal loosen the jurisdiction; only tighten
-- [ ] E13-031 — Resolve the lead's timezone from the country and city where known
-- [ ] E13-032 — Fall back to the campaign's fixed timezone when the lead's is unknown
+- [x] E13-031 — Resolve the lead's timezone from the country and city where known
+- [x] E13-032 — Fall back to the campaign's fixed timezone when the lead's is unknown
 - [ ] E13-033 — Surface how many leads lack a resolvable timezone before launch
 - [ ] E13-034 — Implement the list compliance gate before a list can reach READY
 - [ ] E13-035 — Require sourceType, sourceDetail, and an attestation on every list

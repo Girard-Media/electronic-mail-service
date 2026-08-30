@@ -7,8 +7,8 @@ No cross-customer warmup pool, ever (ADR-0003).
 - [x] E06-002 — Implement the daily-cap curve: startPerDay, incrementWeek, plateau
 - [ ] E06-003 — Support a per-plan and per-domain-age override of the curve
 - [ ] E06-004 — Implement weekday-only ramping when the plan requires it
-- [ ] E06-005 — Implement jittered hourly distribution so sends do not burst on the hour
-- [ ] E06-006 — Never allow two mailboxes on one domain to fire in the same second
+- [x] E06-005 — Implement jittered hourly distribution so sends do not burst on the hour
+- [x] E06-006 — Never allow two mailboxes on one domain to fire in the same second
 - [ ] E06-007 — Implement the warmup day counter advancing only on days with actual sends
 - [x] E06-008 — Implement the hold condition: pause the ramp when bounce rate exceeds the plan max
 - [x] E06-009 — Implement the hold condition on defer rate

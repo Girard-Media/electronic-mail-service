@@ -5,14 +5,14 @@
 - [ ] E15-003 — Implement enrolment: lead plus campaign creates a CampaignLead
 - [ ] E15-004 — Run the compliance gate at enrolment as well as at send
 - [ ] E15-005 — Mark an enrolment BLOCKED_BY_POLICY with the reason rather than silently skipping
-- [ ] E15-006 — Implement step materialisation into SendIntent with a computed dueAt
-- [ ] E15-007 — Compute dueAt from the previous step, the delay, the window, and the timezone
+- [x] E15-006 — Implement step materialisation into SendIntent with a computed dueAt
+- [x] E15-007 — Compute dueAt from the previous step, the delay, the window, and the timezone
 - [ ] E15-008 — Never materialise more than the next step per enrolment
 - [ ] E15-009 — Implement step conditions: no reply, opened, clicked, custom field match
 - [ ] E15-010 — Evaluate conditions at materialisation, not at creation
 - [x] E15-011 — Implement variant assignment deterministically from hash(leadId, stepId)
 - [x] E15-012 — Keep variant assignment stable across re-runs
-- [ ] E15-013 — Implement weighted variant selection
+- [x] E15-013 — Implement weighted variant selection
 - [ ] E15-014 — Track per-variant sent, replied, and bounced counters
 - [ ] E15-015 — Compute variant significance and refuse to declare a winner too early
 - [ ] E15-016 — Show the confidence interval on every variant comparison
@@ -53,12 +53,12 @@
 - [ ] E15-051 — Implement the AI sequence-optimisation task producing reviewable proposals
 - [ ] E15-052 — Never auto-apply an optimisation proposal
 - [ ] E15-053 — Track whether accepted proposals actually improved outcomes
-- [ ] E15-054 — Build the campaign schedule editor: window, days, timezone mode, daily cap
+- [x] E15-054 — Build the campaign schedule editor: window, days, timezone mode, daily cap
 - [ ] E15-055 — Show the projected send curve for the configured schedule
 - [ ] E15-056 — Show the projected completion date before launch
 - [ ] E15-057 — Explain the binding constraint when the projection is slower than the user expects
 - [ ] E15-058 — Offer the specific action that would speed it up
-- [ ] E15-059 — Implement the holiday calendar per country and honour it
+- [x] E15-059 — Implement the holiday calendar per country and honour it
 - [ ] E15-060 — Let the customer add their own blackout dates
 - [ ] E15-061 — Implement the pre-launch checklist covering compliance, capacity, content, and placement
 - [ ] E15-062 — Make every checklist item link to the thing that fixes it
@@ -103,8 +103,8 @@
 - [ ] E15-101 — Test that a blocked jurisdiction produces BLOCKED_BY_POLICY, not a silent skip
 - [ ] E15-102 — Test the soft-launch gate blocks a full send until confirmed
 - [ ] E15-103 — Test the auto-pause breaker with injected bounces
-- [ ] E15-104 — Test timezone handling across a daylight-saving boundary
-- [ ] E15-105 — Test the holiday calendar against a real national holiday
+- [x] E15-104 — Test timezone handling across a daylight-saving boundary
+- [x] E15-105 — Test the holiday calendar against a real national holiday
 - [ ] E15-106 — Fuzz the template renderer with adversarial variable content
 - [ ] E15-107 — Assert the renderer cannot be used to inject headers
 - [ ] E15-108 — Document the sequence engine in planning/specs/sequence/
