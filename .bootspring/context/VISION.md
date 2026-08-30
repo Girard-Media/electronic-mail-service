@@ -1,50 +1,41 @@
-# ems — Vision
+# Vision — Electronic Mail Services
 
-**Generated:** 2026-06-20
-**Status:** Draft v1
+> Canonical source: `planning/VISION.md`. This is the agent-facing summary.
 
-## One-liner
+**Cold B2B outreach infrastructure that we own end to end** — our metal, our IPs,
+our MTA, our mail log. That ownership *is* the product: it is why `delivered`
+means the receiving MX returned 250, read from our own Postfix log, rather than
+a vendor's optimistic counter.
 
-**ems is the developer-first platform for application email** — the email your app *has* to send (transactional today, marketing & lifecycle tomorrow) — delivered with Resend-grade DX, Postmark-grade deliverability, and white-label multi-tenancy built in from day one.
+## The reframe
 
-## Problem
+To send 1,000 cold emails a day you need ~30 healthy mailboxes across ~12 domains,
+because a mailbox plateaus at 30–50/day for cold traffic. So this is not a "send a
+lot of mail" product. It is a fleet-management and scheduling system that happens
+to emit email — closer to Kubernetes than to Mailchimp.
 
-Every application sends email, and almost everyone hates how they do it.
+**Reputation is the scarce resource.** Every campaign burns it; warmup and good
+behaviour regenerate it. The product is a reputation budget allocator.
 
-- **Transactional email is the acute pain.** Password resets, magic links, receipts, OTPs, invites, alerts. If these are slow, land in spam, or silently fail, users churn and support tickets spike — yet the incumbents make this *harder*, not easier.
-- **The legacy giants (SendGrid, Mailgun) have rotted.** Painful APIs, opaque deliverability, shared-IP reputation roulette, console UX from 2014, surprise bills, and support that disappears below enterprise tier.
-- **The modern darling (Resend) nailed DX but is a closed box.** No self-host, limited white-label, and pricing that punishes you exactly when you start to win.
-- **Deliverability is a black art** nobody hands developers good tools for: no inbox-placement visibility, no guided SPF/DKIM/DMARC/BIMI, no warmup, no reputation dashboard.
-- **Agencies and platforms can't resell email under their own brand** without gluing together SES + a dashboard themselves.
+## Why incumbents cannot copy this
 
-## Solution
+Instantly, Smartlead, Lemlist, Apollo and the rest resell Google/Microsoft
+mailboxes or third-party SMTP. They rent the mailbox, the IP, the MTA, the
+reputation and the economics. They see "accepted by Google," never "delivered by
+the receiving MX" — so bounce classification is guesswork and per-IP warmup is
+impossible.
 
-A single platform that treats application email as a first-class product surface:
+## Scope boundary — enforce this
 
-1. **Zero-switching-cost migration.** A **Resend-compatible API** — change one base URL and existing `resend` SDK code keeps working. We win by removing the reason not to switch.
-2. **Deliverability as a product, not a prayer.** Guided domain auth, dedicated IP pools with automated warmup, suppression/bounce/complaint management, seed-list inbox-placement testing, and a live reputation dashboard.
-3. **White-label and multi-tenant from the first commit.** Orgs → projects → domains → keys, custom sending + dashboard domains, per-tenant branding. Agencies and SaaS platforms resell email as *their* feature.
-4. **One event stream, two jobs.** The same delivery/engagement events that power transactional observability later power **marketing automation, lifecycle journeys, and CRM** — so customers grow *into* marketing without leaving.
-5. **Own your substrate.** Built on AWS SES initially, behind a provider abstraction so we can add SMTP relays, multi-provider routing, and our own MTA without customers ever changing code.
+EMS is acquisition. **usermails is lifecycle.** The moment a lead opts in they
+leave EMS via the handoff. Do not add opt-in marketing features here.
 
-## Why now
+## Refused, permanently
 
-- Resend proved developers will pay for email DX — and validated the category — but left self-host, white-label, and marketing on the table.
-- SES made world-class sending infrastructure a commodity; the value has moved up to the **control plane, deliverability tooling, and DX**.
-- AI-built apps are multiplying the number of apps that need email overnight, each one a buyer.
+Header forgery · domain spoofing · open relay · `RE:` on a first touch ·
+invisible text, homoglyphs, zero-width padding · hidden or delayed unsubscribes ·
+cross-customer fake-engagement warmup pools · lists with no provenance · sending
+for an unidentified customer · a score we cannot decompose.
 
-## Core values
-
-- **Developer experience is the product.** Docs, SDKs, errors, and dashboards that respect the developer's time.
-- **Deliverability is non-negotiable.** We measure the inbox, not the "sent" count.
-- **Transparent by default.** Clear pricing, clear logs, clear reasons an email failed.
-- **White-label native.** Every feature must survive being someone else's brand.
-- **Boring reliability.** Email is infrastructure. It should be invisible when it works and loud when it doesn't.
-
-## What success looks like
-
-Developers reach for ems the way they reach for Stripe for payments — the obvious default for application email — and a meaningful share of them are agencies and platforms reselling it under their own name.
-
-## Related
-
-See [[MARKET]], [[COMPETITORS]], [[PRD]], [[ARCHITECTURE]], [[DELIVERABILITY]], [[ROADMAP]], [[BUSINESS_MODEL]].
+The line: every deliverability feature here is what a *good* sender does. We do
+not build tools whose purpose is to defeat a filter that correctly identified spam.

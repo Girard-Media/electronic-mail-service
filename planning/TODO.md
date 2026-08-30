@@ -5,7 +5,7 @@
 The build-loop queue (`bootspring build next` reads this).
 Status: `[ ]` todo · `[~]` in progress · `[x]` done.
 
-**84 / 2502 complete.**
+**98 / 2502 complete.**
 
 Governing documents — read before taking a task:
 
@@ -26,7 +26,7 @@ invariant it protects.
 
 ---
 
-<!-- source: planning/backlog/01-foundation.md · 23/82 -->
+<!-- source: planning/backlog/01-foundation.md · 37/82 -->
 # Epic 01 — Foundation & Fork Hygiene
 
 Goal: the forked repo compiles green, carries no usermails identity, and every
@@ -43,22 +43,22 @@ inherited subsystem is consciously kept, retargeted, or deleted.
 - [ ] E01-009a — Make `pnpm typecheck` build @ems/sdk first, or emit types in place, so the ordering is not a tribal fact
 - [x] E01-009 — pnpm lint green — but only apps/web defines a lint script; see E01-009b
 - [ ] E01-009b — Add an eslint config and a lint script to the other ten workspace packages; 10 of 11 are currently unlinted
-- [ ] E01-010 — Run the inherited pnpm test suite; triage every failure into keep/retarget/delete
+- [x] E01-010 — Run the inherited pnpm test suite; triage every failure into keep/retarget/delete
 - [x] E01-011 — Update bootspring.config.js: name ems, hosting hostssh, analytics clickhouse, email own-mta
 - [x] E01-012 — Rewrite CLAUDE.md for EMS: product definition, constraints, repo map, commands
 - [ ] E01-013 — Rewrite AGENTS.md with the EMS send-path invariants I1–I7 as agent-visible rules
 - [x] E01-014 — Rewrite README.md: what ships, what does not, honest status line
 - [ ] E01-015 — Rewrite SEED.md as the EMS seed brief; archive the usermails original under planning/lineage/
-- [ ] E01-016 — Delete .bootspring/specs/transactional-core (usermails lineage, not ours)
-- [ ] E01-017 — Rewrite .bootspring/context/VISION.md from planning/VISION.md
-- [ ] E01-018 — Rewrite .bootspring/context/ARCHITECTURE.md from planning/ARCHITECTURE.md
-- [ ] E01-019 — Rewrite .bootspring/context/DELIVERABILITY.md for cold-outreach physics
-- [ ] E01-020 — Rewrite .bootspring/context/INFRA.md for the blast-node fleet
-- [ ] E01-021 — Rewrite .bootspring/context/COMPETITORS.md: Instantly, Smartlead, Lemlist, Apollo, Woodpecker, Reply, Salesforge, QuickMail
-- [ ] E01-022 — Rewrite .bootspring/context/BUSINESS_MODEL.md with the cost model from planning/INFRA.md §12
-- [ ] E01-023 — Rewrite .bootspring/context/AUDIENCE.md: agency, SDR team, founder-led sales
-- [ ] E01-024 — Write .bootspring/context/DECISIONS.md D1..D20 for EMS (own MTA, no warmup pool, opens off by default…)
-- [ ] E01-025 — Reset .bootspring/facts and project-memory to EMS facts only
+- [x] E01-016 — Delete .bootspring/specs/transactional-core (usermails lineage, not ours)
+- [x] E01-017 — Rewrite .bootspring/context/VISION.md from planning/VISION.md
+- [x] E01-018 — Rewrite .bootspring/context/ARCHITECTURE.md from planning/ARCHITECTURE.md
+- [x] E01-019 — Rewrite .bootspring/context/DELIVERABILITY.md for cold-outreach physics
+- [x] E01-020 — Rewrite .bootspring/context/INFRA.md for the blast-node fleet
+- [x] E01-021 — Rewrite .bootspring/context/COMPETITORS.md: Instantly, Smartlead, Lemlist, Apollo, Woodpecker, Reply, Salesforge, QuickMail
+- [x] E01-022 — Rewrite .bootspring/context/BUSINESS_MODEL.md with the cost model from planning/INFRA.md §12
+- [x] E01-023 — Rewrite .bootspring/context/AUDIENCE.md: agency, SDR team, founder-led sales
+- [x] E01-024 — Write .bootspring/context/DECISIONS.md D1..D20 for EMS (own MTA, no warmup pool, opens off by default…)
+- [x] E01-025 — Reset .bootspring/facts and project-memory to EMS facts only
 - [ ] E01-026 — Decide and record: keep apps/dashboard (legacy Hono SPA) or delete in favour of apps/web
 - [ ] E01-027 — Delete apps/api/public/*.html static marketing pages superseded by apps/web
 - [ ] E01-028 — Audit packages/migrate sources; retarget from ESP-migration to outreach-platform migration
@@ -88,9 +88,9 @@ inherited subsystem is consciously kept, retargeted, or deleted.
 - [ ] E01-052 — Add CODEOWNERS with the send path and policy package requiring review
 - [ ] E01-053 — Add a PR template that asks which send-path invariant the change touches
 - [ ] E01-054 — Add .editorconfig and confirm formatter settings match the inherited code
-- [ ] E01-055 — Document the fork lineage and the licence boundary in planning/lineage/FORK.md
-- [ ] E01-056 — Confirm the freeresend (MIT) attribution survives the fork; keep NOTICE current
-- [ ] E01-057 — Restate the usesend AGPLv3 clean-room rule in CLAUDE.md and AGENTS.md
+- [x] E01-055 — Document the fork lineage and the licence boundary in planning/lineage/FORK.md
+- [x] E01-056 — Confirm the freeresend (MIT) attribution survives the fork; keep NOTICE current
+- [x] E01-057 — Restate the usesend AGPLv3 clean-room rule in CLAUDE.md and AGENTS.md
 - [ ] E01-058 — Remove every usermails-specific test that asserts Resend API compatibility we no longer need
 - [ ] E01-059 — Keep and retarget scripts/ssrf-test.mts to the new outbound surfaces
 - [ ] E01-060 — Keep and retarget scripts/security-headers-test.mts to apps/web and apps/api

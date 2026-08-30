@@ -44,7 +44,7 @@ ok("reserved names all validate as shapes", [...RESERVED_INBOX_USERNAMES].every(
 // --- shared inbox domains (multi-domain: agents.* + inbox.* etc.) -----------
 ok(
   "parses a comma list, lowercased + trimmed",
-  JSON.stringify(parseSharedInboxDomains(" Agents.EMS.com , inbox.electronicmailservices.com ")) ===
+  JSON.stringify(parseSharedInboxDomains(" Agents.ElectronicMailServices.com , inbox.electronicmailservices.com ")) ===
     JSON.stringify(["agents.electronicmailservices.com", "inbox.electronicmailservices.com"]),
 );
 ok("dedupes", parseSharedInboxDomains("a.com,a.com,b.com").length === 2);
@@ -53,7 +53,7 @@ ok("strips a trailing dot (FQDN form)", parseSharedInboxDomains("a.com.")[0] ===
 ok("empty config → empty list (no accidental allow)", parseSharedInboxDomains("").length === 0);
 const SHARED = parseSharedInboxDomains("agents.electronicmailservices.com,inbox.electronicmailservices.com");
 ok("membership matches", isSharedInboxDomain("inbox.electronicmailservices.com", SHARED));
-ok("membership is case-insensitive", isSharedInboxDomain("Inbox.EMS.COM", SHARED));
+ok("membership is case-insensitive", isSharedInboxDomain("Inbox.ElectronicMailServices.COM", SHARED));
 ok("non-member rejected", !isSharedInboxDomain("evil.com", SHARED));
 ok(
   "apex electronicmailservices.com is NOT a shared inbox domain (system-send only)",
