@@ -5,7 +5,7 @@
 The build-loop queue (`bootspring build next` reads this).
 Status: `[ ]` todo · `[~]` in progress · `[x]` done.
 
-**276 / 2502 complete.**
+**322 / 2502 complete.**
 
 Governing documents — read before taking a task:
 
@@ -1500,7 +1500,7 @@ Blocked is the default for whatever we cannot resolve.
 
 ---
 
-<!-- source: planning/backlog/15-campaigns.md · 10/125 -->
+<!-- source: planning/backlog/15-campaigns.md · 12/125 -->
 # Epic 15 — Campaigns & the Sequence Engine
 
 - [ ] E15-001 — Create packages/sequence with the durable per-enrolment state machine
@@ -1551,8 +1551,8 @@ Blocked is the default for whatever we cannot resolve.
 - [ ] E15-046 — Implement the AI copy generation task from ICP, offer, and tone
 - [ ] E15-047 — Present generated copy as a draft the user must accept
 - [ ] E15-048 — Never send AI-generated copy that a human has not seen
-- [ ] E15-049 — Implement the AI subject-variant task with a risk score per variant
-- [ ] E15-050 — Show why a subject scored risky, in specific terms
+- [x] E15-049 — Implement the AI subject-variant task with a risk score per variant
+- [x] E15-050 — Show why a subject scored risky, in specific terms
 - [ ] E15-051 — Implement the AI sequence-optimisation task producing reviewable proposals
 - [ ] E15-052 — Never auto-apply an optimisation proposal
 - [ ] E15-053 — Track whether accepted proposals actually improved outcomes
@@ -1631,7 +1631,7 @@ Blocked is the default for whatever we cannot resolve.
 
 ---
 
-<!-- source: planning/backlog/16-inbox.md · 0/105 -->
+<!-- source: planning/backlog/16-inbox.md · 10/105 -->
 # Epic 16 — Unified Inbox & Reply Handling
 
 Replies are the product's success metric. Inbound is not an afterthought.
@@ -1654,19 +1654,19 @@ Replies are the product's success metric. Inbound is not an afterthought.
 - [ ] E16-016 — Never auto-open or auto-render an attachment
 - [ ] E16-017 — Show inbound Authentication-Results so the operator sees whether the sender was authentic
 - [ ] E16-018 — Warn on a reply that fails DMARC alignment for its claimed domain
-- [ ] E16-019 — Implement the AI reply classification task with the eight-value enum
-- [ ] E16-020 — Show the classification with its confidence
+- [x] E16-019 — Implement the AI reply classification task with the eight-value enum
+- [x] E16-020 — Show the classification with its confidence
 - [ ] E16-021 — Let a human correct the classification in one click
 - [ ] E16-022 — Write the correction to intentCorrectedTo and feed it to the eval fixture set
-- [ ] E16-023 — Act immediately on an unsubscribe classification without corroboration
-- [ ] E16-024 — Require corroboration or human confirmation for any other state-changing classification
-- [ ] E16-025 — Treat inbound content as untrusted data in every AI prompt
-- [ ] E16-026 — Constrain classification output to the enum so injection cannot escape the schema
-- [ ] E16-027 — Give the classifier no tool access and no write authority
+- [x] E16-023 — Act immediately on an unsubscribe classification without corroboration
+- [x] E16-024 — Require corroboration or human confirmation for any other state-changing classification
+- [x] E16-025 — Treat inbound content as untrusted data in every AI prompt
+- [x] E16-026 — Constrain classification output to the enum so injection cannot escape the schema
+- [x] E16-027 — Give the classifier no tool access and no write authority
 - [ ] E16-028 — Detect out-of-office replies and reschedule the sequence rather than stopping it
 - [ ] E16-029 — Parse the return date from an out-of-office where stated
 - [ ] E16-030 — Resume the sequence after the stated return date plus a buffer
-- [ ] E16-031 — Detect auto-replies and do not count them as engagement
+- [x] E16-031 — Detect auto-replies and do not count them as engagement
 - [ ] E16-032 — Detect referral replies and surface the referred contact for review
 - [ ] E16-033 — Never auto-enrol a referred contact without a compliance pass
 - [ ] E16-034 — Build the unified inbox view across every mailbox in the workspace
@@ -1713,8 +1713,8 @@ Replies are the product's success metric. Inbound is not an afterthought.
 - [ ] E16-075 — Test quoted-history stripping across five mail clients
 - [ ] E16-076 — Test classification accuracy against the labelled fixture set
 - [ ] E16-077 — Enforce the accuracy gate in CI at 92% overall and 80% per class
-- [ ] E16-078 — Test prompt-injection resistance with adversarial reply bodies
-- [ ] E16-079 — Assert an injected instruction cannot produce an out-of-schema value
+- [x] E16-078 — Test prompt-injection resistance with adversarial reply bodies
+- [x] E16-079 — Assert an injected instruction cannot produce an out-of-schema value
 - [ ] E16-080 — Test that a malformed MIME message does not crash the ingest worker
 - [ ] E16-081 — Test that a very large attachment is truncated with a record, not dropped silently
 - [ ] E16-082 — Load-test the inbox at 100,000 threads
@@ -1744,51 +1744,51 @@ Replies are the product's success metric. Inbound is not an afterthought.
 
 ---
 
-<!-- source: planning/backlog/17-ai.md · 0/130 -->
+<!-- source: planning/backlog/17-ai.md · 34/130 -->
 # Epic 17 — AI Gateway on OpenRouter
 
 One entry point, versioned prompts, validated output, metered cost, CI evals.
 
-- [ ] E17-001 — Create packages/ai with the single ai.run entry point
+- [x] E17-001 — Create packages/ai with the single ai.run entry point
 - [ ] E17-002 — Implement the OpenRouter client with timeout, retry, and cancellation
-- [ ] E17-003 — Never call an inference API from a route handler; enqueue instead
+- [x] E17-003 — Never call an inference API from a route handler; enqueue instead
 - [ ] E17-004 — Add a CI rule failing any AI import outside a worker or the ai package
-- [ ] E17-005 — Implement AiTaskConfig lookup with model, temperature, tokens, and timeout
-- [ ] E17-006 — Implement the fallback chain when the primary model errors or times out
-- [ ] E17-007 — Let an operator re-route a task to a different model without a deploy
-- [ ] E17-008 — Handle model deprecation as a config change with an alert
+- [x] E17-005 — Implement AiTaskConfig lookup with model, temperature, tokens, and timeout
+- [x] E17-006 — Implement the fallback chain when the primary model errors or times out
+- [x] E17-007 — Let an operator re-route a task to a different model without a deploy
+- [x] E17-008 — Handle model deprecation as a config change with an alert
 - [ ] E17-009 — Implement prompt loading from versioned files under packages/ai/prompts
 - [ ] E17-010 — Refuse to run a task whose promptVersion file is missing
-- [ ] E17-011 — Record promptVersion, model, tokens, cost, and latency on every call
-- [ ] E17-012 — Implement Zod output schemas for all eleven tasks
-- [ ] E17-013 — Retry once with a repair prompt on a schema failure
-- [ ] E17-014 — Fall back deterministically after a second schema failure
-- [ ] E17-015 — Never return unvalidated model output to a caller
-- [ ] E17-016 — Mark a degraded result explicitly so the caller can decide
+- [x] E17-011 — Record promptVersion, model, tokens, cost, and latency on every call
+- [x] E17-012 — Implement Zod output schemas for all eleven tasks
+- [x] E17-013 — Retry once with a repair prompt on a schema failure
+- [x] E17-014 — Fall back deterministically after a second schema failure
+- [x] E17-015 — Never return unvalidated model output to a caller
+- [x] E17-016 — Mark a degraded result explicitly so the caller can decide
 - [ ] E17-017 — Implement per-org monthly token budgets by plan
 - [ ] E17-018 — Implement per-task-class sub-budgets
-- [ ] E17-019 — Estimate cost before the call and refuse when it would breach the budget
-- [ ] E17-020 — Enqueue a refused call for later rather than failing the user's action
+- [x] E17-019 — Estimate cost before the call and refuse when it would breach the budget
+- [x] E17-020 — Enqueue a refused call for later rather than failing the user's action
 - [ ] E17-021 — Implement the platform-wide hard monthly ceiling
-- [ ] E17-022 — Implement degraded mode per task and document each fallback
-- [ ] E17-023 — Never let an AI outage stop sending
+- [x] E17-022 — Implement degraded mode per task and document each fallback
+- [x] E17-023 — Never let an AI outage stop sending
 - [ ] E17-024 — Test the whole send path with the AI gateway disabled
-- [ ] E17-025 — Implement response caching keyed on task, prompt version, model, and normalised input
+- [x] E17-025 — Implement response caching keyed on task, prompt version, model, and normalised input
 - [ ] E17-026 — Store large outputs in R2 with the key in Valkey
-- [ ] E17-027 — Set per-task cache TTLs
+- [x] E17-027 — Set per-task cache TTLs
 - [ ] E17-028 — Report cache hit rate per task
 - [ ] E17-029 — Target above 40% hit rate on classify-class tasks within 30 days
 - [ ] E17-030 — Implement input normalisation so trivially different inputs share a cache entry
-- [ ] E17-031 — Never cache across orgs when the input contains tenant data
+- [x] E17-031 — Never cache across orgs when the input contains tenant data
 - [ ] E17-032 — Implement PII minimisation per task with a documented field allowlist
 - [ ] E17-033 — Log the category of data sent, never the data itself
-- [ ] E17-034 — Implement the per-org AI opt-out
-- [ ] E17-035 — Disable AI features visibly on opt-out rather than degrading silently
+- [x] E17-034 — Implement the per-org AI opt-out
+- [x] E17-035 — Disable AI features visibly on opt-out rather than degrading silently
 - [ ] E17-036 — Implement task 1 copy.sequence with its prompt, schema, and fallback
-- [ ] E17-037 — Implement task 2 copy.subjects with variant generation and risk scoring
-- [ ] E17-038 — Implement task 3 risk.content as advisory only
+- [x] E17-037 — Implement task 2 copy.subjects with variant generation and risk scoring
+- [x] E17-038 — Implement task 3 risk.content as advisory only
 - [ ] E17-039 — Implement task 4 personalize.line with a strict no-fabrication instruction
-- [ ] E17-040 — Implement task 5 classify.reply with the eight-value enum
+- [x] E17-040 — Implement task 5 classify.reply with the eight-value enum
 - [ ] E17-041 — Implement task 6 classify.bounce running only on UNKNOWN responses
 - [ ] E17-042 — Make task 6 output a proposed BounceRule row, not a direct classification
 - [ ] E17-043 — Implement task 7 advise.deliverability with a ranked action list
@@ -1817,12 +1817,12 @@ One entry point, versioned prompts, validated output, metered cost, CI evals.
 - [ ] E17-066 — Add a weekly eval run reported to the team regardless of code changes
 - [ ] E17-067 — Track model drift by re-running evals against the same model over time
 - [ ] E17-068 — Alert on drift and re-route the task if it degrades
-- [ ] E17-069 — Implement the prompt-injection posture: delimiters plus explicit data framing
-- [ ] E17-070 — Add an injection test suite per task fed with adversarial inputs
-- [ ] E17-071 — Assert no task can be made to produce an out-of-schema value
-- [ ] E17-072 — Assert no task has tool access, database write access, or send authority
-- [ ] E17-073 — Document the blast radius of a successful injection per task
-- [ ] E17-074 — Write every call to ClickHouse ai_calls for aggregation
+- [x] E17-069 — Implement the prompt-injection posture: delimiters plus explicit data framing
+- [x] E17-070 — Add an injection test suite per task fed with adversarial inputs
+- [x] E17-071 — Assert no task can be made to produce an out-of-schema value
+- [x] E17-072 — Assert no task has tool access, database write access, or send authority
+- [x] E17-073 — Document the blast radius of a successful injection per task
+- [x] E17-074 — Write every call to ClickHouse ai_calls for aggregation
 - [ ] E17-075 — Build the AI cockpit panel: cost, accuracy, cache rate, latency, budget burn-down
 - [ ] E17-076 — Show the current model routing table in the cockpit
 - [ ] E17-077 — Show per-task accuracy measured against human corrections
@@ -1834,9 +1834,9 @@ One entry point, versioned prompts, validated output, metered cost, CI evals.
 - [ ] E17-083 — Implement the AI kill switch per task and platform-wide
 - [ ] E17-084 — Test that every task degrades correctly when killed
 - [ ] E17-085 — Implement structured streaming for long generation tasks in the UI
-- [ ] E17-086 — Cancel an in-flight generation when the user navigates away
+- [x] E17-086 — Cancel an in-flight generation when the user navigates away
 - [ ] E17-087 — Never bill for a cancelled generation the user did not receive
-- [ ] E17-088 — Implement request deduplication for identical concurrent calls
+- [x] E17-088 — Implement request deduplication for identical concurrent calls
 - [ ] E17-089 — Implement a per-org concurrency cap on AI calls
 - [ ] E17-090 — Implement queue prioritisation: interactive tasks ahead of batch tasks
 - [ ] E17-091 — Measure and report p95 latency per task
@@ -1859,13 +1859,13 @@ One entry point, versioned prompts, validated output, metered cost, CI evals.
 - [ ] E17-108 — Add AI MCP tools so an agent can inspect task configuration and costs
 - [ ] E17-109 — Never let an MCP agent change a prompt or a model routing without human approval
 - [ ] E17-110 — Add a prompt review process requiring a second reviewer on send-path-adjacent tasks
-- [ ] E17-111 — Keep every prompt in the repo; never store a prompt only in the database
+- [x] E17-111 — Keep every prompt in the repo; never store a prompt only in the database
 - [ ] E17-112 — Add a prompt diff view showing what changed between versions
 - [ ] E17-113 — Correlate prompt versions with outcome metrics
 - [ ] E17-114 — Roll back a prompt version in one action when outcomes degrade
 - [ ] E17-115 — Test rollback end to end
 - [ ] E17-116 — Add a deterministic seed where the model supports it, for reproducible evals
-- [ ] E17-117 — Record the exact provider response id for every call for support escalation
+- [x] E17-117 — Record the exact provider response id for every call for support escalation
 - [ ] E17-118 — Add an AI section to the security review covering data flow and retention
 - [ ] E17-119 — Confirm and document OpenRouter's data retention posture
 - [ ] E17-120 — Choose models whose providers do not train on our inputs, and document the choice

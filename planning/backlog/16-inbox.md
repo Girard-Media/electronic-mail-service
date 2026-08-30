@@ -20,19 +20,19 @@ Replies are the product's success metric. Inbound is not an afterthought.
 - [ ] E16-016 — Never auto-open or auto-render an attachment
 - [ ] E16-017 — Show inbound Authentication-Results so the operator sees whether the sender was authentic
 - [ ] E16-018 — Warn on a reply that fails DMARC alignment for its claimed domain
-- [ ] E16-019 — Implement the AI reply classification task with the eight-value enum
-- [ ] E16-020 — Show the classification with its confidence
+- [x] E16-019 — Implement the AI reply classification task with the eight-value enum
+- [x] E16-020 — Show the classification with its confidence
 - [ ] E16-021 — Let a human correct the classification in one click
 - [ ] E16-022 — Write the correction to intentCorrectedTo and feed it to the eval fixture set
-- [ ] E16-023 — Act immediately on an unsubscribe classification without corroboration
-- [ ] E16-024 — Require corroboration or human confirmation for any other state-changing classification
-- [ ] E16-025 — Treat inbound content as untrusted data in every AI prompt
-- [ ] E16-026 — Constrain classification output to the enum so injection cannot escape the schema
-- [ ] E16-027 — Give the classifier no tool access and no write authority
+- [x] E16-023 — Act immediately on an unsubscribe classification without corroboration
+- [x] E16-024 — Require corroboration or human confirmation for any other state-changing classification
+- [x] E16-025 — Treat inbound content as untrusted data in every AI prompt
+- [x] E16-026 — Constrain classification output to the enum so injection cannot escape the schema
+- [x] E16-027 — Give the classifier no tool access and no write authority
 - [ ] E16-028 — Detect out-of-office replies and reschedule the sequence rather than stopping it
 - [ ] E16-029 — Parse the return date from an out-of-office where stated
 - [ ] E16-030 — Resume the sequence after the stated return date plus a buffer
-- [ ] E16-031 — Detect auto-replies and do not count them as engagement
+- [x] E16-031 — Detect auto-replies and do not count them as engagement
 - [ ] E16-032 — Detect referral replies and surface the referred contact for review
 - [ ] E16-033 — Never auto-enrol a referred contact without a compliance pass
 - [ ] E16-034 — Build the unified inbox view across every mailbox in the workspace
@@ -79,8 +79,8 @@ Replies are the product's success metric. Inbound is not an afterthought.
 - [ ] E16-075 — Test quoted-history stripping across five mail clients
 - [ ] E16-076 — Test classification accuracy against the labelled fixture set
 - [ ] E16-077 — Enforce the accuracy gate in CI at 92% overall and 80% per class
-- [ ] E16-078 — Test prompt-injection resistance with adversarial reply bodies
-- [ ] E16-079 — Assert an injected instruction cannot produce an out-of-schema value
+- [x] E16-078 — Test prompt-injection resistance with adversarial reply bodies
+- [x] E16-079 — Assert an injected instruction cannot produce an out-of-schema value
 - [ ] E16-080 — Test that a malformed MIME message does not crash the ingest worker
 - [ ] E16-081 — Test that a very large attachment is truncated with a record, not dropped silently
 - [ ] E16-082 — Load-test the inbox at 100,000 threads

@@ -59,7 +59,8 @@ export const DEGRADED_MODE: Record<TaskId, string> = {
   "embed.text": "disabled",
 };
 
-export interface AiTaskConfig {
+// TaskConfig lives in ./gateway.ts. This is the DB row shape.
+export interface AiTaskConfigRow {
   taskId: TaskId;
   model: string;
   fallbackChain: string[];
@@ -69,26 +70,6 @@ export interface AiTaskConfig {
   promptVersion: string;
   enabled: boolean;
   cacheTtlSec: number;
-}
-
-export interface RunContext {
-  orgId: string | null;
-  /** Per-org AI opt-out disables the feature visibly, never silently (E17-035). */
-  aiEnabled: boolean;
-  budgetRemainingTokens: number;
-}
-
-export interface RunResult<T> {
-  output: T;
-  degraded: boolean;
-  model: string;
-  promptVersion: string;
-  inputTokens: number;
-  outputTokens: number;
-  costUsd: number;
-  latencyMs: number;
-  cacheHit: boolean;
-  confidence: number | null;
 }
 
 /**
@@ -102,13 +83,7 @@ export function wrapUntrusted(content: string, label = "UNTRUSTED_CONTENT"): str
   return `${fence}\n${content.replaceAll(fence, "")}\n${fence}`;
 }
 
-export class NotImplemented extends Error {
-  constructor(task: string) {
-    super(`not implemented — see ${task} in planning/TODO.md`);
-    this.name = "NotImplemented";
-  }
-}
 
-export async function run<T>(_taskId: TaskId, _input: unknown, _ctx: RunContext): Promise<RunResult<T>> {
-  throw new NotImplemented("E17-001..E17-035");
-}
+export * from "./gateway.js";
+export * from "./tasks/classify-reply.js";
+export * from "./tasks/subjects.js";

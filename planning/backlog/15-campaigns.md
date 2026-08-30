@@ -48,8 +48,8 @@
 - [ ] E15-046 — Implement the AI copy generation task from ICP, offer, and tone
 - [ ] E15-047 — Present generated copy as a draft the user must accept
 - [ ] E15-048 — Never send AI-generated copy that a human has not seen
-- [ ] E15-049 — Implement the AI subject-variant task with a risk score per variant
-- [ ] E15-050 — Show why a subject scored risky, in specific terms
+- [x] E15-049 — Implement the AI subject-variant task with a risk score per variant
+- [x] E15-050 — Show why a subject scored risky, in specific terms
 - [ ] E15-051 — Implement the AI sequence-optimisation task producing reviewable proposals
 - [ ] E15-052 — Never auto-apply an optimisation proposal
 - [ ] E15-053 — Track whether accepted proposals actually improved outcomes
