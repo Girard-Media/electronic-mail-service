@@ -22,7 +22,7 @@
 - [ ] E22-020 — Write the test asserting Message-ID uniqueness under concurrency
 - [ ] E22-021 — Write the test asserting an intent processed twice sends once
 - [ ] E22-022 — Write the cross-tenant isolation test suite
-- [ ] E22-023 — Write the compliance test suite from planning/COMPLIANCE.md
+- [x] E22-023 — Write the compliance test suite from planning/COMPLIANCE.md
 - [x] E22-024 — Write the deliverability test suite from the bounce corpus
 - [ ] E22-025 — Write the router property tests over randomised fleet states
 - [ ] E22-026 — Write the warmup tests including hold and rollback

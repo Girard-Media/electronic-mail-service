@@ -10,8 +10,8 @@
 - [ ] E15-008 — Never materialise more than the next step per enrolment
 - [ ] E15-009 — Implement step conditions: no reply, opened, clicked, custom field match
 - [ ] E15-010 — Evaluate conditions at materialisation, not at creation
-- [ ] E15-011 — Implement variant assignment deterministically from hash(leadId, stepId)
-- [ ] E15-012 — Keep variant assignment stable across re-runs
+- [x] E15-011 — Implement variant assignment deterministically from hash(leadId, stepId)
+- [x] E15-012 — Keep variant assignment stable across re-runs
 - [ ] E15-013 — Implement weighted variant selection
 - [ ] E15-014 — Track per-variant sent, replied, and bounced counters
 - [ ] E15-015 — Compute variant significance and refuse to declare a winner too early
@@ -62,7 +62,7 @@
 - [ ] E15-060 — Let the customer add their own blackout dates
 - [ ] E15-061 — Implement the pre-launch checklist covering compliance, capacity, content, and placement
 - [ ] E15-062 — Make every checklist item link to the thing that fixes it
-- [ ] E15-063 — Block launch on any hard checklist failure
+- [x] E15-063 — Block launch on any hard checklist failure
 - [ ] E15-064 — Allow launch with warnings, but record that the user accepted them
 - [ ] E15-065 — Implement a soft launch: send to a small sample and hold for review
 - [ ] E15-066 — Run a placement test on the soft-launch sample automatically

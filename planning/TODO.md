@@ -5,7 +5,7 @@
 The build-loop queue (`bootspring build next` reads this).
 Status: `[ ]` todo · `[~]` in progress · `[x]` done.
 
-**135 / 2502 complete.**
+**167 / 2502 complete.**
 
 Governing documents — read before taking a task:
 
@@ -1371,7 +1371,7 @@ Self-hosted, five stages, on a dedicated IP that never sends campaigns.
 
 ---
 
-<!-- source: planning/backlog/14-compliance.md · 2/120 -->
+<!-- source: planning/backlog/14-compliance.md · 30/120 -->
 # Epic 14 — Policy Engine, Consent, Suppression, Trust
 
 `packages/policy` sits between the scheduler and the MTA and can block anything.
@@ -1379,7 +1379,7 @@ Blocked is the default for whatever we cannot resolve.
 
 - [x] E14-001 — Create packages/policy with the PolicyEngine entry point
 - [x] E14-002 — Define the PolicyInput and PolicyResult types and freeze them
-- [ ] E14-003 — Implement JurisdictionPolicy lookup by country with a wildcard default
+- [x] E14-003 — Implement JurisdictionPolicy lookup by country with a wildcard default
 - [ ] E14-004 — Implement policy versioning with effectiveFrom and effectiveTo
 - [ ] E14-005 — Always resolve the policy version in force at decision time, not the latest
 - [ ] E14-006 — Seed the US CAN-SPAM opt-out row with its citation
@@ -1394,19 +1394,19 @@ Blocked is the default for whatever we cannot resolve.
 - [ ] E14-015 — Require a citation on every policy row
 - [ ] E14-016 — Audit every policy row change with actor, before, after, and reason
 - [ ] E14-017 — Never let a policy change apply retroactively to past decisions
-- [ ] E14-018 — Implement the jurisdiction resolver with the four-source precedence
-- [ ] E14-019 — Record the source and confidence on every resolution
-- [ ] E14-020 — Implement the asymmetry rule: weak signals tighten, never loosen
-- [ ] E14-021 — Return unresolved and block when no source is confident
-- [ ] E14-022 — Build the ccTLD-to-country map as data, not code
+- [x] E14-018 — Implement the jurisdiction resolver with the four-source precedence
+- [x] E14-019 — Record the source and confidence on every resolution
+- [x] E14-020 — Implement the asymmetry rule: weak signals tighten, never loosen
+- [x] E14-021 — Return unresolved and block when no source is confident
+- [x] E14-022 — Build the ccTLD-to-country map as data, not code
 - [ ] E14-023 — Build the MX-geo lookup with a self-hosted IP-to-country dataset
 - [ ] E14-024 — Refresh the IP-to-country dataset on a schedule
 - [ ] E14-025 — Implement the ConsentRecord model with basis, source, evidence, and attestation
-- [ ] E14-026 — Support multiple consent records per lead with the strongest basis winning
-- [ ] E14-027 — Implement consent expiry for time-boxed CASL implied consent
-- [ ] E14-028 — Exclude expired consent from the basis resolution
-- [ ] E14-029 — Implement consent revocation on unsubscribe or objection
-- [ ] E14-030 — Never resurrect a revoked consent, even from a re-import
+- [x] E14-026 — Support multiple consent records per lead with the strongest basis winning
+- [x] E14-027 — Implement consent expiry for time-boxed CASL implied consent
+- [x] E14-028 — Exclude expired consent from the basis resolution
+- [x] E14-029 — Implement consent revocation on unsubscribe or objection
+- [x] E14-030 — Never resurrect a revoked consent, even from a re-import
 - [ ] E14-031 — Store consent evidence in R2 with a signed retrieval URL
 - [ ] E14-032 — Implement the Legitimate Interest Assessment form and store it as structured data
 - [ ] E14-033 — Require an LIA for any GDPR legitimate-interest basis
@@ -1424,11 +1424,11 @@ Blocked is the default for whatever we cannot resolve.
 - [ ] E14-045 — Treat a send to a suppressed address as a Sev-1 incident
 - [ ] E14-046 — Add a continuous audit job scanning recent sends against suppression
 - [ ] E14-047 — Alert immediately on any audit finding
-- [ ] E14-048 — Implement RFC 8058 List-Unsubscribe and List-Unsubscribe-Post
-- [ ] E14-049 — Honour a one-click POST without confirmation, login, or interstitial
+- [x] E14-048 — Implement RFC 8058 List-Unsubscribe and List-Unsubscribe-Post
+- [x] E14-049 — Honour a one-click POST without confirmation, login, or interstitial
 - [ ] E14-050 — Implement the mailto unsubscribe path into the same suppression flow
 - [ ] E14-051 — Require a visible unsubscribe link in the body with accessible contrast
-- [ ] E14-052 — Refuse to compose a message whose unsubscribe link fails the contrast check
+- [x] E14-052 — Refuse to compose a message whose unsubscribe link fails the contrast check
 - [ ] E14-053 — Make unsubscribe suppress, stop the sequence, and stop all campaigns in one transaction
 - [ ] E14-054 — Complete unsubscribe processing in under sixty seconds end to end
 - [ ] E14-055 — Show a plain confirmation page after an unsubscribe
@@ -1438,13 +1438,13 @@ Blocked is the default for whatever we cannot resolve.
 - [ ] E14-059 — Suppress immediately on an unsubscribe classification without corroboration
 - [ ] E14-060 — Default an ambiguous reply to suppressing rather than continuing
 - [ ] E14-061 — Queue ambiguous cases for human review after suppressing
-- [ ] E14-062 — Implement the message validator for CAN-SPAM mandatory elements
-- [ ] E14-063 — Block on a missing postal address with a specific actionable error
-- [ ] E14-064 — Block on a missing or non-functional unsubscribe mechanism
-- [ ] E14-065 — Block on a deceptive subject heuristic such as RE: on a first touch
-- [ ] E14-066 — Block on a From display name that does not match the sending identity
-- [ ] E14-067 — Block on any attempt to set a From domain we have not verified
-- [ ] E14-068 — Block on CR or LF injection in any header field
+- [x] E14-062 — Implement the message validator for CAN-SPAM mandatory elements
+- [x] E14-063 — Block on a missing postal address with a specific actionable error
+- [x] E14-064 — Block on a missing or non-functional unsubscribe mechanism
+- [x] E14-065 — Block on a deceptive subject heuristic such as RE: on a first touch
+- [x] E14-066 — Block on a From display name that does not match the sending identity
+- [x] E14-067 — Block on any attempt to set a From domain we have not verified
+- [x] E14-068 — Block on CR or LF injection in any header field
 - [ ] E14-069 — Require ad identification where the jurisdiction demands it
 - [ ] E14-070 — Implement the prohibited-content screen at campaign creation
 - [ ] E14-071 — Keep the prohibited-category list as operator-editable versioned data
@@ -1473,15 +1473,15 @@ Blocked is the default for whatever we cannot resolve.
 - [ ] E14-094 — Meet the stated SLA on each right and report against it
 - [ ] E14-095 — Implement the restriction right as a lead freeze the router honours
 - [ ] E14-096 — Build the DSR queue with timers and escalation
-- [ ] E14-097 — Test that a blocked jurisdiction cannot be sent to under any configuration
-- [ ] E14-098 — Test that an expired consent blocks a CASL-jurisdiction send
-- [ ] E14-099 — Test that a revoked consent cannot be resurrected by re-import
+- [x] E14-097 — Test that a blocked jurisdiction cannot be sent to under any configuration
+- [x] E14-098 — Test that an expired consent blocks a CASL-jurisdiction send
+- [x] E14-099 — Test that a revoked consent cannot be resurrected by re-import
 - [ ] E14-100 — Test that unsubscribe propagates across every campaign in the org
 - [ ] E14-101 — Test that the emit path fails closed when Valkey is unavailable
-- [ ] E14-102 — Test that a message missing a postal address cannot be composed
-- [ ] E14-103 — Test that RE: on a first touch is rejected
-- [ ] E14-104 — Test that an unverified From domain is rejected
-- [ ] E14-105 — Fuzz the header builder with injection payloads
+- [x] E14-102 — Test that a message missing a postal address cannot be composed
+- [x] E14-103 — Test that RE: on a first touch is rejected
+- [x] E14-104 — Test that an unverified From domain is rejected
+- [x] E14-105 — Fuzz the header builder with injection payloads
 - [ ] E14-106 — Add a CI test asserting no send path bypasses the policy gate
 - [ ] E14-107 — Add a CI test asserting PolicyDecision is written for every send
 - [ ] E14-108 — Document the policy engine in planning/specs/policy/
@@ -1500,7 +1500,7 @@ Blocked is the default for whatever we cannot resolve.
 
 ---
 
-<!-- source: planning/backlog/15-campaigns.md · 0/125 -->
+<!-- source: planning/backlog/15-campaigns.md · 3/125 -->
 # Epic 15 — Campaigns & the Sequence Engine
 
 - [ ] E15-001 — Create packages/sequence with the durable per-enrolment state machine
@@ -1513,8 +1513,8 @@ Blocked is the default for whatever we cannot resolve.
 - [ ] E15-008 — Never materialise more than the next step per enrolment
 - [ ] E15-009 — Implement step conditions: no reply, opened, clicked, custom field match
 - [ ] E15-010 — Evaluate conditions at materialisation, not at creation
-- [ ] E15-011 — Implement variant assignment deterministically from hash(leadId, stepId)
-- [ ] E15-012 — Keep variant assignment stable across re-runs
+- [x] E15-011 — Implement variant assignment deterministically from hash(leadId, stepId)
+- [x] E15-012 — Keep variant assignment stable across re-runs
 - [ ] E15-013 — Implement weighted variant selection
 - [ ] E15-014 — Track per-variant sent, replied, and bounced counters
 - [ ] E15-015 — Compute variant significance and refuse to declare a winner too early
@@ -1565,7 +1565,7 @@ Blocked is the default for whatever we cannot resolve.
 - [ ] E15-060 — Let the customer add their own blackout dates
 - [ ] E15-061 — Implement the pre-launch checklist covering compliance, capacity, content, and placement
 - [ ] E15-062 — Make every checklist item link to the thing that fixes it
-- [ ] E15-063 — Block launch on any hard checklist failure
+- [x] E15-063 — Block launch on any hard checklist failure
 - [ ] E15-064 — Allow launch with warnings, but record that the user accepted them
 - [ ] E15-065 — Implement a soft launch: send to a small sample and hold for review
 - [ ] E15-066 — Run a placement test on the soft-launch sample automatically
@@ -2412,7 +2412,7 @@ Stripe is the one unavoidable third party, isolated behind a BillingProvider sea
 
 ---
 
-<!-- source: planning/backlog/22-testing-ci.md · 2/105 -->
+<!-- source: planning/backlog/22-testing-ci.md · 3/105 -->
 # Epic 22 — Testing, CI & Quality Gates
 
 - [ ] E22-001 — Define the test taxonomy: unit, integration, contract, e2e, load, abuse
@@ -2437,7 +2437,7 @@ Stripe is the one unavoidable third party, isolated behind a BillingProvider sea
 - [ ] E22-020 — Write the test asserting Message-ID uniqueness under concurrency
 - [ ] E22-021 — Write the test asserting an intent processed twice sends once
 - [ ] E22-022 — Write the cross-tenant isolation test suite
-- [ ] E22-023 — Write the compliance test suite from planning/COMPLIANCE.md
+- [x] E22-023 — Write the compliance test suite from planning/COMPLIANCE.md
 - [x] E22-024 — Write the deliverability test suite from the bounce corpus
 - [ ] E22-025 — Write the router property tests over randomised fleet states
 - [ ] E22-026 — Write the warmup tests including hold and rollback
