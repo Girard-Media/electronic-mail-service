@@ -12,7 +12,8 @@ inherited subsystem is consciously kept, retargeted, or deleted.
 - [x] E01-007 — pnpm install clean; lockfile regenerated as a fork artifact
 - [x] E01-008 — pnpm typecheck green on the fork (fixed: packages/mcp imported the old `ems` SDK name; @ems/sdk must be built first)
 - [ ] E01-009a — Make `pnpm typecheck` build @ems/sdk first, or emit types in place, so the ordering is not a tribal fact
-- [ ] E01-009 — pnpm lint must pass green; fix inherited violations rather than widening the config
+- [x] E01-009 — pnpm lint green — but only apps/web defines a lint script; see E01-009b
+- [ ] E01-009b — Add an eslint config and a lint script to the other ten workspace packages; 10 of 11 are currently unlinted
 - [ ] E01-010 — Run the inherited pnpm test suite; triage every failure into keep/retarget/delete
 - [x] E01-011 — Update bootspring.config.js: name ems, hosting hostssh, analytics clickhouse, email own-mta
 - [x] E01-012 — Rewrite CLAUDE.md for EMS: product definition, constraints, repo map, commands
