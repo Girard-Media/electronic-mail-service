@@ -1,6 +1,6 @@
 # Epic 13 — Leads: Import, Normalise, Dedupe, Segment, Enrich
 
-- [ ] E13-001 — Create packages/leads with the import pipeline
+- [x] E13-001 — Create packages/leads with the import pipeline
 - [ ] E13-002 — Implement CSV import with delimiter and encoding detection
 - [ ] E13-003 — Handle UTF-8 BOM, Latin-1, and Windows-1252 without mangling names
 - [ ] E13-004 — Implement column mapping with a suggested mapping from the header row
@@ -13,34 +13,34 @@
 - [ ] E13-011 — Make import resumable and idempotent on retry
 - [ ] E13-012 — Report per-row errors with the row number and the specific problem
 - [ ] E13-013 — Produce a rejected-rows file the user can fix and re-upload
-- [ ] E13-014 — Normalise names: trim, collapse whitespace, fix all-caps, preserve real capitalisation
-- [ ] E13-015 — Never mangle a name we are unsure about; leave it as supplied
-- [ ] E13-016 — Normalise company names by stripping legal suffixes into a separate field
-- [ ] E13-017 — Derive companyDomain from an email address when absent
-- [ ] E13-018 — Never derive a company domain from a free-mail address
-- [ ] E13-019 — Normalise phone numbers to E.164 where a country is known
-- [ ] E13-020 — Normalise LinkedIn URLs to a canonical form
-- [ ] E13-021 — Implement exact deduplication on (orgId, email)
-- [ ] E13-022 — Implement fuzzy duplicate detection across name and company
-- [ ] E13-023 — Present fuzzy duplicates for review rather than merging automatically
+- [x] E13-014 — Normalise names: trim, collapse whitespace, fix all-caps, preserve real capitalisation
+- [x] E13-015 — Never mangle a name we are unsure about; leave it as supplied
+- [x] E13-016 — Normalise company names by stripping legal suffixes into a separate field
+- [x] E13-017 — Derive companyDomain from an email address when absent
+- [x] E13-018 — Never derive a company domain from a free-mail address
+- [x] E13-019 — Normalise phone numbers to E.164 where a country is known
+- [x] E13-020 — Normalise LinkedIn URLs to a canonical form
+- [x] E13-021 — Implement exact deduplication on (orgId, email)
+- [x] E13-022 — Implement fuzzy duplicate detection across name and company
+- [x] E13-023 — Present fuzzy duplicates for review rather than merging automatically
 - [ ] E13-024 — Implement a merge that preserves the union of fields and the earliest consent record
 - [ ] E13-025 — Never lose a consent record or a suppression during a merge
-- [ ] E13-026 — Detect the same person at a different company and treat it as a new lead
-- [ ] E13-027 — Detect a role address masquerading as a person
-- [ ] E13-028 — Resolve the lead's country per COMPLIANCE §2 precedence order
-- [ ] E13-029 — Record countrySource and countryConfidence on every lead
-- [ ] E13-030 — Never let a weak signal loosen the jurisdiction; only tighten
+- [x] E13-026 — Detect the same person at a different company and treat it as a new lead
+- [x] E13-027 — Detect a role address masquerading as a person
+- [x] E13-028 — Resolve the lead's country per COMPLIANCE §2 precedence order
+- [x] E13-029 — Record countrySource and countryConfidence on every lead
+- [x] E13-030 — Never let a weak signal loosen the jurisdiction; only tighten
 - [x] E13-031 — Resolve the lead's timezone from the country and city where known
 - [x] E13-032 — Fall back to the campaign's fixed timezone when the lead's is unknown
 - [ ] E13-033 — Surface how many leads lack a resolvable timezone before launch
-- [ ] E13-034 — Implement the list compliance gate before a list can reach READY
-- [ ] E13-035 — Require sourceType, sourceDetail, and an attestation on every list
-- [ ] E13-036 — Record the attesting user, timestamp, and IP
+- [x] E13-034 — Implement the list compliance gate before a list can reach READY
+- [x] E13-035 — Require sourceType, sourceDetail, and an attestation on every list
+- [x] E13-036 — Record the attesting user, timestamp, and IP
 - [ ] E13-037 — Generate the per-batch compliance report artifact and store it in R2
-- [ ] E13-038 — Make the compliance report downloadable for the customer's counsel
-- [ ] E13-039 — Show sendable, blocked, and needs-basis counts with the reasons
-- [ ] E13-040 — Block list activation while any row is unresolvable
-- [ ] E13-041 — Offer to remove or quarantine unresolvable rows
+- [x] E13-038 — Make the compliance report downloadable for the customer's counsel
+- [x] E13-039 — Show sendable, blocked, and needs-basis counts with the reasons
+- [x] E13-040 — Block list activation while any row is unresolvable
+- [x] E13-041 — Offer to remove or quarantine unresolvable rows
 - [ ] E13-042 — Implement segments as saved queries over leads and custom fields
 - [ ] E13-043 — Support boolean composition of segment conditions
 - [ ] E13-044 — Show the live count of a segment as it is built
@@ -50,10 +50,10 @@
 - [ ] E13-048 — Implement lead search across every field with sub-second response
 - [ ] E13-049 — Implement bulk lead actions: tag, suppress, delete, move, enrol
 - [ ] E13-050 — Confirm bulk actions with the exact count and an undo where possible
-- [ ] E13-051 — Never allow a bulk action to bypass the compliance gate
+- [x] E13-051 — Never allow a bulk action to bypass the compliance gate
 - [ ] E13-052 — Implement lead import from the API with the same gates as the UI
 - [ ] E13-053 — Implement lead import from a CRM via a generic webhook receiver
-- [ ] E13-054 — Never let an API import skip the provenance requirement
+- [x] E13-054 — Never let an API import skip the provenance requirement
 - [ ] E13-055 — Implement the enrichment seam with a provider interface
 - [ ] E13-056 — Implement enrichment from public company data we can fetch ourselves
 - [ ] E13-057 — Implement enrichment from the company website we are allowed to read
@@ -101,9 +101,9 @@
 - [ ] E13-099 — Measure and report import throughput and time to first sendable lead
 - [ ] E13-100 — Load-test segment evaluation at ten million leads
 - [ ] E13-101 — Benchmark lead search at ten million leads
-- [ ] E13-102 — Test the compliance gate blocks a list with unresolvable jurisdictions
+- [x] E13-102 — Test the compliance gate blocks a list with unresolvable jurisdictions
 - [ ] E13-103 — Test that erasure preserves suppression
-- [ ] E13-104 — Test that a merge preserves the earliest consent
+- [x] E13-104 — Test that a merge preserves the earliest consent
 - [ ] E13-105 — Test that a frozen lead is never routed
 - [ ] E13-106 — Fuzz the CSV parser with malformed files
 - [ ] E13-107 — Test import of a file with mixed encodings

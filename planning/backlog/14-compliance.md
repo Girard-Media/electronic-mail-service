@@ -37,7 +37,7 @@ Blocked is the default for whatever we cannot resolve.
 - [ ] E14-032 — Implement the Legitimate Interest Assessment form and store it as structured data
 - [ ] E14-033 — Require an LIA for any GDPR legitimate-interest basis
 - [ ] E14-034 — Build the consent view per lead showing every record and its evidence
-- [ ] E14-035 — Build the consent coverage report per list and per campaign
+- [x] E14-035 — Build the consent coverage report per list and per campaign
 - [ ] E14-036 — Implement the three-layer suppression check
 - [ ] E14-037 — Implement global suppression that no tenant can override
 - [ ] E14-038 — Implement org suppression across all workspaces
@@ -94,7 +94,7 @@ Blocked is the default for whatever we cannot resolve.
 - [ ] E14-089 — Make "prove you were allowed to send that" answerable in one query
 - [ ] E14-090 — Snapshot the audit log to R2 with a hash chain
 - [ ] E14-091 — Verify the hash chain on a schedule and alert on any break
-- [ ] E14-092 — Build the compliance evidence export for a customer's legal team
+- [x] E14-092 — Build the compliance evidence export for a customer's legal team
 - [ ] E14-093 — Implement the data subject rights endpoints for access, erasure, and portability
 - [ ] E14-094 — Meet the stated SLA on each right and report against it
 - [ ] E14-095 — Implement the restriction right as a lead freeze the router honours
