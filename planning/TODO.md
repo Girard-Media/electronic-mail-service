@@ -5,7 +5,7 @@
 The build-loop queue (`bootspring build next` reads this).
 Status: `[ ]` todo · `[~]` in progress · `[x]` done.
 
-**405 / 2502 complete.**
+**420 / 2502 complete.**
 
 Governing documents — read before taking a task:
 
@@ -1631,27 +1631,27 @@ Blocked is the default for whatever we cannot resolve.
 
 ---
 
-<!-- source: planning/backlog/16-inbox.md · 10/105 -->
+<!-- source: planning/backlog/16-inbox.md · 25/105 -->
 # Epic 16 — Unified Inbox & Reply Handling
 
 Replies are the product's success metric. Inbound is not an afterthought.
 
-- [ ] E16-001 — Create packages/inbox with MIME parsing and threading
+- [x] E16-001 — Create packages/inbox with MIME parsing and threading
 - [ ] E16-002 — Parse inbound MIME into text, HTML, and attachment parts
 - [ ] E16-003 — Prefer the text part; render HTML sanitised when text is absent
-- [ ] E16-004 — Strip quoted history for display while retaining the full body
-- [ ] E16-005 — Detect and collapse signature blocks
-- [ ] E16-006 — Handle every common quoting style across mail clients
-- [ ] E16-007 — Thread on In-Reply-To and References first
-- [ ] E16-008 — Fall back to subject-plus-participants matching with a recorded confidence
-- [ ] E16-009 — Never merge two threads on a weak match
+- [x] E16-004 — Strip quoted history for display while retaining the full body
+- [x] E16-005 — Detect and collapse signature blocks
+- [x] E16-006 — Handle every common quoting style across mail clients
+- [x] E16-007 — Thread on In-Reply-To and References first
+- [x] E16-008 — Fall back to subject-plus-participants matching with a recorded confidence
+- [x] E16-009 — Never merge two threads on a weak match
 - [ ] E16-010 — Link the thread to the lead, campaign, and mailbox
 - [ ] E16-011 — Store the full MIME to R2 and reference it from the message
-- [ ] E16-012 — Sanitise HTML before rendering; strip scripts, iframes, and remote-loading tags
-- [ ] E16-013 — Block remote image loading by default and offer a per-message reveal
-- [ ] E16-014 — Quarantine executable and archive attachments
+- [x] E16-012 — Sanitise HTML before rendering; strip scripts, iframes, and remote-loading tags
+- [x] E16-013 — Block remote image loading by default and offer a per-message reveal
+- [x] E16-014 — Quarantine executable and archive attachments
 - [ ] E16-015 — Scan attachments and mark anything suspicious
-- [ ] E16-016 — Never auto-open or auto-render an attachment
+- [x] E16-016 — Never auto-open or auto-render an attachment
 - [ ] E16-017 — Show inbound Authentication-Results so the operator sees whether the sender was authentic
 - [ ] E16-018 — Warn on a reply that fails DMARC alignment for its claimed domain
 - [x] E16-019 — Implement the AI reply classification task with the eight-value enum
@@ -1698,8 +1698,8 @@ Replies are the product's success metric. Inbound is not an afterthought.
 - [ ] E16-060 — Implement bulk actions across selected threads
 - [ ] E16-061 — Implement a read and unread state per user, not per org
 - [ ] E16-062 — Implement mentions and internal notes on a thread
-- [ ] E16-063 — Never let an internal note leak into an outbound message
-- [ ] E16-064 — Test that internal notes are excluded from every send path
+- [x] E16-063 — Never let an internal note leak into an outbound message
+- [x] E16-064 — Test that internal notes are excluded from every send path
 - [ ] E16-065 — Implement the positive-reply handoff to usermails or a CRM
 - [ ] E16-066 — Show handoff status inline on the thread
 - [ ] E16-067 — Implement a manual handoff trigger for a human-identified opportunity
@@ -1709,8 +1709,8 @@ Replies are the product's success metric. Inbound is not an afterthought.
 - [ ] E16-071 — Implement inbox export for a specific thread or the whole workspace
 - [ ] E16-072 — Implement inbox retention and purge per the retention schedule
 - [ ] E16-073 — Purge threads for erased leads while retaining aggregate counts
-- [ ] E16-074 — Test threading against a corpus of real reply formats
-- [ ] E16-075 — Test quoted-history stripping across five mail clients
+- [x] E16-074 — Test threading against a corpus of real reply formats
+- [x] E16-075 — Test quoted-history stripping across five mail clients
 - [ ] E16-076 — Test classification accuracy against the labelled fixture set
 - [ ] E16-077 — Enforce the accuracy gate in CI at 92% overall and 80% per class
 - [x] E16-078 — Test prompt-injection resistance with adversarial reply bodies

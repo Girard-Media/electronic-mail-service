@@ -28,18 +28,4 @@ export function resolveAmbiguous(intent: ReplyIntent, confidence: number, floor 
   return "UNSUBSCRIBE";
 }
 
-export interface ThreadKey {
-  inReplyTo: string | null;
-  references: string[];
-  subject: string;
-  participants: string[];
-}
-
-/** Thread on In-Reply-To/References first; never merge two threads on a weak match. */
-export function threadConfidence(k: ThreadKey): number {
-  if (k.inReplyTo) return 1;
-  if (k.references.length > 0) return 0.95;
-  return 0.4;
-}
-
-export const WEAK_MATCH_FLOOR = 0.9;
+export * from "./threading.js";
