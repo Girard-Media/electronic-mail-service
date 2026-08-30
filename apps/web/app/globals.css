@@ -2,7 +2,6 @@
    Next surface is visually identical to the live Hono-served site. Tailwind v4 stays
    available alongside for new component work; these proven component classes drive the
    ported marketing pages. */
-@import url("/vendor/tabler-icons.min.css");
 @import "tailwindcss";
 
 :root {

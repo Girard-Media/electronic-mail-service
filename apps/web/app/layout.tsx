@@ -37,6 +37,13 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
+      <head>
+        {/* Linked, not bundled: the icon font lives in public/ and its own
+            @font-face URL is relative ("./fonts/…"), so it only resolves when
+            the stylesheet is served from /vendor/. A CSS @import of an absolute
+            path is resolved by the bundler as a module and fails the build. */}
+        <link rel="stylesheet" href="/vendor/tabler-icons.min.css" />
+      </head>
       <body>{children}</body>
     </html>
   );
