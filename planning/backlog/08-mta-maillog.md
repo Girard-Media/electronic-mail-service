@@ -6,27 +6,27 @@ No number on a dashboard originates from an optimistic counter.
 - [ ] E08-001 — Extend apps/maillog-bridge to accept batches from multiple nodes
 - [ ] E08-002 — Authenticate every batch with a per-node signature and reject anything unsigned
 - [ ] E08-003 — Add replay protection with a nonce and a timestamp window
-- [ ] E08-004 — Parse the Postfix qmgr line into a queue-id to Message-ID mapping
-- [ ] E08-005 — Parse the Postfix smtp line into (queue-id, to, relay, delay, dsn, status, response)
-- [ ] E08-006 — Preserve the receiving MX response string verbatim; never summarise it at parse time
-- [ ] E08-007 — Parse the Postfix cleanup line to capture our Message-ID
+- [x] E08-004 — Parse the Postfix qmgr line into a queue-id to Message-ID mapping
+- [x] E08-005 — Parse the Postfix smtp line into (queue-id, to, relay, delay, dsn, status, response)
+- [x] E08-006 — Preserve the receiving MX response string verbatim; never summarise it at parse time
+- [x] E08-007 — Parse the Postfix cleanup line to capture our Message-ID
 - [ ] E08-008 — Parse the bounce and error lines for locally generated failures
-- [ ] E08-009 — Handle multi-recipient messages producing several smtp lines per queue id
+- [x] E08-009 — Handle multi-recipient messages producing several smtp lines per queue id
 - [ ] E08-010 — Handle log rotation and truncation without losing or duplicating lines
-- [ ] E08-011 — Handle out-of-order line arrival across batches
-- [ ] E08-012 — Build the correlation store mapping queue-id to intent via Message-ID
-- [ ] E08-013 — Expire the correlation store on the same horizon as the Postfix queue lifetime
+- [x] E08-011 — Handle out-of-order line arrival across batches
+- [x] E08-012 — Build the correlation store mapping queue-id to intent via Message-ID
+- [x] E08-013 — Expire the correlation store on the same horizon as the Postfix queue lifetime
 - [ ] E08-014 — Alert on correlation misses; an uncorrelated delivery means we lost the join key
 - [ ] E08-015 — Write every parsed line to ClickHouse smtp_transactions
 - [ ] E08-016 — Write the raw line to R2 daily archives before parsing
-- [ ] E08-017 — Make the parser table-driven so a new Postfix version is a data change
-- [ ] E08-018 — Add a parser fixture suite from real captured log lines across all ESPs
-- [ ] E08-019 — Fail CI on any parser regression against the fixture suite
-- [ ] E08-020 — Add an unparsed-line queue and alert when it grows
-- [ ] E08-021 — Never discard an unparsed line; it is evidence
-- [ ] E08-022 — Emit the delivered event only from a status=sent line with a 2xx response
-- [ ] E08-023 — Emit the deferred event from a status=deferred line with the 4xx captured
-- [ ] E08-024 — Emit the bounced event from a status=bounced line with the 5xx captured
+- [x] E08-017 — Make the parser table-driven so a new Postfix version is a data change
+- [x] E08-018 — Add a parser fixture suite from real captured log lines across all ESPs
+- [x] E08-019 — Fail CI on any parser regression against the fixture suite
+- [x] E08-020 — Add an unparsed-line queue and alert when it grows
+- [x] E08-021 — Never discard an unparsed line; it is evidence
+- [x] E08-022 — Emit the delivered event only from a status=sent line with a 2xx response
+- [x] E08-023 — Emit the deferred event from a status=deferred line with the 4xx captured
+- [x] E08-024 — Emit the bounced event from a status=bounced line with the 5xx captured
 - [ ] E08-025 — Update the SendIntent state from the correlated log event, not from the submit call
 - [ ] E08-026 — Record the delivery latency from submit to the receiving MX 250
 - [ ] E08-027 — Record the number of delivery attempts per message
@@ -71,7 +71,7 @@ No number on a dashboard originates from an optimistic counter.
 - [ ] E08-066 — Build the event pipeline writing to ClickHouse email_events with batching
 - [ ] E08-067 — Make the event writer fail-soft with local buffering
 - [ ] E08-068 — Add the replay tool for buffered events after a store outage
-- [ ] E08-069 — Deduplicate events on (messageId, type, at) so replay is safe
+- [x] E08-069 — Deduplicate events on (messageId, type, at) so replay is safe
 - [ ] E08-070 — Build the hourly rollup materialised views
 - [ ] E08-071 — Verify rollup totals against raw counts nightly and alert on drift
 - [ ] E08-072 — Build the webhook dispatcher for EMS events, reusing the inherited signing

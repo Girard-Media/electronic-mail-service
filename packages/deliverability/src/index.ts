@@ -85,3 +85,5 @@ export function inboxRate(byFolder: Record<PlacementFolder, number>): number {
   if (total === 0) return 0;
   return (byFolder.PRIMARY ?? 0) / total;
 }
+
+export * from "./maillog.js";

@@ -13,19 +13,19 @@
 - [ ] E22-011 — Build a registrar stub
 - [ ] E22-012 — Build a billing stub implementing the BillingProvider interface
 - [ ] E22-013 — Make every external dependency stubbable without changing production code
-- [ ] E22-014 — Write the send-path integration test covering all ten stages
-- [ ] E22-015 — Write the test asserting no path to the MTA skips the policy gate
+- [x] E22-014 — Write the send-path integration test covering all ten stages
+- [x] E22-015 — Write the test asserting no path to the MTA skips the policy gate
 - [ ] E22-016 — Write the test asserting PolicyDecision is written for every send
 - [ ] E22-017 — Write the test asserting suppression is re-checked before emit
 - [ ] E22-018 — Write the test asserting the emit path fails closed on a store error
 - [x] E22-019 — Write the test asserting cap buckets cannot be overspent under concurrency
-- [ ] E22-020 — Write the test asserting Message-ID uniqueness under concurrency
+- [x] E22-020 — Write the test asserting Message-ID uniqueness under concurrency
 - [ ] E22-021 — Write the test asserting an intent processed twice sends once
 - [ ] E22-022 — Write the cross-tenant isolation test suite
 - [x] E22-023 — Write the compliance test suite from planning/COMPLIANCE.md
 - [x] E22-024 — Write the deliverability test suite from the bounce corpus
-- [ ] E22-025 — Write the router property tests over randomised fleet states
-- [ ] E22-026 — Write the warmup tests including hold and rollback
+- [x] E22-025 — Write the router property tests over randomised fleet states
+- [x] E22-026 — Write the warmup tests including hold and rollback
 - [ ] E22-027 — Write the verification tests against a known-address corpus
 - [ ] E22-028 — Write the sequence engine tests including timezone and holiday edges
 - [ ] E22-029 — Write the inbox threading tests against a real reply corpus

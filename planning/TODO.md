@@ -5,7 +5,7 @@
 The build-loop queue (`bootspring build next` reads this).
 Status: `[ ]` todo · `[~]` in progress · `[x]` done.
 
-**167 / 2502 complete.**
+**226 / 2502 complete.**
 
 Governing documents — read before taking a task:
 
@@ -547,23 +547,23 @@ no manual step, and cannot become routable until it proves it is safe.
 
 ---
 
-<!-- source: planning/backlog/06-warmup.md · 0/80 -->
+<!-- source: planning/backlog/06-warmup.md · 8/80 -->
 # Epic 06 — Warmup Engine
 
 Two mechanisms, both required: ramp scheduling and our own peer network.
 No cross-customer warmup pool, ever (ADR-0003).
 
-- [ ] E06-001 — Create packages/warmup with the WarmupPlan evaluator
-- [ ] E06-002 — Implement the daily-cap curve: startPerDay, incrementWeek, plateau
+- [x] E06-001 — Create packages/warmup with the WarmupPlan evaluator
+- [x] E06-002 — Implement the daily-cap curve: startPerDay, incrementWeek, plateau
 - [ ] E06-003 — Support a per-plan and per-domain-age override of the curve
 - [ ] E06-004 — Implement weekday-only ramping when the plan requires it
 - [ ] E06-005 — Implement jittered hourly distribution so sends do not burst on the hour
 - [ ] E06-006 — Never allow two mailboxes on one domain to fire in the same second
 - [ ] E06-007 — Implement the warmup day counter advancing only on days with actual sends
-- [ ] E06-008 — Implement the hold condition: pause the ramp when bounce rate exceeds the plan max
-- [ ] E06-009 — Implement the hold condition on defer rate
-- [ ] E06-010 — Implement the hold condition on complaint rate
-- [ ] E06-011 — Implement rollback: reduce the cap to the last healthy level rather than only holding
+- [x] E06-008 — Implement the hold condition: pause the ramp when bounce rate exceeds the plan max
+- [x] E06-009 — Implement the hold condition on defer rate
+- [x] E06-010 — Implement the hold condition on complaint rate
+- [x] E06-011 — Implement rollback: reduce the cap to the last healthy level rather than only holding
 - [ ] E06-012 — Record every hold and rollback with the metric that triggered it
 - [ ] E06-013 — Surface the hold reason on the mailbox detail view in plain language
 - [ ] E06-014 — Implement automatic resume once the metric recovers for a configured window
@@ -619,8 +619,8 @@ No cross-customer warmup pool, ever (ADR-0003).
 - [ ] E06-064 — Show the operator exactly when each mailbox becomes production-ready
 - [ ] E06-065 — Alert when a mailbox has been warming longer than the expected duration
 - [ ] E06-066 — Diagnose a stuck warmup automatically and propose the cause
-- [ ] E06-067 — Test the hold condition by injecting synthetic bounces
-- [ ] E06-068 — Test the rollback condition by injecting a complaint
+- [x] E06-067 — Test the hold condition by injecting synthetic bounces
+- [x] E06-068 — Test the rollback condition by injecting a complaint
 - [ ] E06-069 — Test the age gate by attempting to warm a domain registered yesterday
 - [ ] E06-070 — Test peer warmup end to end on a staging node with two real mailboxes
 - [ ] E06-071 — Test that peer warmup volume is excluded from billing
@@ -636,7 +636,7 @@ No cross-customer warmup pool, ever (ADR-0003).
 
 ---
 
-<!-- source: planning/backlog/07-router.md · 13/105 -->
+<!-- source: planning/backlog/07-router.md · 42/105 -->
 # Epic 07 — Router, Pacing & the Send Path
 
 The router is the only package permitted to make a final send decision.
@@ -644,32 +644,32 @@ Deferral is a first-class success (ARCHITECTURE §3.2).
 
 - [x] E07-001 — Create packages/router with the SendPlan and Deferral types
 - [x] E07-002 — Define the SendIntent → SendPlan contract and freeze it
-- [ ] E07-003 — Implement the hard candidate filter: domain verified and past ageReadyAt
-- [ ] E07-004 — Implement the hard candidate filter: mailbox ACTIVE and not held
-- [ ] E07-005 — Implement the hard candidate filter: IP not quarantined or throttled
-- [ ] E07-006 — Implement the hard candidate filter: node ACTIVE with all verify flags true
-- [ ] E07-007 — Implement the hard candidate filter: node role is CAMPAIGN, never VERIFY
-- [ ] E07-008 — Implement the hard candidate filter: cap headroom greater than zero on all four buckets
-- [ ] E07-009 — Implement the hard candidate filter: pool matches the campaign's domain pool
-- [ ] E07-010 — Implement the hard candidate filter: policy allows this domain for this jurisdiction
-- [ ] E07-011 — Implement the per-recipient-domain cooldown so one company is not hit from one mailbox repeatedly
-- [ ] E07-012 — Implement the per-recipient-domain fan-out cap across the whole fleet
+- [x] E07-003 — Implement the hard candidate filter: domain verified and past ageReadyAt
+- [x] E07-004 — Implement the hard candidate filter: mailbox ACTIVE and not held
+- [x] E07-005 — Implement the hard candidate filter: IP not quarantined or throttled
+- [x] E07-006 — Implement the hard candidate filter: node ACTIVE with all verify flags true
+- [x] E07-007 — Implement the hard candidate filter: node role is CAMPAIGN, never VERIFY
+- [x] E07-008 — Implement the hard candidate filter: cap headroom greater than zero on all four buckets
+- [x] E07-009 — Implement the hard candidate filter: pool matches the campaign's domain pool
+- [x] E07-010 — Implement the hard candidate filter: policy allows this domain for this jurisdiction
+- [x] E07-011 — Implement the per-recipient-domain cooldown so one company is not hit from one mailbox repeatedly
+- [x] E07-012 — Implement the per-recipient-domain fan-out cap across the whole fleet
 - [ ] E07-013 — Implement reputationScore as a router input from packages/reputation
-- [ ] E07-014 — Implement headroom normalisation across mailboxes with different caps
-- [ ] E07-015 — Implement espAffinity from measured placement per (domain, recipient ESP)
-- [ ] E07-016 — Implement warmupFit so a warming mailbox is not chosen for a large burst
-- [ ] E07-017 — Implement recencyPenalty on the recipient domain
-- [ ] E07-018 — Implement riskPenalty from listings, complaint trend, and bounce trend
-- [ ] E07-019 — Make every weight configurable and versioned, never a magic number in code
-- [ ] E07-020 — Record the full route trace on every decision into SendIntent.routeTrace
+- [x] E07-014 — Implement headroom normalisation across mailboxes with different caps
+- [x] E07-015 — Implement espAffinity from measured placement per (domain, recipient ESP)
+- [x] E07-016 — Implement warmupFit so a warming mailbox is not chosen for a large burst
+- [x] E07-017 — Implement recencyPenalty on the recipient domain
+- [x] E07-018 — Implement riskPenalty from listings, complaint trend, and bounce trend
+- [x] E07-019 — Make every weight configurable and versioned, never a magic number in code
+- [x] E07-020 — Record the full route trace on every decision into SendIntent.routeTrace
 - [ ] E07-021 — Make the route trace human-readable in the UI: why this mailbox, why not the others
-- [ ] E07-022 — Implement deterministic tie-breaking so identical inputs produce identical plans
-- [ ] E07-023 — Implement the deferral path with a reason enum and a next-attempt time
-- [ ] E07-024 — Implement exponential backoff on repeated deferrals with a jittered ceiling
-- [ ] E07-025 — Cap the deferral count and fail the intent with a clear reason at the limit
-- [ ] E07-026 — Never silently drop an intent; every terminal state has a recorded reason
-- [ ] E07-027 — Implement the recipient ESP classifier from the MX record
-- [ ] E07-028 — Maintain the MX-to-ESP-family map as data, refreshable without a deploy
+- [x] E07-022 — Implement deterministic tie-breaking so identical inputs produce identical plans
+- [x] E07-023 — Implement the deferral path with a reason enum and a next-attempt time
+- [x] E07-024 — Implement exponential backoff on repeated deferrals with a jittered ceiling
+- [x] E07-025 — Cap the deferral count and fail the intent with a clear reason at the limit
+- [x] E07-026 — Never silently drop an intent; every terminal state has a recorded reason
+- [x] E07-027 — Implement the recipient ESP classifier from the MX record
+- [x] E07-028 — Maintain the MX-to-ESP-family map as data, refreshable without a deploy
 - [ ] E07-029 — Cache the ESP classification per recipient domain with a TTL
 - [x] E07-030 — Implement the mailbox daily token bucket as an atomic Lua script
 - [x] E07-031 — Implement the mailbox hourly token bucket with jitter
@@ -719,7 +719,7 @@ Deferral is a first-class success (ARCHITECTURE §3.2).
 - [ ] E07-075 — Handle a submission-time 5xx by classifying it immediately through the taxonomy
 - [ ] E07-076 — Re-check suppression in Valkey immediately before emit, with a Postgres fallback on miss
 - [ ] E07-077 — Fail closed on a suppression-check error; never assume allowed
-- [ ] E07-078 — Write the send-path integration test covering all ten stages
+- [x] E07-078 — Write the send-path integration test covering all ten stages
 - [ ] E07-079 — Write a test asserting there is no code path to the MTA that skips the policy stage
 - [ ] E07-080 — Add a static analysis rule that fails CI if the SMTP client is imported outside the sender
 - [ ] E07-081 — Implement idempotency: an intent can be processed twice without sending twice
@@ -732,13 +732,13 @@ Deferral is a first-class success (ARCHITECTURE §3.2).
 - [ ] E07-088 — Add a router simulation mode: given a campaign, show the plan without sending
 - [ ] E07-089 — Use simulation mode to answer "when will this campaign finish"
 - [ ] E07-090 — Surface the projected completion date on the campaign view
-- [ ] E07-091 — Explain a slow campaign in terms of the binding constraint, not a generic message
+- [x] E07-091 — Explain a slow campaign in terms of the binding constraint, not a generic message
 - [ ] E07-092 — Add a what-if tool: how much faster with N more mailboxes
 - [ ] E07-093 — Benchmark the router decision at 10,000 candidates; target p95 under 50ms
 - [ ] E07-094 — Cache the candidate set per pool with invalidation on any fleet state change
-- [ ] E07-095 — Test router behaviour when every candidate is exhausted
-- [ ] E07-096 — Test router behaviour when the fleet is empty
-- [ ] E07-097 — Test router behaviour when policy blocks every domain for a jurisdiction
+- [x] E07-095 — Test router behaviour when every candidate is exhausted
+- [x] E07-096 — Test router behaviour when the fleet is empty
+- [x] E07-097 — Test router behaviour when policy blocks every domain for a jurisdiction
 - [ ] E07-098 — Fuzz the router with randomised fleet states and assert no invariant breaks
 - [ ] E07-099 — Document the router scoring function and weights in planning/specs/router/
 - [ ] E07-100 — Publish a plain-language explanation of routing in the customer docs
@@ -750,7 +750,7 @@ Deferral is a first-class success (ARCHITECTURE §3.2).
 
 ---
 
-<!-- source: planning/backlog/08-mta-maillog.md · 0/90 -->
+<!-- source: planning/backlog/08-mta-maillog.md · 17/90 -->
 # Epic 08 — MTA Integration, Maillog Truth & Event Pipeline
 
 Our `delivered` comes from the receiving MX's 250, read out of the mail log.
@@ -759,27 +759,27 @@ No number on a dashboard originates from an optimistic counter.
 - [ ] E08-001 — Extend apps/maillog-bridge to accept batches from multiple nodes
 - [ ] E08-002 — Authenticate every batch with a per-node signature and reject anything unsigned
 - [ ] E08-003 — Add replay protection with a nonce and a timestamp window
-- [ ] E08-004 — Parse the Postfix qmgr line into a queue-id to Message-ID mapping
-- [ ] E08-005 — Parse the Postfix smtp line into (queue-id, to, relay, delay, dsn, status, response)
-- [ ] E08-006 — Preserve the receiving MX response string verbatim; never summarise it at parse time
-- [ ] E08-007 — Parse the Postfix cleanup line to capture our Message-ID
+- [x] E08-004 — Parse the Postfix qmgr line into a queue-id to Message-ID mapping
+- [x] E08-005 — Parse the Postfix smtp line into (queue-id, to, relay, delay, dsn, status, response)
+- [x] E08-006 — Preserve the receiving MX response string verbatim; never summarise it at parse time
+- [x] E08-007 — Parse the Postfix cleanup line to capture our Message-ID
 - [ ] E08-008 — Parse the bounce and error lines for locally generated failures
-- [ ] E08-009 — Handle multi-recipient messages producing several smtp lines per queue id
+- [x] E08-009 — Handle multi-recipient messages producing several smtp lines per queue id
 - [ ] E08-010 — Handle log rotation and truncation without losing or duplicating lines
-- [ ] E08-011 — Handle out-of-order line arrival across batches
-- [ ] E08-012 — Build the correlation store mapping queue-id to intent via Message-ID
-- [ ] E08-013 — Expire the correlation store on the same horizon as the Postfix queue lifetime
+- [x] E08-011 — Handle out-of-order line arrival across batches
+- [x] E08-012 — Build the correlation store mapping queue-id to intent via Message-ID
+- [x] E08-013 — Expire the correlation store on the same horizon as the Postfix queue lifetime
 - [ ] E08-014 — Alert on correlation misses; an uncorrelated delivery means we lost the join key
 - [ ] E08-015 — Write every parsed line to ClickHouse smtp_transactions
 - [ ] E08-016 — Write the raw line to R2 daily archives before parsing
-- [ ] E08-017 — Make the parser table-driven so a new Postfix version is a data change
-- [ ] E08-018 — Add a parser fixture suite from real captured log lines across all ESPs
-- [ ] E08-019 — Fail CI on any parser regression against the fixture suite
-- [ ] E08-020 — Add an unparsed-line queue and alert when it grows
-- [ ] E08-021 — Never discard an unparsed line; it is evidence
-- [ ] E08-022 — Emit the delivered event only from a status=sent line with a 2xx response
-- [ ] E08-023 — Emit the deferred event from a status=deferred line with the 4xx captured
-- [ ] E08-024 — Emit the bounced event from a status=bounced line with the 5xx captured
+- [x] E08-017 — Make the parser table-driven so a new Postfix version is a data change
+- [x] E08-018 — Add a parser fixture suite from real captured log lines across all ESPs
+- [x] E08-019 — Fail CI on any parser regression against the fixture suite
+- [x] E08-020 — Add an unparsed-line queue and alert when it grows
+- [x] E08-021 — Never discard an unparsed line; it is evidence
+- [x] E08-022 — Emit the delivered event only from a status=sent line with a 2xx response
+- [x] E08-023 — Emit the deferred event from a status=deferred line with the 4xx captured
+- [x] E08-024 — Emit the bounced event from a status=bounced line with the 5xx captured
 - [ ] E08-025 — Update the SendIntent state from the correlated log event, not from the submit call
 - [ ] E08-026 — Record the delivery latency from submit to the receiving MX 250
 - [ ] E08-027 — Record the number of delivery attempts per message
@@ -824,7 +824,7 @@ No number on a dashboard originates from an optimistic counter.
 - [ ] E08-066 — Build the event pipeline writing to ClickHouse email_events with batching
 - [ ] E08-067 — Make the event writer fail-soft with local buffering
 - [ ] E08-068 — Add the replay tool for buffered events after a store outage
-- [ ] E08-069 — Deduplicate events on (messageId, type, at) so replay is safe
+- [x] E08-069 — Deduplicate events on (messageId, type, at) so replay is safe
 - [ ] E08-070 — Build the hourly rollup materialised views
 - [ ] E08-071 — Verify rollup totals against raw counts nightly and alert on drift
 - [ ] E08-072 — Build the webhook dispatcher for EMS events, reusing the inherited signing
@@ -2412,7 +2412,7 @@ Stripe is the one unavoidable third party, isolated behind a BillingProvider sea
 
 ---
 
-<!-- source: planning/backlog/22-testing-ci.md · 3/105 -->
+<!-- source: planning/backlog/22-testing-ci.md · 8/105 -->
 # Epic 22 — Testing, CI & Quality Gates
 
 - [ ] E22-001 — Define the test taxonomy: unit, integration, contract, e2e, load, abuse
@@ -2428,19 +2428,19 @@ Stripe is the one unavoidable third party, isolated behind a BillingProvider sea
 - [ ] E22-011 — Build a registrar stub
 - [ ] E22-012 — Build a billing stub implementing the BillingProvider interface
 - [ ] E22-013 — Make every external dependency stubbable without changing production code
-- [ ] E22-014 — Write the send-path integration test covering all ten stages
-- [ ] E22-015 — Write the test asserting no path to the MTA skips the policy gate
+- [x] E22-014 — Write the send-path integration test covering all ten stages
+- [x] E22-015 — Write the test asserting no path to the MTA skips the policy gate
 - [ ] E22-016 — Write the test asserting PolicyDecision is written for every send
 - [ ] E22-017 — Write the test asserting suppression is re-checked before emit
 - [ ] E22-018 — Write the test asserting the emit path fails closed on a store error
 - [x] E22-019 — Write the test asserting cap buckets cannot be overspent under concurrency
-- [ ] E22-020 — Write the test asserting Message-ID uniqueness under concurrency
+- [x] E22-020 — Write the test asserting Message-ID uniqueness under concurrency
 - [ ] E22-021 — Write the test asserting an intent processed twice sends once
 - [ ] E22-022 — Write the cross-tenant isolation test suite
 - [x] E22-023 — Write the compliance test suite from planning/COMPLIANCE.md
 - [x] E22-024 — Write the deliverability test suite from the bounce corpus
-- [ ] E22-025 — Write the router property tests over randomised fleet states
-- [ ] E22-026 — Write the warmup tests including hold and rollback
+- [x] E22-025 — Write the router property tests over randomised fleet states
+- [x] E22-026 — Write the warmup tests including hold and rollback
 - [ ] E22-027 — Write the verification tests against a known-address corpus
 - [ ] E22-028 — Write the sequence engine tests including timezone and holiday edges
 - [ ] E22-029 — Write the inbox threading tests against a real reply corpus

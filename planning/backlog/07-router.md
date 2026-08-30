@@ -5,32 +5,32 @@ Deferral is a first-class success (ARCHITECTURE §3.2).
 
 - [x] E07-001 — Create packages/router with the SendPlan and Deferral types
 - [x] E07-002 — Define the SendIntent → SendPlan contract and freeze it
-- [ ] E07-003 — Implement the hard candidate filter: domain verified and past ageReadyAt
-- [ ] E07-004 — Implement the hard candidate filter: mailbox ACTIVE and not held
-- [ ] E07-005 — Implement the hard candidate filter: IP not quarantined or throttled
-- [ ] E07-006 — Implement the hard candidate filter: node ACTIVE with all verify flags true
-- [ ] E07-007 — Implement the hard candidate filter: node role is CAMPAIGN, never VERIFY
-- [ ] E07-008 — Implement the hard candidate filter: cap headroom greater than zero on all four buckets
-- [ ] E07-009 — Implement the hard candidate filter: pool matches the campaign's domain pool
-- [ ] E07-010 — Implement the hard candidate filter: policy allows this domain for this jurisdiction
-- [ ] E07-011 — Implement the per-recipient-domain cooldown so one company is not hit from one mailbox repeatedly
-- [ ] E07-012 — Implement the per-recipient-domain fan-out cap across the whole fleet
+- [x] E07-003 — Implement the hard candidate filter: domain verified and past ageReadyAt
+- [x] E07-004 — Implement the hard candidate filter: mailbox ACTIVE and not held
+- [x] E07-005 — Implement the hard candidate filter: IP not quarantined or throttled
+- [x] E07-006 — Implement the hard candidate filter: node ACTIVE with all verify flags true
+- [x] E07-007 — Implement the hard candidate filter: node role is CAMPAIGN, never VERIFY
+- [x] E07-008 — Implement the hard candidate filter: cap headroom greater than zero on all four buckets
+- [x] E07-009 — Implement the hard candidate filter: pool matches the campaign's domain pool
+- [x] E07-010 — Implement the hard candidate filter: policy allows this domain for this jurisdiction
+- [x] E07-011 — Implement the per-recipient-domain cooldown so one company is not hit from one mailbox repeatedly
+- [x] E07-012 — Implement the per-recipient-domain fan-out cap across the whole fleet
 - [ ] E07-013 — Implement reputationScore as a router input from packages/reputation
-- [ ] E07-014 — Implement headroom normalisation across mailboxes with different caps
-- [ ] E07-015 — Implement espAffinity from measured placement per (domain, recipient ESP)
-- [ ] E07-016 — Implement warmupFit so a warming mailbox is not chosen for a large burst
-- [ ] E07-017 — Implement recencyPenalty on the recipient domain
-- [ ] E07-018 — Implement riskPenalty from listings, complaint trend, and bounce trend
-- [ ] E07-019 — Make every weight configurable and versioned, never a magic number in code
-- [ ] E07-020 — Record the full route trace on every decision into SendIntent.routeTrace
+- [x] E07-014 — Implement headroom normalisation across mailboxes with different caps
+- [x] E07-015 — Implement espAffinity from measured placement per (domain, recipient ESP)
+- [x] E07-016 — Implement warmupFit so a warming mailbox is not chosen for a large burst
+- [x] E07-017 — Implement recencyPenalty on the recipient domain
+- [x] E07-018 — Implement riskPenalty from listings, complaint trend, and bounce trend
+- [x] E07-019 — Make every weight configurable and versioned, never a magic number in code
+- [x] E07-020 — Record the full route trace on every decision into SendIntent.routeTrace
 - [ ] E07-021 — Make the route trace human-readable in the UI: why this mailbox, why not the others
-- [ ] E07-022 — Implement deterministic tie-breaking so identical inputs produce identical plans
-- [ ] E07-023 — Implement the deferral path with a reason enum and a next-attempt time
-- [ ] E07-024 — Implement exponential backoff on repeated deferrals with a jittered ceiling
-- [ ] E07-025 — Cap the deferral count and fail the intent with a clear reason at the limit
-- [ ] E07-026 — Never silently drop an intent; every terminal state has a recorded reason
-- [ ] E07-027 — Implement the recipient ESP classifier from the MX record
-- [ ] E07-028 — Maintain the MX-to-ESP-family map as data, refreshable without a deploy
+- [x] E07-022 — Implement deterministic tie-breaking so identical inputs produce identical plans
+- [x] E07-023 — Implement the deferral path with a reason enum and a next-attempt time
+- [x] E07-024 — Implement exponential backoff on repeated deferrals with a jittered ceiling
+- [x] E07-025 — Cap the deferral count and fail the intent with a clear reason at the limit
+- [x] E07-026 — Never silently drop an intent; every terminal state has a recorded reason
+- [x] E07-027 — Implement the recipient ESP classifier from the MX record
+- [x] E07-028 — Maintain the MX-to-ESP-family map as data, refreshable without a deploy
 - [ ] E07-029 — Cache the ESP classification per recipient domain with a TTL
 - [x] E07-030 — Implement the mailbox daily token bucket as an atomic Lua script
 - [x] E07-031 — Implement the mailbox hourly token bucket with jitter
@@ -80,7 +80,7 @@ Deferral is a first-class success (ARCHITECTURE §3.2).
 - [ ] E07-075 — Handle a submission-time 5xx by classifying it immediately through the taxonomy
 - [ ] E07-076 — Re-check suppression in Valkey immediately before emit, with a Postgres fallback on miss
 - [ ] E07-077 — Fail closed on a suppression-check error; never assume allowed
-- [ ] E07-078 — Write the send-path integration test covering all ten stages
+- [x] E07-078 — Write the send-path integration test covering all ten stages
 - [ ] E07-079 — Write a test asserting there is no code path to the MTA that skips the policy stage
 - [ ] E07-080 — Add a static analysis rule that fails CI if the SMTP client is imported outside the sender
 - [ ] E07-081 — Implement idempotency: an intent can be processed twice without sending twice
@@ -93,13 +93,13 @@ Deferral is a first-class success (ARCHITECTURE §3.2).
 - [ ] E07-088 — Add a router simulation mode: given a campaign, show the plan without sending
 - [ ] E07-089 — Use simulation mode to answer "when will this campaign finish"
 - [ ] E07-090 — Surface the projected completion date on the campaign view
-- [ ] E07-091 — Explain a slow campaign in terms of the binding constraint, not a generic message
+- [x] E07-091 — Explain a slow campaign in terms of the binding constraint, not a generic message
 - [ ] E07-092 — Add a what-if tool: how much faster with N more mailboxes
 - [ ] E07-093 — Benchmark the router decision at 10,000 candidates; target p95 under 50ms
 - [ ] E07-094 — Cache the candidate set per pool with invalidation on any fleet state change
-- [ ] E07-095 — Test router behaviour when every candidate is exhausted
-- [ ] E07-096 — Test router behaviour when the fleet is empty
-- [ ] E07-097 — Test router behaviour when policy blocks every domain for a jurisdiction
+- [x] E07-095 — Test router behaviour when every candidate is exhausted
+- [x] E07-096 — Test router behaviour when the fleet is empty
+- [x] E07-097 — Test router behaviour when policy blocks every domain for a jurisdiction
 - [ ] E07-098 — Fuzz the router with randomised fleet states and assert no invariant breaks
 - [ ] E07-099 — Document the router scoring function and weights in planning/specs/router/
 - [ ] E07-100 — Publish a plain-language explanation of routing in the customer docs

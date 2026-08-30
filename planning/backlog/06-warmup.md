@@ -3,17 +3,17 @@
 Two mechanisms, both required: ramp scheduling and our own peer network.
 No cross-customer warmup pool, ever (ADR-0003).
 
-- [ ] E06-001 — Create packages/warmup with the WarmupPlan evaluator
-- [ ] E06-002 — Implement the daily-cap curve: startPerDay, incrementWeek, plateau
+- [x] E06-001 — Create packages/warmup with the WarmupPlan evaluator
+- [x] E06-002 — Implement the daily-cap curve: startPerDay, incrementWeek, plateau
 - [ ] E06-003 — Support a per-plan and per-domain-age override of the curve
 - [ ] E06-004 — Implement weekday-only ramping when the plan requires it
 - [ ] E06-005 — Implement jittered hourly distribution so sends do not burst on the hour
 - [ ] E06-006 — Never allow two mailboxes on one domain to fire in the same second
 - [ ] E06-007 — Implement the warmup day counter advancing only on days with actual sends
-- [ ] E06-008 — Implement the hold condition: pause the ramp when bounce rate exceeds the plan max
-- [ ] E06-009 — Implement the hold condition on defer rate
-- [ ] E06-010 — Implement the hold condition on complaint rate
-- [ ] E06-011 — Implement rollback: reduce the cap to the last healthy level rather than only holding
+- [x] E06-008 — Implement the hold condition: pause the ramp when bounce rate exceeds the plan max
+- [x] E06-009 — Implement the hold condition on defer rate
+- [x] E06-010 — Implement the hold condition on complaint rate
+- [x] E06-011 — Implement rollback: reduce the cap to the last healthy level rather than only holding
 - [ ] E06-012 — Record every hold and rollback with the metric that triggered it
 - [ ] E06-013 — Surface the hold reason on the mailbox detail view in plain language
 - [ ] E06-014 — Implement automatic resume once the metric recovers for a configured window
@@ -69,8 +69,8 @@ No cross-customer warmup pool, ever (ADR-0003).
 - [ ] E06-064 — Show the operator exactly when each mailbox becomes production-ready
 - [ ] E06-065 — Alert when a mailbox has been warming longer than the expected duration
 - [ ] E06-066 — Diagnose a stuck warmup automatically and propose the cause
-- [ ] E06-067 — Test the hold condition by injecting synthetic bounces
-- [ ] E06-068 — Test the rollback condition by injecting a complaint
+- [x] E06-067 — Test the hold condition by injecting synthetic bounces
+- [x] E06-068 — Test the rollback condition by injecting a complaint
 - [ ] E06-069 — Test the age gate by attempting to warm a domain registered yesterday
 - [ ] E06-070 — Test peer warmup end to end on a staging node with two real mailboxes
 - [ ] E06-071 — Test that peer warmup volume is excluded from billing
