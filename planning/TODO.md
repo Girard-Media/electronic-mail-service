@@ -5,7 +5,7 @@
 The build-loop queue (`bootspring build next` reads this).
 Status: `[ ]` todo · `[~]` in progress · `[x]` done.
 
-**340 / 2502 complete.**
+**376 / 2502 complete.**
 
 Governing documents — read before taking a task:
 
@@ -636,7 +636,7 @@ No cross-customer warmup pool, ever (ADR-0003).
 
 ---
 
-<!-- source: planning/backlog/07-router.md · 47/105 -->
+<!-- source: planning/backlog/07-router.md · 48/105 -->
 # Epic 07 — Router, Pacing & the Send Path
 
 The router is the only package permitted to make a final send decision.
@@ -654,7 +654,7 @@ Deferral is a first-class success (ARCHITECTURE §3.2).
 - [x] E07-010 — Implement the hard candidate filter: policy allows this domain for this jurisdiction
 - [x] E07-011 — Implement the per-recipient-domain cooldown so one company is not hit from one mailbox repeatedly
 - [x] E07-012 — Implement the per-recipient-domain fan-out cap across the whole fleet
-- [ ] E07-013 — Implement reputationScore as a router input from packages/reputation
+- [x] E07-013 — Implement reputationScore as a router input from packages/reputation
 - [x] E07-014 — Implement headroom normalisation across mailboxes with different caps
 - [x] E07-015 — Implement espAffinity from measured placement per (domain, recipient ESP)
 - [x] E07-016 — Implement warmupFit so a warming mailbox is not chosen for a large burst
@@ -1043,47 +1043,47 @@ The only true measure of placement. Everything else is a proxy.
 
 ---
 
-<!-- source: planning/backlog/11-reputation.md · 0/95 -->
+<!-- source: planning/backlog/11-reputation.md · 35/95 -->
 # Epic 11 — The Five Reputation Ledgers
 
 Five independent series with different half-lives, composed only at read time.
 There is no stored "the score".
 
-- [ ] E11-001 — Create packages/reputation with the five-ledger model
-- [ ] E11-002 — Define the IP ledger inputs: listings, deferral rate, block rate, SNDS, TLS failures
-- [ ] E11-003 — Define the domain ledger inputs: DMARC alignment, complaints, bounces, placement
-- [ ] E11-004 — Define the mailbox ledger inputs: bounces, defers, complaints, replies, age, warmup stage
-- [ ] E11-005 — Define the content ledger inputs: rspamd score, link reputation, AI risk, historical placement
-- [ ] E11-006 — Define the engagement ledger inputs: replies, positive replies, unsubscribes, complaints
-- [ ] E11-007 — Implement the exponential decay function with a configurable half-life per ledger
-- [ ] E11-008 — Set the IP half-life to roughly 21 days and make it configurable
-- [ ] E11-009 — Set the domain half-life to roughly 10 days
-- [ ] E11-010 — Set the mailbox half-life to roughly 3 days
-- [ ] E11-011 — Set the content half-life to roughly 1 day
-- [ ] E11-012 — Set the engagement half-life to roughly 7 days
-- [ ] E11-013 — Normalise every input to a bounded 0..1 contribution
-- [ ] E11-014 — Handle a zero-volume subject without producing a misleading score
-- [ ] E11-015 — Return an explicit insufficient-data state rather than a default score
+- [x] E11-001 — Create packages/reputation with the five-ledger model
+- [x] E11-002 — Define the IP ledger inputs: listings, deferral rate, block rate, SNDS, TLS failures
+- [x] E11-003 — Define the domain ledger inputs: DMARC alignment, complaints, bounces, placement
+- [x] E11-004 — Define the mailbox ledger inputs: bounces, defers, complaints, replies, age, warmup stage
+- [x] E11-005 — Define the content ledger inputs: rspamd score, link reputation, AI risk, historical placement
+- [x] E11-006 — Define the engagement ledger inputs: replies, positive replies, unsubscribes, complaints
+- [x] E11-007 — Implement the exponential decay function with a configurable half-life per ledger
+- [x] E11-008 — Set the IP half-life to roughly 21 days and make it configurable
+- [x] E11-009 — Set the domain half-life to roughly 10 days
+- [x] E11-010 — Set the mailbox half-life to roughly 3 days
+- [x] E11-011 — Set the content half-life to roughly 1 day
+- [x] E11-012 — Set the engagement half-life to roughly 7 days
+- [x] E11-013 — Normalise every input to a bounded 0..1 contribution
+- [x] E11-014 — Handle a zero-volume subject without producing a misleading score
+- [x] E11-015 — Return an explicit insufficient-data state rather than a default score
 - [ ] E11-016 — Implement the nightly snapshot writer into ReputationSnapshot
 - [ ] E11-017 — Store the full factor decomposition in every snapshot
 - [ ] E11-018 — Make historical charts read snapshots so they are reproducible
 - [ ] E11-019 — Never recompute history with today's weights; version the weights
-- [ ] E11-020 — Implement the composite score at read time with explicit weights
-- [ ] E11-021 — Always return the decomposition alongside the composite
-- [ ] E11-022 — Refuse to expose a composite through any API without its decomposition
+- [x] E11-020 — Implement the composite score at read time with explicit weights
+- [x] E11-021 — Always return the decomposition alongside the composite
+- [x] E11-022 — Refuse to expose a composite through any API without its decomposition
 - [ ] E11-023 — Build the reputation view showing all five series on one timeline
 - [ ] E11-024 — Let an operator toggle each series and see the composite recompute
 - [ ] E11-025 — Annotate the timeline with events: listings, DNS changes, campaign starts, incidents
 - [ ] E11-026 — Make annotations clickable through to the underlying evidence
-- [ ] E11-027 — Implement the reputation delta view: what changed since yesterday and why
-- [ ] E11-028 — Rank the contributing factors by their contribution to the delta
-- [ ] E11-029 — Feed reputationScore into the router candidate scoring
-- [ ] E11-030 — Feed riskPenalty into the router from listings and trends
+- [x] E11-027 — Implement the reputation delta view: what changed since yesterday and why
+- [x] E11-028 — Rank the contributing factors by their contribution to the delta
+- [x] E11-029 — Feed reputationScore into the router candidate scoring
+- [x] E11-030 — Feed riskPenalty into the router from listings and trends
 - [ ] E11-031 — Feed espAffinity into the router from placement measurements
-- [ ] E11-032 — Make every router input traceable back to a measurement
+- [x] E11-032 — Make every router input traceable back to a measurement
 - [ ] E11-033 — Implement the reputation alert thresholds per ledger
-- [ ] E11-034 — Alert on a rate of change, not only on an absolute level
-- [ ] E11-035 — Detect a slow degradation before it crosses an absolute threshold
+- [x] E11-034 — Alert on a rate of change, not only on an absolute level
+- [x] E11-035 — Detect a slow degradation before it crosses an absolute threshold
 - [ ] E11-036 — Implement anomaly detection on each series with a seasonality-aware baseline
 - [ ] E11-037 — Avoid alerting on the weekly business-day seasonality
 - [ ] E11-038 — Feed anomalies into the AI narration task for a plain-language summary
@@ -1102,9 +1102,9 @@ There is no stored "the score".
 - [ ] E11-051 — Label the forecast as a projection with its confidence interval
 - [ ] E11-052 — Validate forecast accuracy against outcomes and publish the error internally
 - [ ] E11-053 — Retire the forecast if it does not beat persistence as a baseline
-- [ ] E11-054 — Implement reputation-aware campaign admission control
+- [x] E11-054 — Implement reputation-aware campaign admission control
 - [ ] E11-055 — Refuse to start a large campaign on a degrading domain
-- [ ] E11-056 — Explain the refusal with the specific series and threshold
+- [x] E11-056 — Explain the refusal with the specific series and threshold
 - [ ] E11-057 — Offer the customer a smaller safe volume rather than a flat refusal
 - [ ] E11-058 — Implement the reputation budget concept: volume a subject can afford this week
 - [ ] E11-059 — Surface the budget to the operator as the primary capacity number
@@ -1112,11 +1112,11 @@ There is no stored "the score".
 - [ ] E11-061 — Write the reputation model documentation with every formula stated
 - [ ] E11-062 — Publish a simplified version of the model in customer docs
 - [ ] E11-063 — Never publish a score without publishing how it is computed
-- [ ] E11-064 — Test decay with a synthetic series and assert the half-life is correct
-- [ ] E11-065 — Test the insufficient-data path with a brand-new subject
-- [ ] E11-066 — Test that a listing immediately depresses the IP ledger
-- [ ] E11-067 — Test that a complaint immediately depresses the mailbox and engagement ledgers
-- [ ] E11-068 — Test that placement improvement lifts the domain ledger
+- [x] E11-064 — Test decay with a synthetic series and assert the half-life is correct
+- [x] E11-065 — Test the insufficient-data path with a brand-new subject
+- [x] E11-066 — Test that a listing immediately depresses the IP ledger
+- [x] E11-067 — Test that a complaint immediately depresses the mailbox and engagement ledgers
+- [x] E11-068 — Test that placement improvement lifts the domain ledger
 - [ ] E11-069 — Test snapshot reproducibility by recomputing a historical day
 - [ ] E11-070 — Load-test scoring for 10,000 subjects in one pass
 - [ ] E11-071 — Benchmark read-time composite computation; target under 10ms
@@ -1130,10 +1130,10 @@ There is no stored "the score".
 - [ ] E11-079 — Alert when an override is about to expire
 - [ ] E11-080 — Audit every override in the immutable log
 - [ ] E11-081 — Track how often overrides preceded an incident and report it
-- [ ] E11-082 — Weight the engagement ledger by reply, not by open, given MPP
-- [ ] E11-083 — Document why opens are excluded from reputation
+- [x] E11-082 — Weight the engagement ledger by reply, not by open, given MPP
+- [x] E11-083 — Document why opens are excluded from reputation
 - [ ] E11-084 — Add a negative-engagement signal from delete-without-read where any provider exposes it
-- [ ] E11-085 — Keep the model simple enough that an operator can predict its behaviour
+- [x] E11-085 — Keep the model simple enough that an operator can predict its behaviour
 - [ ] E11-086 — Review the weights quarterly against outcomes and record the decision
 - [ ] E11-087 — Version every weight change and keep old snapshots on old weights
 - [ ] E11-088 — Add a reputation regression test suite from recorded historical incidents

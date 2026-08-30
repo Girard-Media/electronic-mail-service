@@ -15,7 +15,7 @@ Deferral is a first-class success (ARCHITECTURE §3.2).
 - [x] E07-010 — Implement the hard candidate filter: policy allows this domain for this jurisdiction
 - [x] E07-011 — Implement the per-recipient-domain cooldown so one company is not hit from one mailbox repeatedly
 - [x] E07-012 — Implement the per-recipient-domain fan-out cap across the whole fleet
-- [ ] E07-013 — Implement reputationScore as a router input from packages/reputation
+- [x] E07-013 — Implement reputationScore as a router input from packages/reputation
 - [x] E07-014 — Implement headroom normalisation across mailboxes with different caps
 - [x] E07-015 — Implement espAffinity from measured placement per (domain, recipient ESP)
 - [x] E07-016 — Implement warmupFit so a warming mailbox is not chosen for a large burst
