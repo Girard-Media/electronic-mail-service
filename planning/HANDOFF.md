@@ -134,6 +134,12 @@ Work in **`/Users/girardmedia/Documents/WEB/electronic-mail-service`**. Do not o
 - `POST /app/inbox/threads/:id/outcome` `{ intent }` halt INTERESTED/NOT_INTERESTED/REFERRAL across every campaign; UNSUBSCRIBE too. OOO/auto-reply do not halt
 - Stub CAMPAIGN `BlastNode` (PROVISIONING) + RFC1918 IP auto-created so mailbox create is unblocked. **Not routable** until 90-verify
 
+### Step 2c — compose + emit — **done 2026-09-09**
+- After `route()` returns a plan, `emitRoutedIntent` personalises copy, appends postal + unsubscribe, validates CAN-SPAM, then submits.
+- No SMTP_URL / `MAIL_RELAY_STUB=true` → `SUBMITTED` with a stub 250 (same as transactional worker).
+- Real SMTP uses FleetDomain DKIM. **Delivered is still maillog-only (E08-025).**
+- Unverified From domain fails closed (`unverified-from-domain`). Stub node traffic will FAILED until DNS + 90-verify.
+
 ### Step 3 — inbox that salespeople can use (next product surface)
 - E16-010 link inbound to lead + campaign + mailbox (`SendIntent.messageId` ↔ `In-Reply-To`)
 - E16-034 cockpit on top of `GET /app/inbox/threads`

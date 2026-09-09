@@ -5,7 +5,7 @@
 The build-loop queue (`bootspring build next` reads this).
 Status: `[ ]` todo · `[~]` in progress · `[x]` done.
 
-**487 / 2511 complete.**
+**489 / 2513 complete.**
 
 Governing documents — read before taking a task:
 
@@ -1505,10 +1505,10 @@ Blocked is the default for whatever we cannot resolve.
 
 ---
 
-<!-- source: planning/backlog/15-campaigns.md · 24/130 -->
+<!-- source: planning/backlog/15-campaigns.md · 26/132 -->
 # Epic 15 — Campaigns & the Sequence Engine
 
-**2026-09-09:** pool + launch + fleet API + enrolment/halt-on-reply. SMTP emit and full jurisdiction gate still open. See `planning/HANDOFF.md`.
+**2026-09-09:** pool + launch + fleet API + enrolment/halt-on-reply + compose/emit (SUBMITTED; delivered still from maillog). Full jurisdiction gate and live blast node still open. See `planning/HANDOFF.md`.
 
 - [x] E15-001 — Create packages/sequence with the durable per-enrolment state machine
 - [x] E15-002 — Define the legal state transitions and reject anything else
@@ -1546,6 +1546,8 @@ Blocked is the default for whatever we cannot resolve.
 - [x] E15-031c — Dashboard API: `GET/POST /app/campaigns`, `PUT /app/campaigns/:id/mailboxes`
 - [x] E15-031d — Send worker loads `CampaignMailbox` rows and passes `mailboxIds` into `route()` (`apps/workers/src/route-intent.ts`, `QUEUE_INTENT`)
 - [x] E15-031e — Block launch when `poolCapacityToday` remaining < campaign.dailyCap (`POST /app/campaigns/:id/launch` + `decideLaunch`)
+- [x] E15-031f — Compose personalised body + CAN-SPAM footer + RFC 8058 headers (`composeCampaignMessage`)
+- [x] E15-031g — Emit ROUTED intents through MailProvider (stub or SMTP); state is SUBMITTED — delivered still comes from the maillog
 - [ ] E15-032 — Gate campaign creation on the org having capacity and a verified domain
 - [ ] E15-033 — Explain exactly what is missing when the gate blocks
 - [ ] E15-034 — Build the sequence editor with plain-text-first composition

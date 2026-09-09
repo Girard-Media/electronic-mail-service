@@ -29,3 +29,4 @@ export function assignVariant(leadId: string, stepId: string, weights: number[])
 export * from "./schedule.js";
 export * from "./enroll.js";
 export * from "./halt.js";
+export * from "./compose.js";

@@ -1,6 +1,5 @@
 /**
- * E15-031d — load the campaign mailbox pool and pass it into route().
- * Stops at ROUTED / DEFERRED. Emit (SMTP) is a later stage.
+ * E15-031d — load the campaign mailbox pool, route(), then emit.
  */
 
 import { connection, type IntentJobData } from "@ems/core";
@@ -13,6 +12,7 @@ import {
   capsForCandidate,
   type RouteRequest,
 } from "@ems/router";
+import { emitRoutedIntent } from "./emit-intent.js";
 
 export async function routeIntent(job: IntentJobData): Promise<{ state: string; mailboxId: string | null }> {
   const intent = await prisma.sendIntent.findUnique({
@@ -100,6 +100,8 @@ export async function routeIntent(job: IntentJobData): Promise<{ state: string; 
       where: { id: patch.mailboxId },
       data: { lastSendAt: at },
     });
+    const emitted = await emitRoutedIntent(intent.id);
+    return { state: emitted.state, mailboxId: patch.mailboxId };
   }
 
   return { state: patch.state, mailboxId: patch.mailboxId };
