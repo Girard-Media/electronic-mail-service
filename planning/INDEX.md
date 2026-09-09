@@ -8,6 +8,7 @@
 | [COMPLIANCE.md](COMPLIANCE.md) | Jurisdiction map, consent ledger, suppression, KYC/AUP, refused capabilities |
 | [AI.md](AI.md) | OpenRouter gateway, the eleven tasks, evals, budgets, injection posture |
 | [ROADMAP.md](ROADMAP.md) | The ninety-day shape and the gates between phases |
+| [HANDOFF.md](HANDOFF.md) | **Start here if you are the next agent on ListKit-class outreach** (2026-09-09) |
 | [TODO.md](TODO.md) | **Generated** build-loop queue — 2,500 tasks |
 | [backlog/](backlog/) | Source of truth for the queue, 24 epic files |
 | [bootspring/](bootspring/) | Notes back to the Bootspring team from building this |
@@ -15,6 +16,7 @@
 
 ## Reading order for a new contributor
 
+0. **If you are continuing the ListKit / campaign-pool thread:** `HANDOFF.md` then D16–D19 in `.bootspring/context/DECISIONS.md`.
 1. `VISION.md` §2 (first principles) and §7 (what we refuse) — twenty minutes, and it prevents most wrong turns.
 2. `ARCHITECTURE.md` §3 (the send path) — memorise the ten stages and the seven invariants.
 3. `COMPLIANCE.md` §1 and §9 — the legal map and the refused list.
@@ -37,3 +39,4 @@ resource; the product is a reputation budget allocator.
 EMS is acquisition (cold outreach). **The moment a lead opts in, they leave EMS.**
 Different boxes, different IPs, different PTRs, different DKIM keys, different mail logs.
 The only link is an outbound handoff API call. See `ARCHITECTURE.md` §1.
+usermails recorded this as **D15** (2026-09-09). ListKit-class attach/rotate/inbox work continues from `HANDOFF.md`.

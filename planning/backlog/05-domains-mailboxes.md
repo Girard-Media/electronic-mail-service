@@ -1,5 +1,7 @@
 # Epic 05 — Domain Fleet Lifecycle, Mailboxes & Personas
 
+**Next after the 2026-09-09 campaign-pool slice:** this epic is the cockpit the attach API needs. Campaigns can already attach mailbox ids; tenants cannot yet create FleetDomain / FleetMailbox rows through a UI. Start at E05-001 / E05-015 / E05-023. See `planning/HANDOFF.md`.
+
 - [ ] E05-001 — Build the FleetDomain registry CRUD in packages/fleet
 - [ ] E05-002 — Implement the FleetDomainStatus state machine with legal transitions only
 - [ ] E05-003 — Refuse REGISTERED → WARMING without spfOk, dkimOk, dmarcOk, mxOk, and siteLiveOk

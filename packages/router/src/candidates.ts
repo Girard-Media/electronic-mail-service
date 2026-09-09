@@ -41,11 +41,18 @@ export interface Candidate {
   riskPenalty: number;
   /** When this mailbox last sent to the recipient's company domain. */
   lastSendToRecipientDomainAt: Date | null;
+  /** When this mailbox last sent anything. LRU tie-break across equal scores. */
+  lastSendAt?: Date | null;
 }
 
 export interface FilterContext {
   at: Date;
   pool: string;
+  /**
+   * When set and non-empty, the campaign attached these mailboxes. Named `pool`
+   * is then ignored. Null / empty → named-pool matching (legacy).
+   */
+  mailboxIds?: Set<string> | null;
   esp: EspFamily;
   recipientDomain: string;
   /** Domains this jurisdiction is permitted to send from, or null for no restriction. */
@@ -70,7 +77,11 @@ export function reject(c: Candidate, ctx: FilterContext): HardFilter | null {
   if (c.nodeStatus !== "ACTIVE" || !c.nodeVerified) return "node-unhealthy";
   if (c.nodeRole !== "CAMPAIGN") return "node-role-not-campaign";
   if (c.mailboxSentToday >= c.mailboxDailyCap) return "no-cap-headroom";
-  if (c.pool !== ctx.pool) return "pool-mismatch";
+  if (ctx.mailboxIds && ctx.mailboxIds.size > 0) {
+    if (!ctx.mailboxIds.has(c.mailboxId)) return "pool-mismatch";
+  } else if (c.pool !== ctx.pool) {
+    return "pool-mismatch";
+  }
   if (ctx.allowedDomainIds !== null && !ctx.allowedDomainIds.has(c.domainId)) {
     return "policy-denies-domain-for-jurisdiction";
   }
@@ -142,7 +153,7 @@ export function select(
     survivors.push({ c, factors, s: score(factors, weights) });
   }
 
-  survivors.sort((a, b) => b.s - a.s || (a.c.mailboxId < b.c.mailboxId ? -1 : 1));
+  survivors.sort((a, b) => b.s - a.s || lruCmp(a.c, b.c) || (a.c.mailboxId < b.c.mailboxId ? -1 : 1));
   const best = survivors[0];
 
   const trace: RouteTrace = {
@@ -156,6 +167,13 @@ export function select(
   };
 
   return { chosen: best?.c ?? null, trace };
+}
+
+/** Older lastSendAt wins. Never-sent (null) is treated as epoch 0 — first in line. */
+function lruCmp(a: Candidate, b: Candidate): number {
+  const at = a.lastSendAt?.getTime() ?? 0;
+  const bt = b.lastSendAt?.getTime() ?? 0;
+  return at - bt;
 }
 
 function clamp01(n: number): number {

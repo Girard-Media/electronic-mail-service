@@ -25,8 +25,13 @@ export interface RouteRequest {
   recipientEmail: string;
   recipientDomain: string;
   esp: EspFamily;
-  /** Campaign's domain pool. Candidates outside it are filtered before scoring. */
+  /** Campaign's named fleet pool. Ignored when `mailboxIds` is set. */
   pool: string;
+  /**
+   * Explicit campaign mailbox set (CampaignMailbox). When present and non-empty,
+   * only these mailboxes are eligible — the ListKit attach-domains move.
+   */
+  mailboxIds?: string[];
   /** ISO-3166-2 resolved by @ems/policy. Never routed without one (I7). */
   jurisdiction: string;
   at: Date;
@@ -129,6 +134,7 @@ export function score(factors: ScoreFactors, w: RouterWeights = DEFAULT_WEIGHTS)
 
 export * from "./buckets.js";
 export * from "./candidates.js";
+export * from "./pool.js";
 
 import { select, type Candidate, type FilterContext } from "./candidates.js";
 import { buildSpecs, claim, type BucketClient, type BucketInputs } from "./buckets.js";
@@ -160,7 +166,11 @@ const DEFAULT_BACKOFF_MIN = [1, 5, 15, 30, 60, 120, 240];
  * not the fleet's capacity.
  */
 export async function route(req: RouteRequest, deps: RouteDeps): Promise<RouteResult> {
-  const { chosen, trace } = select(deps.candidates, deps.filterContext, deps.weights ?? DEFAULT_WEIGHTS);
+  const filterContext =
+    req.mailboxIds && req.mailboxIds.length > 0
+      ? { ...deps.filterContext, mailboxIds: new Set(req.mailboxIds) }
+      : deps.filterContext;
+  const { chosen, trace } = select(deps.candidates, filterContext, deps.weights ?? DEFAULT_WEIGHTS);
 
   if (chosen === null) {
     return defer(req, trace, deps, inferReason(trace));

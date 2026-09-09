@@ -34,6 +34,8 @@ import { team } from "./team.js";
 import { subaccounts } from "./subaccounts.js";
 import { billing } from "./billing.js";
 import { privacy } from "./privacy.js";
+import { campaigns } from "./campaigns.js";
+import { inbox } from "./inbox.js";
 import { enqueueEmail, cancelEmail } from "../lib/send.js";
 import { sendFromMailbox, replyToMessage } from "../lib/mailbox-actions.js";
 import { checkDomainRecords } from "../lib/domain-records.js";
@@ -69,6 +71,8 @@ dash.route("/subaccounts", subaccounts);
 dash.route("/billing", billing);
 // GDPR stubs: account export + delete.
 dash.route("/privacy", privacy);
+dash.route("/campaigns", campaigns);
+dash.route("/inbox", inbox);
 
 // Resolve the session org's plan limits (server is the sole authority — the
 // dashboard's checks are UX only). God Mode operator workspaces self-heal to

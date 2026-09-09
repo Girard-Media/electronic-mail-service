@@ -790,6 +790,7 @@ model FleetMailbox {
   drainedAt    DateTime?
   sendIntents  SendIntent[]
   inboxThreads InboxThread[]
+  campaigns    CampaignMailbox[]
   createdAt    DateTime           @default(now())
   updatedAt    DateTime           @updatedAt
 
@@ -1276,10 +1277,26 @@ model Campaign {
   enrollments      CampaignLead[]
   intents          SendIntent[]
   placementTests   PlacementTest[]
+  // Explicit sending pool. Empty = fall back to named `domainPool`.
+  mailboxes        CampaignMailbox[]
   createdAt        DateTime        @default(now())
   updatedAt        DateTime        @updatedAt
 
   @@index([orgId, status])
+}
+
+/// Join: which fleet mailboxes a campaign may rotate across.
+/// Attaching a domain expands to that domain's attachable mailboxes (ACTIVE /
+/// WARMING / PAUSED). The router still refuses anything that is not ACTIVE.
+model CampaignMailbox {
+  campaignId String
+  mailboxId  String
+  campaign   Campaign     @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  mailbox    FleetMailbox @relation(fields: [mailboxId], references: [id], onDelete: Cascade)
+  attachedAt DateTime     @default(now())
+
+  @@id([campaignId, mailboxId])
+  @@index([mailboxId])
 }
 
 model SequenceStep {
@@ -1449,6 +1466,7 @@ model InboxThread {
 
   @@index([orgId, state, lastMessageAt])
   @@index([mailboxId])
+  @@index([campaignId])
   @@index([intent])
 }
 

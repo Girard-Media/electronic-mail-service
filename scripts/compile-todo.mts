@@ -45,6 +45,7 @@ Governing documents — read before taking a task:
 | \`planning/INFRA.md\` | The blast-node fleet |
 | \`planning/COMPLIANCE.md\` | The policy gate and the legal map |
 | \`planning/AI.md\` | The OpenRouter gateway contract |
+| \`planning/HANDOFF.md\` | Current ListKit/campaign-pool slice — read before picking E15/E05/E16 |
 
 **Order.** Epics 01–02 gate everything. 03–05 (fleet) gate 06–08 (warmup, router, send).
 09–11 (deliverability, reputation) can run parallel to 12–16 (product) once the fleet exists.

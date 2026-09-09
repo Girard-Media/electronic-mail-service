@@ -12,6 +12,7 @@ Deferral is a first-class success (ARCHITECTURE §3.2).
 - [x] E07-007 — Implement the hard candidate filter: node role is CAMPAIGN, never VERIFY
 - [x] E07-008 — Implement the hard candidate filter: cap headroom greater than zero on all four buckets
 - [x] E07-009 — Implement the hard candidate filter: pool matches the campaign's domain pool
+- [x] E07-009a — Attached `CampaignMailbox` set overrides named `domainPool` (`mailboxIds` on RouteRequest / FilterContext). Empty attach → named pool. Gate: `scripts/campaign-pool-test.mts`
 - [x] E07-010 — Implement the hard candidate filter: policy allows this domain for this jurisdiction
 - [x] E07-011 — Implement the per-recipient-domain cooldown so one company is not hit from one mailbox repeatedly
 - [x] E07-012 — Implement the per-recipient-domain fan-out cap across the whole fleet
@@ -25,6 +26,7 @@ Deferral is a first-class success (ARCHITECTURE §3.2).
 - [x] E07-020 — Record the full route trace on every decision into SendIntent.routeTrace
 - [ ] E07-021 — Make the route trace human-readable in the UI: why this mailbox, why not the others
 - [x] E07-022 — Implement deterministic tie-breaking so identical inputs produce identical plans
+- [x] E07-022a — LRU tie-break on `lastSendAt` before mailboxId (ReflexWare harvest). Equal scores rotate to the idle mailbox; never-sent still breaks on id. Gate: `scripts/campaign-pool-test.mts`
 - [x] E07-023 — Implement the deferral path with a reason enum and a next-attempt time
 - [x] E07-024 — Implement exponential backoff on repeated deferrals with a jittered ceiling
 - [x] E07-025 — Cap the deferral count and fail the intent with a clear reason at the limit

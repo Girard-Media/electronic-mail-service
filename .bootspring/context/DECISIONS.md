@@ -17,3 +17,7 @@
 | D13 | freeresend (MIT) lineage kept; usesend (AGPLv3) stays clean-room only | Inherited licence boundary; survives the fork unchanged. |
 | D14 | Node state is disposable; keys are not | Blast nodes are cattle. DKIM private keys live encrypted in Postgres and are materialised at provision time. |
 | D15 | A node is not routable until `90-verify.sh` passes | Three flags: no open relay, DKIM actually signs, port 25 egress works. |
+| D16 | ListKit-class outreach lives here, not in usermails | usermails stays transactional. Cold volume on that MTA/IP would burn password-reset reputation. Positive replies that opt in hand off via `HandoffEvent`. |
+| D17 | A campaign attaches an explicit mailbox pool | `CampaignMailbox` is the join. Named `domainPool` is the fallback when no rows exist. The router is the only mailbox picker (D2 + ARCHITECTURE §3.2). |
+| D18 | Visual HTML builder is optional, never the default composer | D12 stands. ReflexWare's block builder may render `bodyHtml` with a heavy-HTML warning. Cold steps stay plain-text-first. |
+| D19 | Calendar is a booking link, not a Workspace clone | Google Calendar busy/free + first-party booking page. AI drafts may include the URL. AI never auto-sends. `meeting-booked` is the terminal success. |

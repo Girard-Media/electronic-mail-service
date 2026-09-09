@@ -35,7 +35,8 @@ Replies are the product's success metric. Inbound is not an afterthought.
 - [x] E16-031 — Detect auto-replies and do not count them as engagement
 - [ ] E16-032 — Detect referral replies and surface the referred contact for review
 - [ ] E16-033 — Never auto-enrol a referred contact without a compliance pass
-- [ ] E16-034 — Build the unified inbox view across every mailbox in the workspace
+- [x] E16-034a — `GET /app/inbox/threads` lists across mailboxes with campaign / domain / mailbox / intent filters
+- [ ] E16-034 — Build the unified inbox view across every mailbox in the workspace (API is E16-034a; this is the cockpit)
 - [ ] E16-035 — Default the view to interested replies first
 - [ ] E16-036 — Provide filters by classification, campaign, mailbox, and assignment
 - [ ] E16-037 — Provide full-text search across every thread

@@ -34,6 +34,10 @@ ok("mailbox forward add needs mailbox:write", permForAppWrite("POST", "/app/mail
 ok("mailbox GET is allow", permForAppWrite("GET", "/app/mailboxes") === "allow");
 ok("webhook create needs webhook:write", permForAppWrite("POST", "/app/webhooks") === "webhook:write");
 ok("disconnect mailbox needs mailbox:write", permForAppWrite("DELETE", "/app/connected-accounts/x") === "mailbox:write");
+ok("campaign create needs email:send", permForAppWrite("POST", "/app/campaigns") === "email:send");
+ok("campaign pool attach needs email:send", permForAppWrite("PUT", "/app/campaigns/c1/mailboxes") === "email:send");
+ok("campaign GET is allow", permForAppWrite("GET", "/app/campaigns") === "allow");
+ok("inbox threads GET is allow", permForAppWrite("GET", "/app/inbox/threads") === "allow");
 
 ok("works without /app prefix", permForAppWrite("POST", "/keys") === "key:write");
 ok("unknown write fails closed", permForAppWrite("POST", "/app/not-a-real-route") === "deny");

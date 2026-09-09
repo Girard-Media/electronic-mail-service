@@ -1,5 +1,7 @@
 # Epic 15 — Campaigns & the Sequence Engine
 
+**2026-09-09 slice (done):** `CampaignMailbox` join + dashboard API to attach mailboxes/domains + router honouring that set. See `planning/HANDOFF.md`. Next agent: wire `route()` to load the join at send time (**E15-031d**), then enrolment/halt-on-reply (E15-003, E15-018).
+
 - [ ] E15-001 — Create packages/sequence with the durable per-enrolment state machine
 - [ ] E15-002 — Define the legal state transitions and reject anything else
 - [ ] E15-003 — Implement enrolment: lead plus campaign creates a CampaignLead
@@ -31,6 +33,11 @@
 - [ ] E15-029 — Require an operator action to resume an auto-paused campaign
 - [ ] E15-030 — Implement campaign completion when every enrolment reaches a terminal state
 - [ ] E15-031 — Build the campaign creation flow as a linear wizard with no dead ends
+- [x] E15-031a — CampaignMailbox join: attach mailboxes / domains to a campaign (D17)
+- [x] E15-031b — Router honours the attached mailbox set (`mailboxIds`) over named `domainPool`
+- [x] E15-031c — Dashboard API: `GET/POST /app/campaigns`, `PUT /app/campaigns/:id/mailboxes`
+- [ ] E15-031d — Send worker loads `CampaignMailbox` rows and passes `mailboxIds` into `route()` — the join is inert until this
+- [ ] E15-031e — Block launch when `poolCapacityToday` remaining < campaign.dailyCap
 - [ ] E15-032 — Gate campaign creation on the org having capacity and a verified domain
 - [ ] E15-033 — Explain exactly what is missing when the gate blocks
 - [ ] E15-034 — Build the sequence editor with plain-text-first composition

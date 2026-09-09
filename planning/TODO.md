@@ -5,7 +5,7 @@
 The build-loop queue (`bootspring build next` reads this).
 Status: `[ ]` todo · `[~]` in progress · `[x]` done.
 
-**460 / 2502 complete.**
+**466 / 2511 complete.**
 
 Governing documents — read before taking a task:
 
@@ -16,6 +16,7 @@ Governing documents — read before taking a task:
 | `planning/INFRA.md` | The blast-node fleet |
 | `planning/COMPLIANCE.md` | The policy gate and the legal map |
 | `planning/AI.md` | The OpenRouter gateway contract |
+| `planning/HANDOFF.md` | Current ListKit/campaign-pool slice — read before picking E15/E05/E16 |
 
 **Order.** Epics 01–02 gate everything. 03–05 (fleet) gate 06–08 (warmup, router, send).
 09–11 (deliverability, reputation) can run parallel to 12–16 (product) once the fleet exists.
@@ -454,6 +455,8 @@ no manual step, and cannot become routable until it proves it is safe.
 <!-- source: planning/backlog/05-domains-mailboxes.md · 0/90 -->
 # Epic 05 — Domain Fleet Lifecycle, Mailboxes & Personas
 
+**Next after the 2026-09-09 campaign-pool slice:** this epic is the cockpit the attach API needs. Campaigns can already attach mailbox ids; tenants cannot yet create FleetDomain / FleetMailbox rows through a UI. Start at E05-001 / E05-015 / E05-023. See `planning/HANDOFF.md`.
+
 - [ ] E05-001 — Build the FleetDomain registry CRUD in packages/fleet
 - [ ] E05-002 — Implement the FleetDomainStatus state machine with legal transitions only
 - [ ] E05-003 — Refuse REGISTERED → WARMING without spfOk, dkimOk, dmarcOk, mxOk, and siteLiveOk
@@ -636,7 +639,7 @@ No cross-customer warmup pool, ever (ADR-0003).
 
 ---
 
-<!-- source: planning/backlog/07-router.md · 48/105 -->
+<!-- source: planning/backlog/07-router.md · 50/107 -->
 # Epic 07 — Router, Pacing & the Send Path
 
 The router is the only package permitted to make a final send decision.
@@ -651,6 +654,7 @@ Deferral is a first-class success (ARCHITECTURE §3.2).
 - [x] E07-007 — Implement the hard candidate filter: node role is CAMPAIGN, never VERIFY
 - [x] E07-008 — Implement the hard candidate filter: cap headroom greater than zero on all four buckets
 - [x] E07-009 — Implement the hard candidate filter: pool matches the campaign's domain pool
+- [x] E07-009a — Attached `CampaignMailbox` set overrides named `domainPool` (`mailboxIds` on RouteRequest / FilterContext). Empty attach → named pool. Gate: `scripts/campaign-pool-test.mts`
 - [x] E07-010 — Implement the hard candidate filter: policy allows this domain for this jurisdiction
 - [x] E07-011 — Implement the per-recipient-domain cooldown so one company is not hit from one mailbox repeatedly
 - [x] E07-012 — Implement the per-recipient-domain fan-out cap across the whole fleet
@@ -664,6 +668,7 @@ Deferral is a first-class success (ARCHITECTURE §3.2).
 - [x] E07-020 — Record the full route trace on every decision into SendIntent.routeTrace
 - [ ] E07-021 — Make the route trace human-readable in the UI: why this mailbox, why not the others
 - [x] E07-022 — Implement deterministic tie-breaking so identical inputs produce identical plans
+- [x] E07-022a — LRU tie-break on `lastSendAt` before mailboxId (ReflexWare harvest). Equal scores rotate to the idle mailbox; never-sent still breaks on id. Gate: `scripts/campaign-pool-test.mts`
 - [x] E07-023 — Implement the deferral path with a reason enum and a next-attempt time
 - [x] E07-024 — Implement exponential backoff on repeated deferrals with a jittered ceiling
 - [x] E07-025 — Cap the deferral count and fail the intent with a clear reason at the limit
@@ -1500,8 +1505,10 @@ Blocked is the default for whatever we cannot resolve.
 
 ---
 
-<!-- source: planning/backlog/15-campaigns.md · 12/125 -->
+<!-- source: planning/backlog/15-campaigns.md · 15/130 -->
 # Epic 15 — Campaigns & the Sequence Engine
+
+**2026-09-09 slice (done):** `CampaignMailbox` join + dashboard API to attach mailboxes/domains + router honouring that set. See `planning/HANDOFF.md`. Next agent: wire `route()` to load the join at send time (**E15-031d**), then enrolment/halt-on-reply (E15-003, E15-018).
 
 - [ ] E15-001 — Create packages/sequence with the durable per-enrolment state machine
 - [ ] E15-002 — Define the legal state transitions and reject anything else
@@ -1534,6 +1541,11 @@ Blocked is the default for whatever we cannot resolve.
 - [ ] E15-029 — Require an operator action to resume an auto-paused campaign
 - [ ] E15-030 — Implement campaign completion when every enrolment reaches a terminal state
 - [ ] E15-031 — Build the campaign creation flow as a linear wizard with no dead ends
+- [x] E15-031a — CampaignMailbox join: attach mailboxes / domains to a campaign (D17)
+- [x] E15-031b — Router honours the attached mailbox set (`mailboxIds`) over named `domainPool`
+- [x] E15-031c — Dashboard API: `GET/POST /app/campaigns`, `PUT /app/campaigns/:id/mailboxes`
+- [ ] E15-031d — Send worker loads `CampaignMailbox` rows and passes `mailboxIds` into `route()` — the join is inert until this
+- [ ] E15-031e — Block launch when `poolCapacityToday` remaining < campaign.dailyCap
 - [ ] E15-032 — Gate campaign creation on the org having capacity and a verified domain
 - [ ] E15-033 — Explain exactly what is missing when the gate blocks
 - [ ] E15-034 — Build the sequence editor with plain-text-first composition
@@ -1631,7 +1643,7 @@ Blocked is the default for whatever we cannot resolve.
 
 ---
 
-<!-- source: planning/backlog/16-inbox.md · 25/105 -->
+<!-- source: planning/backlog/16-inbox.md · 26/106 -->
 # Epic 16 — Unified Inbox & Reply Handling
 
 Replies are the product's success metric. Inbound is not an afterthought.
@@ -1669,7 +1681,8 @@ Replies are the product's success metric. Inbound is not an afterthought.
 - [x] E16-031 — Detect auto-replies and do not count them as engagement
 - [ ] E16-032 — Detect referral replies and surface the referred contact for review
 - [ ] E16-033 — Never auto-enrol a referred contact without a compliance pass
-- [ ] E16-034 — Build the unified inbox view across every mailbox in the workspace
+- [x] E16-034a — `GET /app/inbox/threads` lists across mailboxes with campaign / domain / mailbox / intent filters
+- [ ] E16-034 — Build the unified inbox view across every mailbox in the workspace (API is E16-034a; this is the cockpit)
 - [ ] E16-035 — Default the view to interested replies first
 - [ ] E16-036 — Provide filters by classification, campaign, mailbox, and assignment
 - [ ] E16-037 — Provide full-text search across every thread
@@ -1882,7 +1895,7 @@ One entry point, versioned prompts, validated output, metered cost, CI evals.
 
 ---
 
-<!-- source: planning/backlog/18-frontend.md · 0/185 -->
+<!-- source: planning/backlog/18-frontend.md · 0/186 -->
 # Epic 18 — Frontend: The Four Cockpits
 
 Next.js 15 App Router per gm-stack, held to app-feel standards.
@@ -1974,6 +1987,7 @@ The campaign builder should be plain and fast, not clever.
 
 ## Campaign cockpit
 - [ ] E18-078 — Build the campaign list with status, progress, and health
+- [ ] E18-078a — Campaign create/detail: attach domains and mailboxes via `PUT /app/campaigns/:id/mailboxes` (API already ships)
 - [ ] E18-079 — Build the campaign creation wizard as a linear flow
 - [ ] E18-080 — Build the sequence editor, plain-text-first
 - [ ] E18-081 — Show the live spam-signal score as the user types

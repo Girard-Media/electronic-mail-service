@@ -89,6 +89,7 @@ The campaign builder should be plain and fast, not clever.
 
 ## Campaign cockpit
 - [ ] E18-078 — Build the campaign list with status, progress, and health
+- [ ] E18-078a — Campaign create/detail: attach domains and mailboxes via `PUT /app/campaigns/:id/mailboxes` (API already ships)
 - [ ] E18-079 — Build the campaign creation wizard as a linear flow
 - [ ] E18-080 — Build the sequence editor, plain-text-first
 - [ ] E18-081 — Show the live spam-signal score as the user types

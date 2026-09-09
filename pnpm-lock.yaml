@@ -47,6 +47,9 @@ importers:
       '@ems/providers':
         specifier: workspace:*
         version: link:../../packages/providers
+      '@ems/router':
+        specifier: workspace:*
+        version: link:../../packages/router
       '@hono/node-server':
         specifier: ^1.13.0
         version: 1.19.17(hono@4.13.5)
