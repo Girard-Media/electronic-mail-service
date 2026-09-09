@@ -44,6 +44,9 @@ importers:
       '@ems/db':
         specifier: workspace:*
         version: link:../../packages/db
+      '@ems/fleet':
+        specifier: workspace:*
+        version: link:../../packages/fleet
       '@ems/providers':
         specifier: workspace:*
         version: link:../../packages/providers

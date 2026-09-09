@@ -78,3 +78,6 @@ export function fleetForTarget(perDay: number, capPerMailbox = 40, mailboxesPerD
   const mailboxes = Math.ceil(perDay / (capPerMailbox * CAPACITY_SAFETY_FACTOR));
   return { mailboxes, domains: Math.ceil(mailboxes / mailboxesPerDomain) };
 }
+
+export * from "./identity.js";
+export * from "./lifecycle.js";

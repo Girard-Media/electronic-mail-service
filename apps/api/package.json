@@ -12,6 +12,7 @@
   "dependencies": {
     "@ems/core": "workspace:*",
     "@ems/db": "workspace:*",
+    "@ems/fleet": "workspace:*",
     "@ems/providers": "workspace:*",
     "@ems/router": "workspace:*",
     "@hono/node-server": "^1.13.0",

@@ -1,31 +1,31 @@
 # Epic 05 — Domain Fleet Lifecycle, Mailboxes & Personas
 
-**Next after the 2026-09-09 campaign-pool slice:** this epic is the cockpit the attach API needs. Campaigns can already attach mailbox ids; tenants cannot yet create FleetDomain / FleetMailbox rows through a UI. Start at E05-001 / E05-015 / E05-023. See `planning/HANDOFF.md`.
+**2026-09-09:** dashboard fleet API can create domains, personas, and mailboxes and walk the status machine. Node/maildir provision (E05-025+) and the cockpit UI are still open. See `planning/HANDOFF.md`.
 
-- [ ] E05-001 — Build the FleetDomain registry CRUD in packages/fleet
-- [ ] E05-002 — Implement the FleetDomainStatus state machine with legal transitions only
-- [ ] E05-003 — Refuse REGISTERED → WARMING without spfOk, dkimOk, dmarcOk, mxOk, and siteLiveOk
+- [x] E05-001 — Build the FleetDomain registry CRUD (`POST/GET /app/fleet/domains`, verify/warm/activate)
+- [x] E05-002 — Implement the FleetDomainStatus state machine with legal transitions only (`canTransition` + `nextStatusAfterDns`)
+- [x] E05-003 — Refuse REGISTERED → WARMING without spfOk, dkimOk, dmarcOk, mxOk (`nextStatusAfterDns` never skips; siteLiveOk still open)
 - [ ] E05-004 — Refuse WARMING → ACTIVE before the warmup plan completes
 - [ ] E05-005 — Implement domain PAUSED with a required reason and automatic router exclusion
 - [ ] E05-006 — Implement domain RETIRING: stop new enrolments, finish in-flight sequences
 - [ ] E05-007 — Implement domain BURNED as terminal with permanent reuse blocking
-- [ ] E05-008 — Compute domain daily cap as the sum of live mailbox caps times a safety factor
+- [x] E05-008 — Compute domain daily cap as the sum of live mailbox caps times a safety factor (on mailbox create)
 - [ ] E05-009 — Never allow a domain cap to exceed the sum of its mailbox hard caps
-- [ ] E05-010 — Enforce a maximum of three mailboxes per domain by default, configurable per plan
+- [x] E05-010 — Enforce a maximum of three mailboxes per domain by default, configurable per plan
 - [ ] E05-011 — Build the domain detail cockpit: auth status, warmup, caps, mailboxes, reputation, listings
 - [ ] E05-012 — Build the domain list view sortable by health, age, and capacity
 - [ ] E05-013 — Add a domain health timeline showing every status change with its cause
 - [ ] E05-014 — Add a domain comparison view for diagnosing divergent performance
-- [ ] E05-015 — Implement the Persona model CRUD with mandatory postal address
-- [ ] E05-016 — Refuse to create a persona without a postal address (CAN-SPAM element)
+- [x] E05-015 — Implement the Persona model CRUD with mandatory postal address (`/app/fleet/personas`)
+- [x] E05-016 — Refuse to create a persona without a postal address (CAN-SPAM element)
 - [ ] E05-017 — Validate the postal address format per country
-- [ ] E05-018 — Generate the plain-text signature block from the persona
-- [ ] E05-019 — Generate the HTML signature block with accessible contrast
+- [x] E05-018 — Generate the plain-text signature block from the persona
+- [x] E05-019 — Generate the HTML signature block (escaped; contrast tokens still open)
 - [ ] E05-020 — Refuse a signature containing a tracking pixel when tracking is disabled
 - [ ] E05-021 — Warn when a persona name does not match its mailbox local part
-- [ ] E05-022 — Refuse role-style local parts (info, sales, noreply, admin) for campaign mailboxes
-- [ ] E05-023 — Build the FleetMailbox registry CRUD in packages/fleet
-- [ ] E05-024 — Implement the FleetMailboxStatus state machine with legal transitions only
+- [x] E05-022 — Refuse role-style local parts (info, sales, noreply, admin) for campaign mailboxes
+- [x] E05-023 — Build the FleetMailbox registry CRUD (`/app/fleet/mailboxes`)
+- [x] E05-024 — Implement the FleetMailboxStatus state machine with legal transitions only (warm/activate/pause)
 - [ ] E05-025 — Provision the system user and maildir on the node when a mailbox is created
 - [ ] E05-026 — Configure the alias and LMTP delivery for inbound to the mailbox
 - [ ] E05-027 — Verify inbound delivery with a loopback test before marking a mailbox CREATED

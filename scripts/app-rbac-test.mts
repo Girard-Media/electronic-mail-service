@@ -37,6 +37,10 @@ ok("disconnect mailbox needs mailbox:write", permForAppWrite("DELETE", "/app/con
 ok("campaign create needs email:send", permForAppWrite("POST", "/app/campaigns") === "email:send");
 ok("campaign pool attach needs email:send", permForAppWrite("PUT", "/app/campaigns/c1/mailboxes") === "email:send");
 ok("campaign launch needs email:send", permForAppWrite("POST", "/app/campaigns/c1/launch") === "email:send");
+ok("fleet domain create needs domain:write", permForAppWrite("POST", "/app/fleet/domains") === "domain:write");
+ok("fleet mailbox create needs mailbox:write", permForAppWrite("POST", "/app/fleet/mailboxes") === "mailbox:write");
+ok("fleet persona create needs mailbox:write", permForAppWrite("POST", "/app/fleet/personas") === "mailbox:write");
+ok("fleet domain GET is allow", permForAppWrite("GET", "/app/fleet/domains") === "allow");
 ok("campaign GET is allow", permForAppWrite("GET", "/app/campaigns") === "allow");
 ok("inbox threads GET is allow", permForAppWrite("GET", "/app/inbox/threads") === "allow");
 

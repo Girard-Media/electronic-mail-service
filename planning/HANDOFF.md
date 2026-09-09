@@ -119,19 +119,15 @@ Work in **`/Users/girardmedia/Documents/WEB/electronic-mail-service`**. Do not o
 - `apps/workers/src/route-intent.ts` loads the join and calls `route({ mailboxIds })` (E15-031d). Persist ROUTED/DEFERRED + `FleetMailbox.lastSendAt`. Does **not** SMTP-emit yet.
 - Queue: `QUEUE_INTENT` / `intentQueue`. Launch enqueues due PENDING/DEFERRED intents.
 
-### Step 2 — tenants need mailboxes to attach (highest leverage now)
-Epic 05 is the blocker behind “connect domains.” Schema `FleetDomain` / `FleetMailbox` / `Persona` exists; there is no CRUD API/UI.
+### Step 2 — tenants need mailboxes to attach — **API done 2026-09-09**
+- `POST /app/fleet/domains` mints DKIM, returns records to publish
+- `POST /app/fleet/domains/:id/verify` walks REGISTERED → DNS_PENDING → AGING (never skips to WARMING)
+- `POST …/warm` and `…/activate` are explicit promotions
+- Personas require a postal address; mailboxes refuse role local-parts; cap 3 per domain
+- Mailbox create needs a CAMPAIGN `BlastNode` (org-owned or platform). **409 `no_campaign_node` until Epic 03 provisions one.**
+- No cockpit UI yet (E18). No maildir provision (E05-025).
 
-Minimum to dogfood attach:
-
-- E05-015 Persona with postal address (CAN-SPAM)
-- E05-022 refuse role local-parts
-- E05-023 FleetMailbox CRUD
-- E05-001 FleetDomain CRUD + DNS verify (usermails domain flow was forked — reuse, don’t rewrite DKIM)
-
-Default 2 inboxes/domain, hard cap 3 (E05-010).
-
-### Step 3 — inbox that salespeople can use
+### Step 3 — inbox that salespeople can use (next product surface after a node exists)
 - E16-010 link inbound to lead + campaign + mailbox (`SendIntent.messageId` ↔ `In-Reply-To`)
 - E16-034 cockpit on top of `GET /app/inbox/threads`
 - E16-041 reply from the receiving mailbox only

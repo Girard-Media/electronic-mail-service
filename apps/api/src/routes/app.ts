@@ -36,6 +36,7 @@ import { billing } from "./billing.js";
 import { privacy } from "./privacy.js";
 import { campaigns } from "./campaigns.js";
 import { inbox } from "./inbox.js";
+import { fleet } from "./fleet.js";
 import { enqueueEmail, cancelEmail } from "../lib/send.js";
 import { sendFromMailbox, replyToMessage } from "../lib/mailbox-actions.js";
 import { checkDomainRecords } from "../lib/domain-records.js";
@@ -73,6 +74,7 @@ dash.route("/billing", billing);
 dash.route("/privacy", privacy);
 dash.route("/campaigns", campaigns);
 dash.route("/inbox", inbox);
+dash.route("/fleet", fleet);
 
 // Resolve the session org's plan limits (server is the sole authority — the
 // dashboard's checks are UX only). God Mode operator workspaces self-heal to

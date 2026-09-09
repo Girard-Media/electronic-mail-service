@@ -52,6 +52,8 @@ export function permForAppWrite(method: string, pathname: string): WriteDecision
   if (p === "/webhooks" || /^\/webhooks\/[^/]+$/.test(p)) return "webhook:write";
   if (p.startsWith("/connected-accounts")) return "mailbox:write";
   if (p.startsWith("/campaigns")) return "email:send";
+  if (p.startsWith("/fleet/domains")) return "domain:write";
+  if (p.startsWith("/fleet/mailboxes") || p.startsWith("/fleet/personas")) return "mailbox:write";
   return "deny";
 }
 
