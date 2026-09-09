@@ -54,6 +54,7 @@ export function permForAppWrite(method: string, pathname: string): WriteDecision
   if (p.startsWith("/campaigns")) return "email:send";
   if (p.startsWith("/fleet/domains")) return "domain:write";
   if (p.startsWith("/fleet/mailboxes") || p.startsWith("/fleet/personas")) return "mailbox:write";
+  if (p.startsWith("/inbox")) return "mailbox:write";
   return "deny";
 }
 

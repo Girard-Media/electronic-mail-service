@@ -41,6 +41,8 @@ ok("fleet domain create needs domain:write", permForAppWrite("POST", "/app/fleet
 ok("fleet mailbox create needs mailbox:write", permForAppWrite("POST", "/app/fleet/mailboxes") === "mailbox:write");
 ok("fleet persona create needs mailbox:write", permForAppWrite("POST", "/app/fleet/personas") === "mailbox:write");
 ok("fleet domain GET is allow", permForAppWrite("GET", "/app/fleet/domains") === "allow");
+ok("campaign enroll needs email:send", permForAppWrite("POST", "/app/campaigns/c1/enroll") === "email:send");
+ok("inbox outcome needs mailbox:write", permForAppWrite("POST", "/app/inbox/threads/t1/outcome") === "mailbox:write");
 ok("campaign GET is allow", permForAppWrite("GET", "/app/campaigns") === "allow");
 ok("inbox threads GET is allow", permForAppWrite("GET", "/app/inbox/threads") === "allow");
 

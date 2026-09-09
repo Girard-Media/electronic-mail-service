@@ -2,6 +2,8 @@ import { Hono } from "hono";
 import { z } from "zod";
 import { prisma } from "@ems/db";
 import { errors, intentQueue } from "@ems/core";
+import { isDeceptiveFirstTouch } from "@ems/sequence";
+import { enrolLeads } from "../lib/enrol.js";
 import {
   mergeAttach,
   poolCapacityToday,
@@ -243,4 +245,94 @@ campaigns.delete("/:id/mailboxes/:mailboxId", async (c) => {
     where: { campaignId: campaign.id, mailboxId: c.req.param("mailboxId") },
   });
   return c.json({ ok: true });
+});
+
+campaigns.post("/:id/steps", async (c) => {
+  const campaign = await campaignOfOrg(c.get("orgId"), c.req.param("id"));
+  const parsed = z.object({
+    subject: z.string().trim().min(1).max(200),
+    bodyText: z.string().trim().min(1).max(20_000),
+    bodyHtml: z.string().max(80_000).optional(),
+    delayDays: z.number().int().min(0).max(60).optional(),
+    delayHours: z.number().int().min(0).max(23).optional(),
+    isFirstTouch: z.boolean().optional(),
+  }).safeParse(await c.req.json().catch(() => ({})));
+  if (!parsed.success) throw errors.validation("subject and bodyText are required.");
+  const last = await prisma.sequenceStep.findFirst({
+    where: { campaignId: campaign.id },
+    orderBy: { position: "desc" },
+    select: { position: true },
+  });
+  const position = (last?.position ?? -1) + 1;
+  const isFirstTouch = parsed.data.isFirstTouch ?? position === 0;
+  if (isDeceptiveFirstTouch(parsed.data.subject, isFirstTouch)) {
+    throw errors.validation("A first-touch step cannot use a RE:/FW: subject.");
+  }
+  const step = await prisma.sequenceStep.create({
+    data: {
+      campaignId: campaign.id,
+      position,
+      delayDays: parsed.data.delayDays ?? 0,
+      delayHours: parsed.data.delayHours ?? 0,
+      isFirstTouch,
+      variants: {
+        create: {
+          label: "A",
+          subject: parsed.data.subject,
+          bodyText: parsed.data.bodyText,
+          bodyHtml: parsed.data.bodyHtml ?? null,
+          weight: 1,
+        },
+      },
+    },
+    include: { variants: true },
+  });
+  return c.json({ data: step }, 201);
+});
+
+campaigns.post("/:id/enroll", async (c) => {
+  const campaign = await campaignOfOrg(c.get("orgId"), c.req.param("id"));
+  const parsed = z.object({
+    leadIds: z.array(z.string().min(1)).max(500).optional(),
+    listId: z.string().min(1).optional(),
+  }).safeParse(await c.req.json().catch(() => ({})));
+  if (!parsed.success) throw errors.validation("leadIds or listId is required.");
+  let leadIds = parsed.data.leadIds ?? [];
+  if (parsed.data.listId) {
+    const members = await prisma.leadListMembership.findMany({
+      where: { listId: parsed.data.listId, list: { orgId: c.get("orgId") } },
+      select: { leadId: true },
+    });
+    leadIds = [...new Set([...leadIds, ...members.map((m) => m.leadId)])];
+  }
+  if (leadIds.length === 0) throw errors.validation("leadIds or listId is required.");
+  const result = await enrolLeads({
+    orgId: c.get("orgId"),
+    projectId: c.get("projectId"),
+    campaignId: campaign.id,
+    leadIds,
+  });
+  return c.json({ data: result });
+});
+
+campaigns.get("/:id/enrollments", async (c) => {
+  const campaign = await campaignOfOrg(c.get("orgId"), c.req.param("id"));
+  const rows = await prisma.campaignLead.findMany({
+    where: { campaignId: campaign.id },
+    orderBy: { enrolledAt: "desc" },
+    take: 200,
+    include: { lead: { select: { id: true, email: true, status: true } } },
+  });
+  return c.json({
+    data: rows.map((r) => ({
+      id: r.id,
+      state: r.state,
+      currentStep: r.currentStep,
+      nextDueAt: r.nextDueAt,
+      stoppedReason: r.stoppedReason,
+      leadId: r.lead.id,
+      email: r.lead.email,
+      leadStatus: r.lead.status,
+    })),
+  });
 });

@@ -127,7 +127,14 @@ Work in **`/Users/girardmedia/Documents/WEB/electronic-mail-service`**. Do not o
 - Mailbox create needs a CAMPAIGN `BlastNode` (org-owned or platform). **409 `no_campaign_node` until Epic 03 provisions one.**
 - No cockpit UI yet (E18). No maildir provision (E05-025).
 
-### Step 3 — inbox that salespeople can use (next product surface after a node exists)
+### Step 2b — enrolment + halt-on-reply — **done 2026-09-09**
+- `POST /app/campaigns/:id/steps` then `POST /app/campaigns/:id/enroll` `{ leadIds | listId }`
+- Frozen/suppressed leads get `BLOCKED_BY_POLICY` rows, not a silent skip
+- First SendIntent only (E15-008). Due at `scheduleStep` in the lead's timezone
+- `POST /app/inbox/threads/:id/outcome` `{ intent }` halt INTERESTED/NOT_INTERESTED/REFERRAL across every campaign; UNSUBSCRIBE too. OOO/auto-reply do not halt
+- Stub CAMPAIGN `BlastNode` (PROVISIONING) + RFC1918 IP auto-created so mailbox create is unblocked. **Not routable** until 90-verify
+
+### Step 3 — inbox that salespeople can use (next product surface)
 - E16-010 link inbound to lead + campaign + mailbox (`SendIntent.messageId` ↔ `In-Reply-To`)
 - E16-034 cockpit on top of `GET /app/inbox/threads`
 - E16-041 reply from the receiving mailbox only

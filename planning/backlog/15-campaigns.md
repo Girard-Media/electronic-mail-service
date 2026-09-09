@@ -1,15 +1,15 @@
 # Epic 15 — Campaigns & the Sequence Engine
 
-**2026-09-09 slice (done):** mailbox pool join, launch capacity gate, intent worker that passes `mailboxIds` into `route()`. Stops at ROUTED/DEFERRED — SMTP emit is later. Next: enrolment/halt-on-reply (E15-003, E15-018), then Epic 05 so tenants can create fleet mailboxes. See `planning/HANDOFF.md`.
+**2026-09-09:** pool + launch + fleet API + enrolment/halt-on-reply. SMTP emit and full jurisdiction gate still open. See `planning/HANDOFF.md`.
 
-- [ ] E15-001 — Create packages/sequence with the durable per-enrolment state machine
-- [ ] E15-002 — Define the legal state transitions and reject anything else
-- [ ] E15-003 — Implement enrolment: lead plus campaign creates a CampaignLead
-- [ ] E15-004 — Run the compliance gate at enrolment as well as at send
-- [ ] E15-005 — Mark an enrolment BLOCKED_BY_POLICY with the reason rather than silently skipping
+- [x] E15-001 — Create packages/sequence with the durable per-enrolment state machine
+- [x] E15-002 — Define the legal state transitions and reject anything else
+- [x] E15-003 — Implement enrolment: lead plus campaign creates a CampaignLead (`POST /app/campaigns/:id/enroll`)
+- [ ] E15-004 — Run the compliance gate at enrolment as well as at send (frozen/suppression ship; jurisdiction still send-path only)
+- [x] E15-005 — Mark an enrolment BLOCKED_BY_POLICY with the reason rather than silently skipping
 - [x] E15-006 — Implement step materialisation into SendIntent with a computed dueAt
 - [x] E15-007 — Compute dueAt from the previous step, the delay, the window, and the timezone
-- [ ] E15-008 — Never materialise more than the next step per enrolment
+- [x] E15-008 — Never materialise more than the next step per enrolment (enrol creates only the first SendIntent)
 - [ ] E15-009 — Implement step conditions: no reply, opened, clicked, custom field match
 - [ ] E15-010 — Evaluate conditions at materialisation, not at creation
 - [x] E15-011 — Implement variant assignment deterministically from hash(leadId, stepId)
@@ -19,8 +19,8 @@
 - [ ] E15-015 — Compute variant significance and refuse to declare a winner too early
 - [ ] E15-016 — Show the confidence interval on every variant comparison
 - [ ] E15-017 — Never auto-promote a variant on an underpowered sample
-- [ ] E15-018 — Implement reply detection stopping the enrolment immediately
-- [ ] E15-019 — Propagate a reply as a domain event stopping every campaign for that person
+- [x] E15-018 — Implement reply detection stopping the enrolment immediately (`POST /app/inbox/threads/:id/outcome`)
+- [x] E15-019 — Propagate a reply as a domain event stopping every campaign for that person (`haltLeadAcrossCampaigns`)
 - [ ] E15-020 — Implement the company-level stop when configured
 - [ ] E15-021 — Implement bounce handling: suppress the address and stop the enrolment
 - [ ] E15-022 — Implement hard-bounce clustering triggering a domain-level pause

@@ -1,6 +1,8 @@
 import { Hono } from "hono";
+import { z } from "zod";
 import { prisma } from "@ems/db";
 import { errors } from "@ems/core";
+import { haltLeadAcrossCampaigns, haltTargetForIntent } from "../lib/halt.js";
 import type { SessionVars } from "../middleware/session.js";
 
 /**
@@ -65,4 +67,40 @@ inbox.get("/threads", async (c) => {
       lastMessageAt: t.lastMessageAt,
     })),
   });
+});
+
+inbox.post("/threads/:id/outcome", async (c) => {
+  const orgId = c.get("orgId");
+  const parsed = z.object({
+    intent: z.enum([
+      "INTERESTED",
+      "NOT_INTERESTED",
+      "OUT_OF_OFFICE",
+      "REFERRAL",
+      "UNSUBSCRIBE",
+      "AUTO_REPLY",
+      "BOUNCE",
+      "OTHER",
+    ]),
+  }).safeParse(await c.req.json().catch(() => ({})));
+  if (!parsed.success) throw errors.validation("intent is required.");
+  const thread = await prisma.inboxThread.findFirst({
+    where: { id: c.req.param("id"), orgId },
+  });
+  if (!thread) throw errors.notFound("Thread not found.");
+  await prisma.inboxThread.update({
+    where: { id: thread.id },
+    data: { intent: parsed.data.intent, intentCorrectedTo: parsed.data.intent },
+  });
+  const haltTo = haltTargetForIntent(parsed.data.intent);
+  let halt = { halted: 0, cancelledIntents: 0 };
+  if (haltTo && thread.leadId) {
+    halt = await haltLeadAcrossCampaigns({
+      orgId,
+      leadId: thread.leadId,
+      to: haltTo,
+      reason: `inbox:${parsed.data.intent}`,
+    });
+  }
+  return c.json({ data: { threadId: thread.id, intent: parsed.data.intent, halt } });
 });

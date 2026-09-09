@@ -6,21 +6,7 @@ import { hash32 } from "./schedule.js";
  * as a domain event rather than a per-campaign check (E15-019).
  */
 
-export type EnrollmentState =
-  | "PENDING" | "ACTIVE" | "REPLIED" | "BOUNCED"
-  | "UNSUBSCRIBED" | "COMPLETED" | "STOPPED" | "BLOCKED_BY_POLICY";
-
-export const TERMINAL: EnrollmentState[] = [
-  "REPLIED", "BOUNCED", "UNSUBSCRIBED", "COMPLETED", "STOPPED", "BLOCKED_BY_POLICY",
-];
-
-export const ENROLLMENT_TRANSITIONS: Record<EnrollmentState, EnrollmentState[]> = {
-  PENDING: ["ACTIVE", "BLOCKED_BY_POLICY", "STOPPED"],
-  ACTIVE: ["REPLIED", "BOUNCED", "UNSUBSCRIBED", "COMPLETED", "STOPPED"],
-  REPLIED: [], BOUNCED: [], UNSUBSCRIBED: [], COMPLETED: [], STOPPED: [], BLOCKED_BY_POLICY: [],
-};
-
-// SendWindow lives in ./schedule.ts — declaring it here would shadow it.
+// EnrollmentState / TERMINAL / ENROLLMENT_TRANSITIONS live in ./enroll.ts.
 
 /**
  * Variant assignment is deterministic from (leadId, stepId) so re-runs are
@@ -40,11 +26,6 @@ export function assignVariant(leadId: string, stepId: string, weights: number[])
   return weights.length - 1;
 }
 
-/** A first-touch step may never use RE:/FW: — deceptive subject, illegal (E15-063). */
-const DECEPTIVE_PREFIX = /^\s*(re|fw|fwd)\s*:/i;
-
-export function isDeceptiveFirstTouch(subject: string, isFirstTouch: boolean): boolean {
-  return isFirstTouch && DECEPTIVE_PREFIX.test(subject);
-}
-
 export * from "./schedule.js";
+export * from "./enroll.js";
+export * from "./halt.js";

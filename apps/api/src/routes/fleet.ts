@@ -34,19 +34,42 @@ const nameSchema = z.string().min(3).transform((s) =>
   s.toLowerCase().trim().replace(/^https?:\/\//, "").replace(/\/.*$/, ""),
 );
 
-async function campaignNodeId(orgId: string): Promise<string | null> {
-  const own = await prisma.blastNode.findFirst({
-    where: { orgId, role: "CAMPAIGN", status: { in: ["ACTIVE", "VERIFYING"] } },
-    orderBy: { createdAt: "asc" },
+/** Find a CAMPAIGN node or create a PROVISIONING stub so mailbox rows can exist before Epic 03 hardware. */
+async function ensureCampaignNode(orgId: string): Promise<string> {
+  const existing = await prisma.blastNode.findFirst({
+    where: {
+      role: "CAMPAIGN",
+      status: { not: "RETIRED" },
+      OR: [{ orgId }, { orgId: null }],
+    },
+    orderBy: [{ orgId: "desc" }, { createdAt: "asc" }],
     select: { id: true },
   });
-  if (own) return own.id;
-  const shared = await prisma.blastNode.findFirst({
-    where: { orgId: null, role: "CAMPAIGN", status: { in: ["ACTIVE", "VERIFYING", "PROVISIONING"] } },
-    orderBy: { createdAt: "asc" },
-    select: { id: true },
+  if (existing) return existing.id;
+  const slug = orgId.replace(/[^a-z0-9]/gi, "").slice(0, 12).toLowerCase() || "org";
+  const node = await prisma.blastNode.create({
+    data: {
+      orgId,
+      name: `campaign-${slug}`,
+      hostname: `mta-${slug}.pending.electronicmailservices.com`,
+      role: "CAMPAIGN",
+      status: "PROVISIONING",
+      relayTestOk: false,
+      dkimTestOk: false,
+      egress25Ok: false,
+      notes: "Stub node auto-created so mailboxes can be registered. Not routable until 90-verify.sh passes.",
+    },
   });
-  return shared?.id ?? null;
+  const n = Number.parseInt(node.id.replace(/\D/g, "").slice(-6) || "1", 10) % 65_000;
+  await prisma.sendingIp.create({
+    data: {
+      nodeId: node.id,
+      address: `10.254.${Math.floor(n / 256)}.${n % 256}`,
+      status: "NEW",
+      pool: "default",
+    },
+  });
+  return node.id;
 }
 
 async function defaultIpId(nodeId: string): Promise<string | null> {
@@ -118,8 +141,8 @@ fleet.post("/domains", async (c) => {
   if (taken) throw errors.conflict("domain_taken", `The domain "${name}" is already registered.`);
 
   const keys = generateDkimKeypair("ems");
-  const nodeId = await campaignNodeId(orgId);
-  const ipId = nodeId ? await defaultIpId(nodeId) : null;
+  const nodeId = await ensureCampaignNode(orgId);
+  const ipId = await defaultIpId(nodeId);
   const row = await prisma.fleetDomain.create({
     data: {
       orgId,
@@ -266,8 +289,7 @@ fleet.post("/mailboxes", async (c) => {
   const slot = mailboxSlotError(live, MAX_MAILBOXES_PER_DOMAIN);
   if (slot) throw errors.conflict("mailbox_cap", slot);
 
-  const nodeId = await campaignNodeId(orgId);
-  if (!nodeId) throw errors.conflict("no_campaign_node", "No campaign blast node is provisioned yet.");
+  const nodeId = await ensureCampaignNode(orgId);
 
   const address = `${local}@${domain.name}`;
   const exists = await prisma.fleetMailbox.findUnique({ where: { address } });
