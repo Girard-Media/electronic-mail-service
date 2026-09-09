@@ -10,14 +10,21 @@ export const connection = new Redis(env.QUEUE_URL, {
 export const QUEUE_SEND = "send";
 export const QUEUE_WEBHOOK = "webhook";
 export const QUEUE_FEEDBACK = "feedback";
+export const QUEUE_INTENT = "intent";
 
 export const sendQueue = new Queue(QUEUE_SEND, { connection });
 export const webhookQueue = new Queue(QUEUE_WEBHOOK, { connection });
 export const feedbackQueue = new Queue(QUEUE_FEEDBACK, { connection });
+export const intentQueue = new Queue(QUEUE_INTENT, { connection });
 
 /** Payload for a send job — keep it small; workers load the row from the database. */
 export interface SendJobData {
   emailId: string;
+}
+
+/** Route one campaign SendIntent through @ems/router (E15-031d). */
+export interface IntentJobData {
+  intentId: string;
 }
 
 /** Payload for a webhook delivery job. */

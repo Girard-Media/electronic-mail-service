@@ -13,6 +13,7 @@
     "@ems/core": "workspace:*",
     "@ems/db": "workspace:*",
     "@ems/providers": "workspace:*",
+    "@ems/router": "workspace:*",
     "bullmq": "^5.34.0",
     "tsx": "^4.19.0"
   },

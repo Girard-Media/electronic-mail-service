@@ -276,6 +276,9 @@ importers:
       '@ems/providers':
         specifier: workspace:*
         version: link:../../packages/providers
+      '@ems/router':
+        specifier: workspace:*
+        version: link:../../packages/router
       bullmq:
         specifier: ^5.34.0
         version: 5.81.4

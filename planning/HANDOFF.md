@@ -2,7 +2,7 @@
 
 **Date:** 2026-09-09
 **Repos:** work is in **this repo** (`electronic-mail-service`). usermails only recorded D15.
-**State:** **uncommitted** in both trees. No deploy. Migration **not applied** to any live DB.
+**State:** usermails D15 and EMS pool slice are **committed** (`2e929dd`, `cf84319`). Follow-up (launch gate + intent worker) may be uncommitted on EMS. Migration **not applied** to any live DB.
 
 A cold reader should resume here without re-deriving the product split.
 
@@ -114,18 +114,12 @@ Work in **`/Users/girardmedia/Documents/WEB/electronic-mail-service`**. Do not o
 3. Apply migration locally: `pnpm db:migrate`.
 4. `pnpm infra:up` then `pnpm exec tsx scripts/send-path-test.mts` to confirm no router regression.
 
-### Step 1 — make the pool actually send (highest leverage)
-**E15-031d.** Find the campaign send worker / intent emitter. When calling `route()`, load `CampaignMailbox` for that campaign and pass `mailboxIds`. Until this exists, PUT /mailboxes only writes rows.
+### Step 1 — make the pool actually send — **done 2026-09-09**
+- `POST /app/campaigns/:id/launch` runs `decideLaunch` (E15-031e).
+- `apps/workers/src/route-intent.ts` loads the join and calls `route({ mailboxIds })` (E15-031d). Persist ROUTED/DEFERRED + `FleetMailbox.lastSendAt`. Does **not** SMTP-emit yet.
+- Queue: `QUEUE_INTENT` / `intentQueue`. Launch enqueues due PENDING/DEFERRED intents.
 
-Harvest reservation from ReflexWare (do not copy usesend):
-
-- Pure selector already in `@ems/router` (`select` + `reject`)
-- Atomic claim already in `@ems/router` `buckets.ts` (`claim`)
-- ReflexWare reference: `src/lib/email/mailbox-rotation.ts` + `reserveMailboxForSend` in `src/services/mailbox.service.ts`
-
-**E15-031e.** Refuse launch when `poolCapacityToday.remainingToday < campaign.dailyCap`.
-
-### Step 2 — tenants need mailboxes to attach
+### Step 2 — tenants need mailboxes to attach (highest leverage now)
 Epic 05 is the blocker behind “connect domains.” Schema `FleetDomain` / `FleetMailbox` / `Persona` exists; there is no CRUD API/UI.
 
 Minimum to dogfood attach:

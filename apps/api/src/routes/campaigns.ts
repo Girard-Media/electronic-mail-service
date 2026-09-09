@@ -1,11 +1,14 @@
 import { Hono } from "hono";
 import { z } from "zod";
 import { prisma } from "@ems/db";
-import { errors } from "@ems/core";
+import { errors, intentQueue } from "@ems/core";
 import {
   mergeAttach,
   poolCapacityToday,
   isAttachableStatus,
+  decideLaunch,
+  isLaunchableStatus,
+  loadCampaignPool,
   type PoolMailbox,
 } from "@ems/router";
 import type { SessionVars } from "../middleware/session.js";
@@ -112,12 +115,12 @@ campaigns.get("/:id", async (c) => {
     },
   });
   if (!row) throw errors.notFound("Campaign not found.");
-  const pool = poolView(row.mailboxes);
+  const loaded = await loadCampaignPool(row.id, orgId);
   const cap = poolCapacityToday(
-    row.mailboxes.map((m) => ({
-      status: m.mailbox.status,
-      dailyCap: m.mailbox.dailyCap,
-      sentToday: 0,
+    (loaded?.mailboxes ?? []).map((m) => ({
+      status: m.status,
+      dailyCap: m.dailyCap,
+      sentToday: m.sentToday,
     })),
   );
   return c.json({
@@ -127,9 +130,62 @@ campaigns.get("/:id", async (c) => {
       status: row.status,
       dailyCap: row.dailyCap,
       domainPool: row.domainPool,
-      pool,
+      pool: poolView(row.mailboxes),
       capacity: cap,
       createdAt: row.createdAt,
+    },
+  });
+});
+
+campaigns.post("/:id/launch", async (c) => {
+  const orgId = c.get("orgId");
+  const loaded = await loadCampaignPool(c.req.param("id"), orgId);
+  if (!loaded) throw errors.notFound("Campaign not found.");
+  if (!isLaunchableStatus(loaded.campaign.status)) {
+    throw errors.conflict(
+      "not_launchable",
+      `Campaign is ${loaded.campaign.status} and cannot launch.`,
+    );
+  }
+  const decision = decideLaunch(
+    loaded.campaign.dailyCap,
+    loaded.mailboxes.map((m) => ({
+      status: m.status,
+      dailyCap: m.dailyCap,
+      sentToday: m.sentToday,
+    })),
+  );
+  if (!decision.ok) {
+    throw errors.conflict(decision.code, decision.message);
+  }
+
+  const updated = await prisma.campaign.update({
+    where: { id: loaded.campaign.id },
+    data: { status: "RUNNING", startedAt: new Date() },
+  });
+
+  const due = await prisma.sendIntent.findMany({
+    where: {
+      campaignId: updated.id,
+      state: { in: ["PENDING", "DEFERRED"] },
+      dueAt: { lte: new Date() },
+    },
+    select: { id: true },
+    take: 500,
+  });
+  if (due.length > 0) {
+    await intentQueue.addBulk(
+      due.map((i) => ({ name: "route", data: { intentId: i.id }, opts: { jobId: `intent-${i.id}` } })),
+    );
+  }
+
+  return c.json({
+    data: {
+      id: updated.id,
+      status: updated.status,
+      startedAt: updated.startedAt,
+      capacity: decision.capacity,
+      queuedIntents: due.length,
     },
   });
 });

@@ -7,7 +7,8 @@
 import {
   reject, select,
   resolveCampaignPool, expandDomainAttach, mergeAttach, poolCapacityToday, isAttachableStatus,
-  type Candidate, type FilterContext,
+  decideLaunch, isLaunchableStatus, applyRouteResult, toCandidate, defaultFilterContext,
+  type Candidate, type FilterContext, type FleetCandidateRow,
 } from "../packages/router/src/index.js";
 
 let failures = 0;
@@ -103,6 +104,49 @@ console.log("\n--- router: LRU tie-break ---");
     s.chosen?.mailboxId === "mbx-idle", String(s.chosen?.mailboxId));
   const tied = [mailbox("zzz"), mailbox("aaa")];
   ok("never-sent still breaks ties on id", select(tied, ctx()).chosen?.mailboxId === "aaa");
+}
+
+console.log("\n--- launch gate ---");
+{
+  const active = { status: "ACTIVE", dailyCap: 40, sentToday: 10 };
+  ok("DRAFT is launchable", isLaunchableStatus("DRAFT"));
+  ok("RUNNING is not launchable", !isLaunchableStatus("RUNNING"));
+  ok("AUTO_PAUSED is not self-serve launchable", !isLaunchableStatus("AUTO_PAUSED"));
+  const okLaunch = decideLaunch(50, [active, { status: "ACTIVE", dailyCap: 40, sentToday: 0 }]);
+  ok("launch allowed when remaining covers dailyCap", okLaunch.ok && okLaunch.capacity.remainingToday === 70);
+  const short = decideLaunch(200, [active, { status: "ACTIVE", dailyCap: 40, sentToday: 0 }]);
+  ok("launch blocked when remaining < dailyCap", !short.ok && short.code === "capacity-short");
+  const empty = decideLaunch(10, [{ status: "WARMING", dailyCap: 5, sentToday: 0 }]);
+  ok("launch blocked with no ACTIVE mailboxes", !empty.ok && empty.code === "no-active-mailboxes");
+}
+
+console.log("\n--- route result patch + filter context ---");
+{
+  const routed = applyRouteResult({
+    kind: "plan",
+    mailboxId: "mbx-a",
+    sendAt: AT,
+    score: 0.8,
+    trace: { candidatesConsidered: 1, candidatesFiltered: [], chosen: { mailboxId: "mbx-a", factors: { reputationScore: 1, headroom: 1, espAffinity: 1, warmupFit: 1, recencyPenalty: 0, riskPenalty: 0 } }, runnersUp: [], weightsVersion: "w1" },
+  }, 0);
+  ok("a plan patches ROUTED with the chosen mailbox", routed.state === "ROUTED" && routed.mailboxId === "mbx-a");
+  const deferred = applyRouteResult({
+    kind: "defer", until: AT, reason: "no-candidates", bindingConstraint: "pool-mismatch (3 of 3)",
+  }, 2);
+  ok("a deferral increments deferCount", deferred.state === "DEFERRED" && deferred.deferCount === 3);
+  const fc = defaultFilterContext({ at: AT, pool: "default", mailboxIds: ["a", "b"], esp: "google", recipientDomain: "acme.com" });
+  ok("filter context carries the attached set", fc.mailboxIds instanceof Set && fc.mailboxIds.size === 2);
+  const named = defaultFilterContext({ at: AT, pool: "default", mailboxIds: null, esp: "google", recipientDomain: "acme.com" });
+  ok("named-pool fallback leaves mailboxIds empty", !named.mailboxIds || named.mailboxIds.size === 0);
+  const row: FleetCandidateRow = {
+    id: "m1", domainId: "d1", nodeId: "n1", ipId: "ip1",
+    mailboxStatus: "WARMING", domainStatus: "WARMING", ipStatus: "WARMING",
+    nodeStatus: "ACTIVE", nodeRole: "CAMPAIGN", nodeVerified: true, pool: "default",
+    domainVerified: true, domainAgeReadyAt: null, warmupHoldAt: null,
+    mailboxDailyCap: 5, mailboxSentToday: 0, reputationScore: 0.5, warmupDay: 3,
+    lastSendAt: null, domainDailyCap: 10, ipHourlyCap: 20,
+  };
+  ok("toCandidate keeps WARMING so the router can refuse it", toCandidate(row).mailboxStatus === "WARMING");
 }
 
 console.log(failures ? `\n${failures} FAILED` : "\nALL PASS");

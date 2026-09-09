@@ -135,6 +135,10 @@ export function score(factors: ScoreFactors, w: RouterWeights = DEFAULT_WEIGHTS)
 export * from "./buckets.js";
 export * from "./candidates.js";
 export * from "./pool.js";
+export * from "./launch.js";
+export * from "./fleet-map.js";
+export * from "./persist.js";
+export * from "./campaign-load.js";
 
 import { select, type Candidate, type FilterContext } from "./candidates.js";
 import { buildSpecs, claim, type BucketClient, type BucketInputs } from "./buckets.js";

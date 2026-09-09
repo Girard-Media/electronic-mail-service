@@ -5,7 +5,7 @@
 The build-loop queue (`bootspring build next` reads this).
 Status: `[ ]` todo · `[~]` in progress · `[x]` done.
 
-**466 / 2511 complete.**
+**468 / 2511 complete.**
 
 Governing documents — read before taking a task:
 
@@ -1505,10 +1505,10 @@ Blocked is the default for whatever we cannot resolve.
 
 ---
 
-<!-- source: planning/backlog/15-campaigns.md · 15/130 -->
+<!-- source: planning/backlog/15-campaigns.md · 17/130 -->
 # Epic 15 — Campaigns & the Sequence Engine
 
-**2026-09-09 slice (done):** `CampaignMailbox` join + dashboard API to attach mailboxes/domains + router honouring that set. See `planning/HANDOFF.md`. Next agent: wire `route()` to load the join at send time (**E15-031d**), then enrolment/halt-on-reply (E15-003, E15-018).
+**2026-09-09 slice (done):** mailbox pool join, launch capacity gate, intent worker that passes `mailboxIds` into `route()`. Stops at ROUTED/DEFERRED — SMTP emit is later. Next: enrolment/halt-on-reply (E15-003, E15-018), then Epic 05 so tenants can create fleet mailboxes. See `planning/HANDOFF.md`.
 
 - [ ] E15-001 — Create packages/sequence with the durable per-enrolment state machine
 - [ ] E15-002 — Define the legal state transitions and reject anything else
@@ -1544,8 +1544,8 @@ Blocked is the default for whatever we cannot resolve.
 - [x] E15-031a — CampaignMailbox join: attach mailboxes / domains to a campaign (D17)
 - [x] E15-031b — Router honours the attached mailbox set (`mailboxIds`) over named `domainPool`
 - [x] E15-031c — Dashboard API: `GET/POST /app/campaigns`, `PUT /app/campaigns/:id/mailboxes`
-- [ ] E15-031d — Send worker loads `CampaignMailbox` rows and passes `mailboxIds` into `route()` — the join is inert until this
-- [ ] E15-031e — Block launch when `poolCapacityToday` remaining < campaign.dailyCap
+- [x] E15-031d — Send worker loads `CampaignMailbox` rows and passes `mailboxIds` into `route()` (`apps/workers/src/route-intent.ts`, `QUEUE_INTENT`)
+- [x] E15-031e — Block launch when `poolCapacityToday` remaining < campaign.dailyCap (`POST /app/campaigns/:id/launch` + `decideLaunch`)
 - [ ] E15-032 — Gate campaign creation on the org having capacity and a verified domain
 - [ ] E15-033 — Explain exactly what is missing when the gate blocks
 - [ ] E15-034 — Build the sequence editor with plain-text-first composition

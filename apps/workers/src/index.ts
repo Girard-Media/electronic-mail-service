@@ -12,6 +12,7 @@ import {
   QUEUE_SEND,
   QUEUE_WEBHOOK,
   QUEUE_FEEDBACK,
+  QUEUE_INTENT,
   pingHeartbeat,
   decryptSecret,
   encryptSecret,
@@ -26,6 +27,7 @@ import {
   type SendJobData,
   type WebhookJobData,
   type FeedbackJobData,
+  type IntentJobData,
 } from "@ems/core";
 import {
   SmtpProvider,
@@ -39,6 +41,7 @@ import {
 } from "@ems/providers";
 import { prisma, type Email } from "@ems/db";
 import { recordEvent, suppressRecipients } from "./events.js";
+import { routeIntent } from "./route-intent.js";
 
 // ems sends on its OWN infrastructure (SMTP/MTA) via the MailProvider
 // seam — never a third-party cloud sender. When SMTP_URL points at the MTA
@@ -378,8 +381,20 @@ feedbackWorker.on("failed", (job, err) =>
   console.error(`[feedback] failed ${job?.id}:`, err.message),
 );
 
+const intentWorker = new Worker<IntentJobData>(
+  QUEUE_INTENT,
+  async (job) => {
+    const out = await routeIntent(job.data);
+    console.log(`[intent] ${job.data.intentId} -> ${out.state}${out.mailboxId ? ` via ${out.mailboxId}` : ""}`);
+  },
+  { connection, concurrency: 10 },
+);
+intentWorker.on("failed", (job, err) =>
+  console.error(`[intent] failed ${job?.id}:`, err.message),
+);
+
 console.log(
-  `ems workers running (send + webhook + feedback queues) [${mtaProvider ? "smtp" : "stub"}]`,
+  `ems workers running (send + webhook + feedback + intent queues) [${mtaProvider ? "smtp" : "stub"}]`,
 );
 
 // Better Stack heartbeat: a missed ping pages "sending pipeline stalled" even
