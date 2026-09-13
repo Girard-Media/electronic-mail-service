@@ -11,7 +11,7 @@ Replies are the product's success metric. Inbound is not an afterthought.
 - [x] E16-007 — Thread on In-Reply-To and References first
 - [x] E16-008 — Fall back to subject-plus-participants matching with a recorded confidence
 - [x] E16-009 — Never merge two threads on a weak match
-- [ ] E16-010 — Link the thread to the lead, campaign, and mailbox
+- [x] E16-010 — Link the thread to the lead, campaign, and mailbox
 - [ ] E16-011 — Store the full MIME to R2 and reference it from the message
 - [x] E16-012 — Sanitise HTML before rendering; strip scripts, iframes, and remote-loading tags
 - [x] E16-013 — Block remote image loading by default and offer a per-message reveal

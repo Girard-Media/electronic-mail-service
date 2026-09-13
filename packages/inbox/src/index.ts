@@ -29,3 +29,4 @@ export function resolveAmbiguous(intent: ReplyIntent, confidence: number, floor 
 }
 
 export * from "./threading.js";
+export * from "./attribution.js";

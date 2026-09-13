@@ -11,6 +11,8 @@ export interface InboundMessage {
   subject: string;
   messageId?: string;
   inReplyTo?: string;
+  /** Oldest → newest, as sent. May be empty. */
+  references: string[];
   text?: string;
   html?: string;
   snippet: string;
@@ -114,12 +116,17 @@ export function parseInboundMessage(raw: string): InboundMessage {
     .filter(Boolean);
   const mid = header(head, "Message-ID");
   const snippetSrc = out.text ?? (out.html ? stripHtml(out.html) : "");
+  const references = (header(head, "References") ?? "")
+    .split(/\s+/)
+    .map((s) => s.trim())
+    .filter((s) => s.length > 2);
   return {
     from: decodeWords(header(head, "From") ?? ""),
     to,
     subject: decodeWords(header(head, "Subject") ?? ""),
     messageId: mid,
     inReplyTo: header(head, "In-Reply-To"),
+    references,
     text: out.text,
     html: out.html,
     snippet: snippetSrc.replace(/\s+/g, " ").trim().slice(0, 200),

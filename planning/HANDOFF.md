@@ -141,7 +141,7 @@ Work in **`/Users/girardmedia/Documents/WEB/electronic-mail-service`**. Do not o
 - Unverified From domain fails closed (`unverified-from-domain`). Stub node traffic will FAILED until DNS + 90-verify.
 
 ### Step 3 — inbox that salespeople can use (next product surface)
-- E16-010 link inbound to lead + campaign + mailbox (`SendIntent.messageId` ↔ `In-Reply-To`)
+- E16-010 link inbound to lead + campaign + mailbox (`SendIntent.messageId` ↔ `In-Reply-To`) — **done 2026-09-13**: `attributeInbound` in `@ems/inbox` (header → references → sender-email, sender never invents a campaign), `handleFleetInbound` in `apps/api/src/lib/fleet-inbound.ts` stores `InboxThread` + `InboxMessage` with the linkage. Fleet inbound HTTP route / MTA plumbing still unbuilt.
 - E16-034 cockpit on top of `GET /app/inbox/threads`
 - E16-041 reply from the receiving mailbox only
 - E16-047 AI draft, human accept, **never auto-send** (E16-048). Harvest `reflexware/src/services/support-assist.service.ts`. Classifier already in `@ems/ai`.

@@ -13,6 +13,7 @@
     "@ems/core": "workspace:*",
     "@ems/db": "workspace:*",
     "@ems/fleet": "workspace:*",
+    "@ems/inbox": "workspace:*",
     "@ems/providers": "workspace:*",
     "@ems/router": "workspace:*",
     "@ems/sequence": "workspace:*",
