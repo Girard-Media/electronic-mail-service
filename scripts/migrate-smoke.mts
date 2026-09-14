@@ -4,10 +4,13 @@ import { join } from "node:path";
 import { Resend } from "../packages/sdk/src/compat.js";
 import {
   runMigration,
+  writeMigrationKit,
+  emptyInventory,
   ResendSource,
   SendGridSource,
   PostmarkSource,
   MailgunSource,
+  type Inventory,
 } from "../packages/migrate/src/index.js";
 
 /** Build a path-routed mock fetch from a base URL + route map. */
@@ -200,6 +203,45 @@ function ok(name: string, cond: boolean, extra = "") {
   const recFetch = (async (url: string | URL) => { hitUrl = String(url); return new Response("{}", { status: 200 }); }) as unknown as typeof fetch;
   await new MailgunSource({ apiKey: "k", region: "eu", fetch: recFetch }).inventory();
   ok("mailgun: EU region uses api.eu.mailgun.net", hitUrl.startsWith("https://api.eu.mailgun.net"));
+}
+
+// ---------- 6) Outreach-shaped inventory → outreach kit (E01-028) ----------
+{
+  const out = join(process.cwd(), ".tmp-migrate-outreach");
+  const inv: Inventory = {
+    ...emptyInventory("instantly", "2026-06-23T00:00:00.000Z"),
+    domains: [{ name: "send.acme.com", status: "verified" }],
+    campaigns: [{
+      id: "c1",
+      name: "Q3 Founders",
+      status: "active",
+      steps: [
+        { position: 1, subject: "Quick idea", delay: "0d" },
+        { position: 2, subject: "Bump", delay: "2d", hasVariant: true },
+      ],
+      mailboxes: ["ava@send.acme.com"],
+    }],
+    leadLists: [{
+      id: "l1",
+      name: "SaaS CFOs",
+      contacts: [{ email: "cfo@bigco.com", firstName: "Jo", unsubscribed: false }],
+    }],
+    mailboxes: [{ email: "ava@send.acme.com", domain: "send.acme.com", status: "active", dailyCap: 30 }],
+    suppressions: [{ email: "gone@old.co", reason: "bounce" }],
+  };
+  const write = await writeMigrationKit(inv, out);
+  const report = await readFile(write.reportPath, "utf8");
+  ok("outreach: campaign steps rendered in report",
+    report.includes("Q3 Founders") && report.includes("Step 2 (after 2d): Bump") && report.includes("[has variants]"));
+  ok("outreach: suppression-first warning + checklist",
+    report.includes("suppressions.csv") && report.includes("Import `suppressions.csv` FIRST"));
+  ok("outreach: mailbox re-provision note", report.includes("ava@send.acme.com") && report.includes("warm it on its own curve"));
+  const leads = await readFile(join(out, "lead-lists", "saas-cfos.csv"), "utf8");
+  ok("outreach: lead list CSV exported", leads.startsWith("email,first_name,last_name,unsubscribed") && leads.includes("cfo@bigco.com"));
+  const supp = await readFile(join(out, "suppressions.csv"), "utf8");
+  ok("outreach: suppressions CSV exported", supp.startsWith("email,reason") && supp.includes("gone@old.co,bounce"));
+
+  await rm(out, { recursive: true, force: true });
 }
 
 console.log(failures === 0 ? "\nALL PASS" : `\n${failures} FAILURE(S)`);

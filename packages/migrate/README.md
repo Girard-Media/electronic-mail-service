@@ -1,12 +1,16 @@
 # ems-migrate
 
-Move to ems from another email provider — **read-only** on the source, so
-nothing in your old account is touched. It pulls your domains, broadcast
-templates, contacts, and API-key inventory and writes a ready-to-follow migration
-kit.
+Move to ems from another email provider **or outreach platform** —
+**read-only** on the source, so nothing in your old account is touched. It
+pulls your domains, templates, contacts, API-key inventory — and, from
+outreach sources, campaigns with their sequenced steps, lead lists, sending
+mailboxes, and suppressions — and writes a ready-to-follow migration kit.
 
-Supported sources: **Resend**, **SendGrid**, **Postmark**, **Mailgun**. Add another
-by implementing the `MigrationSource` interface in `src/sources/`.
+Supported sources today: **Resend**, **SendGrid**, **Postmark**, **Mailgun**
+(transactional ESPs). Outreach sources (**Instantly, Smartlead, Lemlist, …**)
+plug in through the same `MigrationSource` interface — implement it in
+`src/sources/` and the kit writer already knows how to emit campaigns,
+`lead-lists/*.csv`, and `suppressions.csv`.
 
 ## Use it
 
@@ -57,7 +61,11 @@ client? `import { EMS } from "ems"`.
 | --- | --- |
 | **Domains** | Inventoried with status. You re-verify each in ems (it signs with its own DKIM, so old DNS can't be copied). |
 | **Templates / broadcasts** | HTML/text bodies exported to `templates/`. |
-| **Audiences / contacts** | Exported to `audiences/*.csv`. ems is transactional-first; native import lands when audiences ship. |
+| **Audiences / contacts** | Exported to `audiences/*.csv`. |
+| **Campaigns (outreach)** | Steps, delays, subjects, and attached mailboxes rendered into `report.md` — recreate each as an EMS sequence. |
+| **Lead lists (outreach)** | Exported to `lead-lists/*.csv` — import via EMS lead import. |
+| **Mailboxes (outreach)** | Inventoried with status/caps. Credentials never export — re-provision on EMS domains and warm each on its own curve (never share pools across clients, D4). |
+| **Suppressions (outreach)** | Exported to `suppressions.csv` — **import FIRST** (I1: no unsuppressed send is a Sev-1 matter). |
 | **API keys** | Names listed (secrets are never exportable anywhere). Create fresh keys in ems. |
 | **Webhooks** | Not exposed by Resend's API — recreate endpoints in the ems dashboard. |
 

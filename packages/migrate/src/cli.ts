@@ -53,7 +53,8 @@ Options:
   --out <dir>             Output directory (default ./ems-migration)
   -h, --help              Show this help
 
-Writes: report.md (plan + checklist + code-swap), templates/*.html, audiences/*.csv
+Writes: report.md (plan + checklist + code-swap), templates/*.html, audiences/*.csv,
+        lead-lists/*.csv, suppressions.csv (outreach sources)
 `;
 
 /** Build the right source for the chosen provider, or return an error string. */
@@ -104,11 +105,20 @@ async function main(): Promise<number> {
   process.stdout.write(`Reading your ${source.name} account (read-only)…\n`);
   const { inventory: inv, write } = await runMigration(source, args.out);
 
-  const contacts = inv.audiences.reduce((n, a) => n + a.contacts.length, 0);
+  const contacts =
+    inv.audiences.reduce((n, a) => n + a.contacts.length, 0) +
+    inv.leadLists.reduce((n, l) => n + l.contacts.length, 0);
   process.stdout.write(
     `\nFound: ${inv.domains.length} domain(s), ${inv.audiences.length} audience(s) ` +
-      `(${contacts} contacts), ${inv.templates.length} template(s), ${inv.apiKeys.length} API key(s).\n`,
+      `(${contacts} contacts), ${inv.templates.length} template(s), ${inv.apiKeys.length} API key(s)`,
   );
+  if (inv.campaigns.length || inv.leadLists.length || inv.mailboxes.length || inv.suppressions.length) {
+    process.stdout.write(
+      `, ${inv.campaigns.length} campaign(s), ${inv.leadLists.length} lead list(s), ` +
+        `${inv.mailboxes.length} mailbox(es), ${inv.suppressions.length} suppression(s)`,
+    );
+  }
+  process.stdout.write(".\n");
   process.stdout.write(`Wrote ${write.files.length} file(s) to ${args.out}\n`);
   process.stdout.write(`\nNext: open ${write.reportPath} for the step-by-step plan.\n`);
   return 0;
