@@ -1,3 +1,17 @@
 packages:
   - "apps/*"
   - "packages/*"
+
+# Shared dependency versions (E01-031). Workspaces reference these via
+# `"dep": "catalog:"` so a bump happens once, here, not in 30 files.
+# Exempt: apps/web keeps eslint ^9 — eslint-config-next requires the v9
+# rule API (v10 breaks it: `contextOrFilename.getFilename is not a function`).
+catalog:
+  typescript: ^5.6.0
+  typescript-eslint: ^8.68.0
+  "@eslint/js": ^10.0.1
+  eslint: ^10.9.1
+  zod: ^3.23.0
+  tsx: ^4.19.0
+  "@types/node": ^22.10.0
+  ioredis: 5.11.1

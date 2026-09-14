@@ -84,6 +84,47 @@ const schema = z.object({
   // enable the Connect flow; set the webhook secret to verify Stripe callbacks.
   STRIPE_SECRET_KEY: z.string().optional(),
   STRIPE_WEBHOOK_SECRET: z.string().optional(),
+  // ---- EMS cold-outreach variables (E01-044 example → E01-045 schema) ----
+  // Observation store. Postgres holds decisions; ClickHouse holds what happened.
+  // Local-stack defaults match infra/docker-compose.yml; production overrides all four.
+  CLICKHOUSE_URL: z.string().default("http://127.0.0.1:8123"),
+  CLICKHOUSE_DB: z.string().default("ems"),
+  CLICKHOUSE_USER: z.string().default("ems"),
+  CLICKHOUSE_PASSWORD: z.string().default("ems"),
+  // Local SMTP sink. Dev never sends real mail unless this is explicitly unset
+  // AND EMS_ALLOW_REAL_SEND=1.
+  SMTP_URL: z.string().default("smtp://127.0.0.1:1025"),
+  EMS_ALLOW_REAL_SEND: z.enum(["0", "1"]).default("0"),
+  // Inference — the single sanctioned AI dependency (planning/AI.md).
+  OPENROUTER_API_KEY: z.string().optional(),
+  OPENROUTER_BASE_URL: z.string().default("https://openrouter.ai/api/v1"),
+  AI_MONTHLY_CEILING_USD: z.string().default("250"),
+  // Fleet control plane. The agent signs every report; the API refuses unsigned.
+  EMS_AGENT_SIGNING_KEY: z.string().optional(),
+  EMS_NODE_ALLOWLIST: z.string().optional(),
+  // Registrar + DNS seams (packages/registrar). CLOUDFLARE_DNS_TOKEN is the
+  // current name; DNS_API_TOKEN (and its legacy CLOUDFLARE_API_TOKEN) stay as aliases.
+  CLOUDFLARE_DNS_TOKEN: z.string().optional(),
+  REGISTRAR_PROVIDER: z.string().default("cloudflare"),
+  REGISTRAR_API_KEY: z.string().optional(),
+  // Dedicated domain receiving every sending domain's DMARC rua/ruf + TLS-RPT.
+  AGGREGATE_REPORT_DOMAIN: z.string().optional(),
+  // Verification runs from its own IP that never sends campaigns (E12-017).
+  VERIFY_NODE_URL: z.string().optional(),
+  // Seed accounts for placement probing. Read only by apps/seedbox; this key
+  // must not exist on any host that also sends campaigns (E21-094).
+  SEEDBOX_CREDENTIAL_KEY: z.string().optional(),
+  // Handoff target: the moment a lead opts in, they leave EMS.
+  HANDOFF_TARGET_URL: z.string().optional(),
+  HANDOFF_API_KEY: z.string().optional(),
+  // Object storage (S3-compatible) for raw MIME, DMARC XML, exports, backups.
+  STORAGE_ACCOUNT_ID: z.string().optional(),
+  STORAGE_ACCESS_KEY_ID: z.string().optional(),
+  STORAGE_SECRET_ACCESS_KEY: z.string().optional(),
+  STORAGE_BUCKET: z.string().default("ems-assets"),
+  // Analytics event store (Phase 1d). See infra/observability.md.
+  ANALYTICS_TOKEN: z.string().optional(),
+  ANALYTICS_URL: z.string().optional(),
 });
 
 // Backward-compatible env aliases: the live box may still set the old variable
@@ -95,7 +136,8 @@ const rawEnv = {
   MAIL_RELAY_REGION: process.env.MAIL_RELAY_REGION ?? process.env.AWS_REGION,
   MAIL_RELAY_CONFIG_SET:
     process.env.MAIL_RELAY_CONFIG_SET ?? process.env.SES_CONFIGURATION_SET,
-  DNS_API_TOKEN: process.env.DNS_API_TOKEN ?? process.env.CLOUDFLARE_API_TOKEN,
+  DNS_API_TOKEN:
+    process.env.DNS_API_TOKEN ?? process.env.CLOUDFLARE_DNS_TOKEN ?? process.env.CLOUDFLARE_API_TOKEN,
   // Singular predecessor of SHARED_INBOX_DOMAINS (A1 shipped with one domain).
   SHARED_INBOX_DOMAINS:
     process.env.SHARED_INBOX_DOMAINS ?? process.env.AGENT_INBOX_DOMAIN,
@@ -103,8 +145,31 @@ const rawEnv = {
 
 const parsed = schema.parse(rawEnv);
 
-// Fail-closed in production: never run with a forgeable session secret.
+/**
+ * Fail fast with the variable NAME in the error. Subsystem boot code calls
+ * this for secrets that are optional in the schema but required for that
+ * subsystem (e.g. DKIM_ENC_KEY before decrypting, MTA_FEEDBACK_SECRET before
+ * opening the feedback route).
+ */
+export function requireEnv(name: keyof Env): string {
+  const value = parsed[name];
+  if (value === undefined || value === "") {
+    throw new Error(`Missing required environment variable: ${name}`);
+  }
+  return String(value);
+}
+
+// Fail fast at boot in production: connection strings must be explicitly set
+// (localhost dev defaults are refused) and the session secret must be real.
+// Every check names the variable. Dev/test keep working on defaults.
 if (parsed.NODE_ENV === "production") {
+  const explicitlySet = (name: string): boolean =>
+    process.env[name] !== undefined && process.env[name] !== "";
+  const missing = ["DATABASE_URL", "CLICKHOUSE_URL"].filter((v) => !explicitlySet(v));
+  if (!explicitlySet("QUEUE_URL") && !explicitlySet("REDIS_URL")) missing.push("QUEUE_URL (or REDIS_URL)");
+  for (const name of missing) {
+    throw new Error(`Missing required environment variable in production: ${name}`);
+  }
   if (!process.env.AUTH_SECRET || parsed.AUTH_SECRET === DEV_AUTH_SECRET) {
     throw new Error(
       "AUTH_SECRET must be set in production — the insecure dev default is refused.",

@@ -4,6 +4,30 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+catalogs:
+  default:
+    '@eslint/js':
+      specifier: ^10.0.1
+      version: 10.0.1
+    '@types/node':
+      specifier: ^22.10.0
+      version: 22.20.1
+    eslint:
+      specifier: ^10.9.1
+      version: 10.9.1
+    tsx:
+      specifier: ^4.19.0
+      version: 4.23.12
+    typescript:
+      specifier: ^5.6.0
+      version: 5.9.3
+    typescript-eslint:
+      specifier: ^8.68.0
+      version: 8.68.0
+    zod:
+      specifier: ^3.23.0
+      version: 3.25.76
+
 overrides:
   ioredis: 5.11.1
 
@@ -12,14 +36,14 @@ importers:
   .:
     devDependencies:
       '@eslint/js':
-        specifier: ^10.0.1
-        version: 10.0.1(eslint@9.39.5(jiti@2.7.0))
+        specifier: 'catalog:'
+        version: 10.0.1(eslint@10.9.1(jiti@2.7.0))
       '@types/node':
-        specifier: ^22.10.0
+        specifier: 'catalog:'
         version: 22.20.1
       eslint:
-        specifier: ^9.39.5
-        version: 9.39.5(jiti@2.7.0)
+        specifier: 'catalog:'
+        version: 10.9.1(jiti@2.7.0)
       ioredis:
         specifier: 5.11.1
         version: 5.11.1
@@ -27,14 +51,14 @@ importers:
         specifier: ^1.61.1
         version: 1.62.1
       tsx:
-        specifier: ^4.19.0
+        specifier: 'catalog:'
         version: 4.23.12
       typescript:
-        specifier: ^5.6.0
+        specifier: 'catalog:'
         version: 5.9.3
       typescript-eslint:
-        specifier: ^8.68.0
-        version: 8.68.0(eslint@9.39.5(jiti@2.7.0))(typescript@5.9.3)
+        specifier: 'catalog:'
+        version: 8.68.0(eslint@10.9.1(jiti@2.7.0))(typescript@5.9.3)
 
   apps/api:
     dependencies:
@@ -69,23 +93,23 @@ importers:
         specifier: ^4.6.0
         version: 4.13.5
       tsx:
-        specifier: ^4.19.0
+        specifier: 'catalog:'
         version: 4.23.12
       zod:
-        specifier: ^3.23.0
+        specifier: 'catalog:'
         version: 3.25.76
     devDependencies:
       '@eslint/js':
-        specifier: ^10.0.1
+        specifier: 'catalog:'
         version: 10.0.1(eslint@10.9.1(jiti@2.7.0))
       eslint:
-        specifier: ^10.9.1
+        specifier: 'catalog:'
         version: 10.9.1(jiti@2.7.0)
       typescript:
-        specifier: ^5.6.0
+        specifier: 'catalog:'
         version: 5.9.3
       typescript-eslint:
-        specifier: ^8.68.0
+        specifier: 'catalog:'
         version: 8.68.0(eslint@10.9.1(jiti@2.7.0))(typescript@5.9.3)
 
   apps/dmarc-ingest:
@@ -98,19 +122,19 @@ importers:
         version: link:../../packages/db
     devDependencies:
       '@eslint/js':
-        specifier: ^10.0.1
+        specifier: 'catalog:'
         version: 10.0.1(eslint@10.9.1(jiti@2.7.0))
       eslint:
-        specifier: ^10.9.1
+        specifier: 'catalog:'
         version: 10.9.1(jiti@2.7.0)
       tsx:
-        specifier: ^4.19.0
+        specifier: 'catalog:'
         version: 4.23.12
       typescript:
-        specifier: ^5.6.0
+        specifier: 'catalog:'
         version: 5.9.3
       typescript-eslint:
-        specifier: ^8.68.0
+        specifier: 'catalog:'
         version: 8.68.0(eslint@10.9.1(jiti@2.7.0))(typescript@5.9.3)
 
   apps/feedback-ingest:
@@ -125,23 +149,23 @@ importers:
         specifier: ^3.13.6
         version: 3.19.1
       tsx:
-        specifier: ^4.19.0
+        specifier: 'catalog:'
         version: 4.23.12
     devDependencies:
       '@eslint/js':
-        specifier: ^10.0.1
+        specifier: 'catalog:'
         version: 10.0.1(eslint@10.9.1(jiti@2.7.0))
       '@types/smtp-server':
         specifier: ^3.5.10
         version: 3.5.13
       eslint:
-        specifier: ^10.9.1
+        specifier: 'catalog:'
         version: 10.9.1(jiti@2.7.0)
       typescript:
-        specifier: ^5.6.0
+        specifier: 'catalog:'
         version: 5.9.3
       typescript-eslint:
-        specifier: ^8.68.0
+        specifier: 'catalog:'
         version: 8.68.0(eslint@10.9.1(jiti@2.7.0))(typescript@5.9.3)
 
   apps/fleet-agent:
@@ -154,19 +178,19 @@ importers:
         version: link:../../packages/db
     devDependencies:
       '@eslint/js':
-        specifier: ^10.0.1
+        specifier: 'catalog:'
         version: 10.0.1(eslint@10.9.1(jiti@2.7.0))
       eslint:
-        specifier: ^10.9.1
+        specifier: 'catalog:'
         version: 10.9.1(jiti@2.7.0)
       tsx:
-        specifier: ^4.19.0
+        specifier: 'catalog:'
         version: 4.23.12
       typescript:
-        specifier: ^5.6.0
+        specifier: 'catalog:'
         version: 5.9.3
       typescript-eslint:
-        specifier: ^8.68.0
+        specifier: 'catalog:'
         version: 8.68.0(eslint@10.9.1(jiti@2.7.0))(typescript@5.9.3)
 
   apps/maillog-bridge:
@@ -176,22 +200,22 @@ importers:
         version: link:../../packages/core
     devDependencies:
       '@eslint/js':
-        specifier: ^10.0.1
+        specifier: 'catalog:'
         version: 10.0.1(eslint@10.9.1(jiti@2.7.0))
       '@types/node':
-        specifier: ^22.0.0
+        specifier: 'catalog:'
         version: 22.20.1
       eslint:
-        specifier: ^10.9.1
+        specifier: 'catalog:'
         version: 10.9.1(jiti@2.7.0)
       tsx:
-        specifier: ^4.19.0
+        specifier: 'catalog:'
         version: 4.23.12
       typescript:
-        specifier: ^5.6.0
+        specifier: 'catalog:'
         version: 5.9.3
       typescript-eslint:
-        specifier: ^8.68.0
+        specifier: 'catalog:'
         version: 8.68.0(eslint@10.9.1(jiti@2.7.0))(typescript@5.9.3)
 
   apps/seedbox:
@@ -204,19 +228,19 @@ importers:
         version: link:../../packages/db
     devDependencies:
       '@eslint/js':
-        specifier: ^10.0.1
+        specifier: 'catalog:'
         version: 10.0.1(eslint@10.9.1(jiti@2.7.0))
       eslint:
-        specifier: ^10.9.1
+        specifier: 'catalog:'
         version: 10.9.1(jiti@2.7.0)
       tsx:
-        specifier: ^4.19.0
+        specifier: 'catalog:'
         version: 4.23.12
       typescript:
-        specifier: ^5.6.0
+        specifier: 'catalog:'
         version: 5.9.3
       typescript-eslint:
-        specifier: ^8.68.0
+        specifier: 'catalog:'
         version: 8.68.0(eslint@10.9.1(jiti@2.7.0))(typescript@5.9.3)
 
   apps/web:
@@ -250,7 +274,7 @@ importers:
         specifier: ^4.0.0
         version: 4.3.3
       '@types/node':
-        specifier: ^22.10.0
+        specifier: 'catalog:'
         version: 22.20.1
       '@types/react':
         specifier: ^19.0.0
@@ -271,7 +295,7 @@ importers:
         specifier: ^4.0.0
         version: 4.3.3
       typescript:
-        specifier: ^5.6.0
+        specifier: 'catalog:'
         version: 5.9.3
 
   apps/workers:
@@ -298,20 +322,20 @@ importers:
         specifier: ^5.34.0
         version: 5.81.4
       tsx:
-        specifier: ^4.19.0
+        specifier: 'catalog:'
         version: 4.23.12
     devDependencies:
       '@eslint/js':
-        specifier: ^10.0.1
+        specifier: 'catalog:'
         version: 10.0.1(eslint@10.9.1(jiti@2.7.0))
       eslint:
-        specifier: ^10.9.1
+        specifier: 'catalog:'
         version: 10.9.1(jiti@2.7.0)
       typescript:
-        specifier: ^5.6.0
+        specifier: 'catalog:'
         version: 5.9.3
       typescript-eslint:
-        specifier: ^8.68.0
+        specifier: 'catalog:'
         version: 8.68.0(eslint@10.9.1(jiti@2.7.0))(typescript@5.9.3)
 
   packages/ai:
@@ -323,20 +347,20 @@ importers:
         specifier: workspace:*
         version: link:../db
       zod:
-        specifier: ^3.23.0
+        specifier: 'catalog:'
         version: 3.25.76
     devDependencies:
       '@eslint/js':
-        specifier: ^10.0.1
+        specifier: 'catalog:'
         version: 10.0.1(eslint@10.9.1(jiti@2.7.0))
       eslint:
-        specifier: ^10.9.1
+        specifier: 'catalog:'
         version: 10.9.1(jiti@2.7.0)
       typescript:
-        specifier: ^5.6.0
+        specifier: 'catalog:'
         version: 5.9.3
       typescript-eslint:
-        specifier: ^8.68.0
+        specifier: 'catalog:'
         version: 8.68.0(eslint@10.9.1(jiti@2.7.0))(typescript@5.9.3)
 
   packages/billing:
@@ -345,20 +369,20 @@ importers:
         specifier: workspace:*
         version: link:../db
       zod:
-        specifier: ^3.23.0
+        specifier: 'catalog:'
         version: 3.25.76
     devDependencies:
       '@eslint/js':
-        specifier: ^10.0.1
+        specifier: 'catalog:'
         version: 10.0.1(eslint@10.9.1(jiti@2.7.0))
       eslint:
-        specifier: ^10.9.1
+        specifier: 'catalog:'
         version: 10.9.1(jiti@2.7.0)
       typescript:
-        specifier: ^5.6.0
+        specifier: 'catalog:'
         version: 5.9.3
       typescript-eslint:
-        specifier: ^8.68.0
+        specifier: 'catalog:'
         version: 8.68.0(eslint@10.9.1(jiti@2.7.0))(typescript@5.9.3)
 
   packages/core:
@@ -370,20 +394,20 @@ importers:
         specifier: 5.11.1
         version: 5.11.1
       zod:
-        specifier: ^3.23.0
+        specifier: 'catalog:'
         version: 3.25.76
     devDependencies:
       '@eslint/js':
-        specifier: ^10.0.1
+        specifier: 'catalog:'
         version: 10.0.1(eslint@10.9.1(jiti@2.7.0))
       eslint:
-        specifier: ^10.9.1
+        specifier: 'catalog:'
         version: 10.9.1(jiti@2.7.0)
       typescript:
-        specifier: ^5.6.0
+        specifier: 'catalog:'
         version: 5.9.3
       typescript-eslint:
-        specifier: ^8.68.0
+        specifier: 'catalog:'
         version: 8.68.0(eslint@10.9.1(jiti@2.7.0))(typescript@5.9.3)
 
   packages/db:
@@ -396,16 +420,16 @@ importers:
         version: 6.19.3(typescript@5.9.3)
     devDependencies:
       '@eslint/js':
-        specifier: ^10.0.1
+        specifier: 'catalog:'
         version: 10.0.1(eslint@10.9.1(jiti@2.7.0))
       eslint:
-        specifier: ^10.9.1
+        specifier: 'catalog:'
         version: 10.9.1(jiti@2.7.0)
       typescript:
-        specifier: ^5.6.0
+        specifier: 'catalog:'
         version: 5.9.3
       typescript-eslint:
-        specifier: ^8.68.0
+        specifier: 'catalog:'
         version: 8.68.0(eslint@10.9.1(jiti@2.7.0))(typescript@5.9.3)
 
   packages/deliverability:
@@ -417,20 +441,20 @@ importers:
         specifier: workspace:*
         version: link:../db
       zod:
-        specifier: ^3.23.0
+        specifier: 'catalog:'
         version: 3.25.76
     devDependencies:
       '@eslint/js':
-        specifier: ^10.0.1
+        specifier: 'catalog:'
         version: 10.0.1(eslint@10.9.1(jiti@2.7.0))
       eslint:
-        specifier: ^10.9.1
+        specifier: 'catalog:'
         version: 10.9.1(jiti@2.7.0)
       typescript:
-        specifier: ^5.6.0
+        specifier: 'catalog:'
         version: 5.9.3
       typescript-eslint:
-        specifier: ^8.68.0
+        specifier: 'catalog:'
         version: 8.68.0(eslint@10.9.1(jiti@2.7.0))(typescript@5.9.3)
 
   packages/fleet:
@@ -442,20 +466,20 @@ importers:
         specifier: workspace:*
         version: link:../db
       zod:
-        specifier: ^3.23.0
+        specifier: 'catalog:'
         version: 3.25.76
     devDependencies:
       '@eslint/js':
-        specifier: ^10.0.1
+        specifier: 'catalog:'
         version: 10.0.1(eslint@10.9.1(jiti@2.7.0))
       eslint:
-        specifier: ^10.9.1
+        specifier: 'catalog:'
         version: 10.9.1(jiti@2.7.0)
       typescript:
-        specifier: ^5.6.0
+        specifier: 'catalog:'
         version: 5.9.3
       typescript-eslint:
-        specifier: ^8.68.0
+        specifier: 'catalog:'
         version: 8.68.0(eslint@10.9.1(jiti@2.7.0))(typescript@5.9.3)
 
   packages/inbox:
@@ -467,20 +491,20 @@ importers:
         specifier: workspace:*
         version: link:../db
       zod:
-        specifier: ^3.23.0
+        specifier: 'catalog:'
         version: 3.25.76
     devDependencies:
       '@eslint/js':
-        specifier: ^10.0.1
+        specifier: 'catalog:'
         version: 10.0.1(eslint@10.9.1(jiti@2.7.0))
       eslint:
-        specifier: ^10.9.1
+        specifier: 'catalog:'
         version: 10.9.1(jiti@2.7.0)
       typescript:
-        specifier: ^5.6.0
+        specifier: 'catalog:'
         version: 5.9.3
       typescript-eslint:
-        specifier: ^8.68.0
+        specifier: 'catalog:'
         version: 8.68.0(eslint@10.9.1(jiti@2.7.0))(typescript@5.9.3)
 
   packages/leads:
@@ -492,20 +516,20 @@ importers:
         specifier: workspace:*
         version: link:../db
       zod:
-        specifier: ^3.23.0
+        specifier: 'catalog:'
         version: 3.25.76
     devDependencies:
       '@eslint/js':
-        specifier: ^10.0.1
+        specifier: 'catalog:'
         version: 10.0.1(eslint@10.9.1(jiti@2.7.0))
       eslint:
-        specifier: ^10.9.1
+        specifier: 'catalog:'
         version: 10.9.1(jiti@2.7.0)
       typescript:
-        specifier: ^5.6.0
+        specifier: 'catalog:'
         version: 5.9.3
       typescript-eslint:
-        specifier: ^8.68.0
+        specifier: 'catalog:'
         version: 8.68.0(eslint@10.9.1(jiti@2.7.0))(typescript@5.9.3)
 
   packages/mcp:
@@ -517,42 +541,42 @@ importers:
         specifier: ^1.0.0
         version: 1.30.0(zod@3.25.76)
       zod:
-        specifier: ^3.23.0
+        specifier: 'catalog:'
         version: 3.25.76
     devDependencies:
       '@eslint/js':
-        specifier: ^10.0.1
+        specifier: 'catalog:'
         version: 10.0.1(eslint@10.9.1(jiti@2.7.0))
       eslint:
-        specifier: ^10.9.1
+        specifier: 'catalog:'
         version: 10.9.1(jiti@2.7.0)
       typescript:
-        specifier: ^5.6.0
+        specifier: 'catalog:'
         version: 5.9.3
       typescript-eslint:
-        specifier: ^8.68.0
+        specifier: 'catalog:'
         version: 8.68.0(eslint@10.9.1(jiti@2.7.0))(typescript@5.9.3)
 
   packages/migrate:
     dependencies:
       tsx:
-        specifier: ^4.19.0
+        specifier: 'catalog:'
         version: 4.23.12
     devDependencies:
       '@eslint/js':
-        specifier: ^10.0.1
+        specifier: 'catalog:'
         version: 10.0.1(eslint@10.9.1(jiti@2.7.0))
       '@types/node':
-        specifier: ^22.10.0
+        specifier: 'catalog:'
         version: 22.20.1
       eslint:
-        specifier: ^10.9.1
+        specifier: 'catalog:'
         version: 10.9.1(jiti@2.7.0)
       typescript:
-        specifier: ^5.6.0
+        specifier: 'catalog:'
         version: 5.9.3
       typescript-eslint:
-        specifier: ^8.68.0
+        specifier: 'catalog:'
         version: 8.68.0(eslint@10.9.1(jiti@2.7.0))(typescript@5.9.3)
 
   packages/policy:
@@ -564,20 +588,20 @@ importers:
         specifier: workspace:*
         version: link:../db
       zod:
-        specifier: ^3.23.0
+        specifier: 'catalog:'
         version: 3.25.76
     devDependencies:
       '@eslint/js':
-        specifier: ^10.0.1
+        specifier: 'catalog:'
         version: 10.0.1(eslint@10.9.1(jiti@2.7.0))
       eslint:
-        specifier: ^10.9.1
+        specifier: 'catalog:'
         version: 10.9.1(jiti@2.7.0)
       typescript:
-        specifier: ^5.6.0
+        specifier: 'catalog:'
         version: 5.9.3
       typescript-eslint:
-        specifier: ^8.68.0
+        specifier: 'catalog:'
         version: 8.68.0(eslint@10.9.1(jiti@2.7.0))(typescript@5.9.3)
 
   packages/providers:
@@ -587,38 +611,38 @@ importers:
         version: 9.0.5
     devDependencies:
       '@eslint/js':
-        specifier: ^10.0.1
+        specifier: 'catalog:'
         version: 10.0.1(eslint@10.9.1(jiti@2.7.0))
       '@types/nodemailer':
         specifier: ^6.4.16
         version: 6.4.24
       eslint:
-        specifier: ^10.9.1
+        specifier: 'catalog:'
         version: 10.9.1(jiti@2.7.0)
       typescript:
-        specifier: ^5.6.0
+        specifier: 'catalog:'
         version: 5.9.3
       typescript-eslint:
-        specifier: ^8.68.0
+        specifier: 'catalog:'
         version: 8.68.0(eslint@10.9.1(jiti@2.7.0))(typescript@5.9.3)
 
   packages/registrar:
     dependencies:
       zod:
-        specifier: ^3.23.0
+        specifier: 'catalog:'
         version: 3.25.76
     devDependencies:
       '@eslint/js':
-        specifier: ^10.0.1
+        specifier: 'catalog:'
         version: 10.0.1(eslint@10.9.1(jiti@2.7.0))
       eslint:
-        specifier: ^10.9.1
+        specifier: 'catalog:'
         version: 10.9.1(jiti@2.7.0)
       typescript:
-        specifier: ^5.6.0
+        specifier: 'catalog:'
         version: 5.9.3
       typescript-eslint:
-        specifier: ^8.68.0
+        specifier: 'catalog:'
         version: 8.68.0(eslint@10.9.1(jiti@2.7.0))(typescript@5.9.3)
 
   packages/reputation:
@@ -630,20 +654,20 @@ importers:
         specifier: workspace:*
         version: link:../db
       zod:
-        specifier: ^3.23.0
+        specifier: 'catalog:'
         version: 3.25.76
     devDependencies:
       '@eslint/js':
-        specifier: ^10.0.1
+        specifier: 'catalog:'
         version: 10.0.1(eslint@10.9.1(jiti@2.7.0))
       eslint:
-        specifier: ^10.9.1
+        specifier: 'catalog:'
         version: 10.9.1(jiti@2.7.0)
       typescript:
-        specifier: ^5.6.0
+        specifier: 'catalog:'
         version: 5.9.3
       typescript-eslint:
-        specifier: ^8.68.0
+        specifier: 'catalog:'
         version: 8.68.0(eslint@10.9.1(jiti@2.7.0))(typescript@5.9.3)
 
   packages/router:
@@ -658,35 +682,35 @@ importers:
         specifier: 5.11.1
         version: 5.11.1
       zod:
-        specifier: ^3.23.0
+        specifier: 'catalog:'
         version: 3.25.76
     devDependencies:
       '@eslint/js':
-        specifier: ^10.0.1
+        specifier: 'catalog:'
         version: 10.0.1(eslint@10.9.1(jiti@2.7.0))
       eslint:
-        specifier: ^10.9.1
+        specifier: 'catalog:'
         version: 10.9.1(jiti@2.7.0)
       typescript:
-        specifier: ^5.6.0
+        specifier: 'catalog:'
         version: 5.9.3
       typescript-eslint:
-        specifier: ^8.68.0
+        specifier: 'catalog:'
         version: 8.68.0(eslint@10.9.1(jiti@2.7.0))(typescript@5.9.3)
 
   packages/sdk:
     devDependencies:
       '@eslint/js':
-        specifier: ^10.0.1
+        specifier: 'catalog:'
         version: 10.0.1(eslint@10.9.1(jiti@2.7.0))
       eslint:
-        specifier: ^10.9.1
+        specifier: 'catalog:'
         version: 10.9.1(jiti@2.7.0)
       typescript:
-        specifier: ^5.6.0
+        specifier: 'catalog:'
         version: 5.9.3
       typescript-eslint:
-        specifier: ^8.68.0
+        specifier: 'catalog:'
         version: 8.68.0(eslint@10.9.1(jiti@2.7.0))(typescript@5.9.3)
 
   packages/sequence:
@@ -698,20 +722,20 @@ importers:
         specifier: workspace:*
         version: link:../db
       zod:
-        specifier: ^3.23.0
+        specifier: 'catalog:'
         version: 3.25.76
     devDependencies:
       '@eslint/js':
-        specifier: ^10.0.1
+        specifier: 'catalog:'
         version: 10.0.1(eslint@10.9.1(jiti@2.7.0))
       eslint:
-        specifier: ^10.9.1
+        specifier: 'catalog:'
         version: 10.9.1(jiti@2.7.0)
       typescript:
-        specifier: ^5.6.0
+        specifier: 'catalog:'
         version: 5.9.3
       typescript-eslint:
-        specifier: ^8.68.0
+        specifier: 'catalog:'
         version: 8.68.0(eslint@10.9.1(jiti@2.7.0))(typescript@5.9.3)
 
   packages/verify:
@@ -723,20 +747,20 @@ importers:
         specifier: workspace:*
         version: link:../db
       zod:
-        specifier: ^3.23.0
+        specifier: 'catalog:'
         version: 3.25.76
     devDependencies:
       '@eslint/js':
-        specifier: ^10.0.1
+        specifier: 'catalog:'
         version: 10.0.1(eslint@10.9.1(jiti@2.7.0))
       eslint:
-        specifier: ^10.9.1
+        specifier: 'catalog:'
         version: 10.9.1(jiti@2.7.0)
       typescript:
-        specifier: ^5.6.0
+        specifier: 'catalog:'
         version: 5.9.3
       typescript-eslint:
-        specifier: ^8.68.0
+        specifier: 'catalog:'
         version: 8.68.0(eslint@10.9.1(jiti@2.7.0))(typescript@5.9.3)
 
   packages/warmup:
@@ -748,20 +772,20 @@ importers:
         specifier: workspace:*
         version: link:../db
       zod:
-        specifier: ^3.23.0
+        specifier: 'catalog:'
         version: 3.25.76
     devDependencies:
       '@eslint/js':
-        specifier: ^10.0.1
+        specifier: 'catalog:'
         version: 10.0.1(eslint@10.9.1(jiti@2.7.0))
       eslint:
-        specifier: ^10.9.1
+        specifier: 'catalog:'
         version: 10.9.1(jiti@2.7.0)
       typescript:
-        specifier: ^5.6.0
+        specifier: 'catalog:'
         version: 5.9.3
       typescript-eslint:
-        specifier: ^8.68.0
+        specifier: 'catalog:'
         version: 8.68.0(eslint@10.9.1(jiti@2.7.0))(typescript@5.9.3)
 
 packages:
@@ -1045,8 +1069,8 @@ packages:
     resolution: {integrity: sha512-MwcE1P+AZ4C6DWlpin/OmOA54mmIZ/+xZuJiQd4SyB29oAJjN30UW9wkKNptW2ctp4cEsvhlLY/CsQ1uoHDloQ==}
     engines: {node: ^20.19.0 || ^22.13.0 || >=24}
 
-  '@eslint/eslintrc@3.3.6':
-    resolution: {integrity: sha512-l2Ul9PrHsPCKcEY/ac7VgFj9D80C7S68sOKc618SyHDPK36s1XcFebXY0iTzUVn4Yq+YbwvSnDmCz9yxjX+QrA==}
+  '@eslint/eslintrc@3.3.7':
+    resolution: {integrity: sha512-F42g89Qd5oAWtp0k0nnSrjziAKza7w8SVT4mStc18LZMaRb4J1HQAHLCalEtDCxrTuksx7NU9qsmeLwpOfPqWw==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
 
   '@eslint/js@10.0.1':
@@ -3794,7 +3818,7 @@ snapshots:
     dependencies:
       '@types/json-schema': 7.0.15
 
-  '@eslint/eslintrc@3.3.6':
+  '@eslint/eslintrc@3.3.7':
     dependencies:
       ajv: 6.15.0
       debug: 4.4.3
@@ -3811,10 +3835,6 @@ snapshots:
   '@eslint/js@10.0.1(eslint@10.9.1(jiti@2.7.0))':
     optionalDependencies:
       eslint: 10.9.1(jiti@2.7.0)
-
-  '@eslint/js@10.0.1(eslint@9.39.5(jiti@2.7.0))':
-    optionalDependencies:
-      eslint: 9.39.5(jiti@2.7.0)
 
   '@eslint/js@9.39.5': {}
 
@@ -5174,7 +5194,7 @@ snapshots:
       '@eslint/config-array': 0.21.2
       '@eslint/config-helpers': 0.4.2
       '@eslint/core': 0.17.0
-      '@eslint/eslintrc': 3.3.6
+      '@eslint/eslintrc': 3.3.7
       '@eslint/js': 9.39.5
       '@eslint/plugin-kit': 0.4.1
       '@humanfs/node': 0.16.8

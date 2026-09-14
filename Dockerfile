@@ -18,8 +18,13 @@ RUN pnpm install --frozen-lockfile --prod=false
 RUN [ -f .env.production ] && cp .env.production apps/web/.env.production || true
 RUN pnpm --filter @ems/db generate \
   && NODE_OPTIONS=--max-old-space-size=8192 pnpm --filter @ems/web build
+# New fleet apps are tsx-runtime (no compile step), but a broken skeleton must
+# still fail the image build — typecheck them explicitly (E01-042).
+RUN pnpm --filter @ems/dmarc-ingest --filter @ems/feedback-ingest --filter @ems/fleet-agent --filter @ems/maillog-bridge --filter @ems/seedbox typecheck
 ENV NODE_ENV=production PORT=8787
 EXPOSE 8787
 # Default service = API; root `pnpm start` applies Prisma migrations first.
 # Siblings: `pnpm --filter @ems/web start` · `pnpm --filter @ems/workers start`
+# Fleet siblings (tsx-runtime, same image): @ems/dmarc-ingest · @ems/feedback-ingest
+#   · @ems/fleet-agent · @ems/maillog-bridge · @ems/seedbox (`pnpm --filter <name> start`)
 CMD ["pnpm", "start"]

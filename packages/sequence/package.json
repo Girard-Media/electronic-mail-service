@@ -14,12 +14,12 @@
   "dependencies": {
     "@ems/core": "workspace:*",
     "@ems/db": "workspace:*",
-    "zod": "^3.23.0"
+    "zod": "catalog:"
   },
   "devDependencies": {
-    "@eslint/js": "^10.0.1",
-    "eslint": "^10.9.1",
-    "typescript": "^5.6.0",
-    "typescript-eslint": "^8.68.0"
+    "@eslint/js": "catalog:",
+    "eslint": "catalog:",
+    "typescript": "catalog:",
+    "typescript-eslint": "catalog:"
   }
 }
