@@ -9,8 +9,9 @@
 | [AI.md](AI.md) | OpenRouter gateway, the eleven tasks, evals, budgets, injection posture |
 | [ROADMAP.md](ROADMAP.md) | The ninety-day shape and the gates between phases |
 | [HANDOFF.md](HANDOFF.md) | **Start here if you are the next agent on ListKit-class outreach** (2026-09-09) |
-| [TODO.md](TODO.md) | **Generated** build-loop queue — 2,500 tasks |
-| [backlog/](backlog/) | Source of truth for the queue, 24 epic files |
+| [TODO.md](TODO.md) | **Generated** build-loop queue — re-run `pnpm todo:compile` for Epic 25 |
+| [INNOVATION-100.md](INNOVATION-100.md) | 100 agency-synthesized differentiators (2026-09-14), 20 promoted bets |
+| [backlog/](backlog/) | Source of truth for the queue, 25 epic files |
 | [bootspring/](bootspring/) | Notes back to the Bootspring team from building this |
 | [lineage/](lineage/) | Fork provenance from usermails |
 
