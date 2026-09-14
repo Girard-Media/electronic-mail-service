@@ -1,14 +1,34 @@
 # ems
 
-> Developer-first, white-label application-email platform — a Resend competitor. Transactional today (the acute developer pain point), marketing & lifecycle later on the same event stream.
+> Cold B2B outreach infrastructure we own end to end — our metal, our IPs, our
+> MTA, our mail log — so inbox placement is measured and controlled, not rented
+> and hoped for. Lineage: hard fork of `usermails` (transactional); the
+> pre-fork seed is archived at `planning/lineage/SEED-usermails.md`.
 
 ## Overview
 
-**The Problem:** Every app must send email — password resets, magic links, receipts, OTPs, alerts — and the tooling is bad. Legacy giants (SendGrid, Mailgun) have rotted DX and opaque deliverability; the modern darling (Resend) nailed DX but is a closed box with no self-host, shallow white-label, and pricing that punishes growth; raw AWS SES is cheap infrastructure with no product around it; and nobody hands developers real deliverability tooling (inbox placement, warmup, DMARC/BIMI guidance) or true white-label resale.
+**The Problem:** A business wants to start conversations with companies that
+have never heard of them — one email leaving our machine and landing in a
+stranger's Primary tab. Incumbents (Instantly, Smartlead, Lemlist, Apollo,
+Woodpecker, Reply, Salesforge) all share one structural defect: they do not
+own the sending path. They resell Google/Microsoft mailboxes or a third-party
+relay, so they see "accepted by Google" instead of "delivered by the receiving
+MX," cannot do per-IP warmup/quarantine/remediation, classify bounces by
+guessing at strings, share reputation pools across abusive customers, and pass
+through per-seat mailbox cost with thin margin.
 
-**Our Solution:** ems is the platform for application email — a **drop-in Resend-compatible API** (change one base URL), **deliverability as a product** (dedicated IPs + warmup, suppression, inbox-placement, reputation), and **white-label multi-tenancy from day one** so agencies and SaaS platforms resell email under their own brand. Built on AWS SES behind a provider abstraction, with marketing/lifecycle automation on the same event stream as a natural expansion.
+**Our Solution:** ems is the *acquisition* half to `usermails`' *lifecycle*
+half. The moment a lead opts in, they leave EMS via a signed handoff. Every
+message runs a 10-stage send path (sequence → policy → verify → router →
+compose → score → pace → emit → observe → attribute) guarded by seven
+invariants (I1–I7: no unsuppressed send, no unauthenticated domain, no cap
+violation, Message-ID join key, auditable decisions, reputation only from our
+own measurements, blocked-by-default). Reputation is the propellant; the
+product is a reputation budget allocator.
 
-Foundation: **freeresend (MIT)** adapted + **usesend (AGPLv3) clean-room inspiration only** (see `.bootspring/context/DECISIONS.md` D1).
+Foundation: hard fork of `usermails` (multi-tenant RBAC, suppression,
+webhooks, Postfix sidecar + maillog bridge, provider seam, SDK, MCP) +
+**usesend (AGPLv3) clean-room inspiration only** (DECISIONS D1).
 
 ---
 
@@ -16,11 +36,11 @@ Foundation: **freeresend (MIT)** adapted + **usesend (AGPLv3) clean-room inspira
 
 ```yaml
 stack:
-  framework: nextjs        # dashboard (App Router); public API on hono
+  framework: nextjs        # dashboard (App Router); fleet/API on hono
   language: typescript
-  database: postgresql     # control plane (prisma) + clickhouse/tinybird for events
-  queue: redis + bullmq
-  hosting: coolify         # Hostinger fleet App box .207 (NOT vercel)
+  database: postgresql     # decisions + config (prisma); clickhouse for observations
+  queue: valkey + bullmq   # per-tenant lanes, fencing-token scheduler claims
+  hosting: hostinger vps   # blast-node fleet + data box .211 (NOT vercel)
 
 frontend:
   uiLibrary: shadcn
@@ -28,69 +48,84 @@ frontend:
 
 backend:
   orm: prisma
-  auth: authjs
   api: hono
-  email: aws-ses           # behind a MailProvider seam — swappable for SMTP/own-MTA
-  analytics: clickhouse     # or tinybird (DECISIONS D10)
-  storage: cloudflare-r2    # or shared MinIO on Data box .211
+  email: own-postfix-mta   # behind a MailProvider seam — SMTP, never a vendor relay
+  analytics: clickhouse    # self-hosted; events + reputation series + placement
+  storage: cloudflare-r2   # raw MIME, DMARC XML, exports, backups
 ```
 
 ---
 
 ## Architecture
 
-1. **Public API (Hono)** — Resend-compatible: authn, rate-limit, validation, suppression, enqueue.
-2. **Dashboard (Next.js + tRPC + shadcn)** — domains, keys, logs, deliverability, team, branding, marketing (later).
-3. **Queue (Redis + BullMQ)** — durable send, scheduling, webhook dispatch, IP warmup.
-4. **Send workers** — dispatch through a `MailProvider` (v1 `SesProvider`).
-5. **Postgres (control plane)** — orgs/projects/domains/keys/emails/events/suppression/webhooks/usage.
-6. **Event ingestor** — SES/SNS → suppression rules → ClickHouse (analytics) + Postgres (state).
-7. **Webhook dispatcher** — HMAC-signed, retried, replayable.
-8. **Deliverability subsystem** — DKIM/SPF/DMARC/BIMI, dedicated IP pools + warmup, inbox placement, reputation, abuse screening.
+1. **Fleet (blast nodes)** — per-node Postfix bound to dedicated IPs, rDNS/PTR
+   controlled, `maillog-bridge` streaming `250`/deferral/bounce truth.
+2. **Router (`packages/router`)** — the only package that makes a final send
+   decision: constrained cost-minimization over (node, ip, domain, mailbox);
+   deferral is a first-class success.
+3. **Policy gate (`packages/policy`)** — jurisdiction + consent + suppression +
+   content; versioned packs pinned per campaign; BLOCKED_BY_POLICY with reason.
+4. **Sequence engine (`packages/sequence`)** — durable per-enrolment state
+   machine; halt-on-reply/bounce/complaint/unsub across all campaigns.
+5. **Verification engine (`packages/verify`)** — self-run DNS/SMTP checks from
+   dedicated IPs that never burn sender reputation.
+6. **Warmup (`packages/warmup`)** — quota-ramped curves as Valkey Lua token
+   buckets with auto-hold; strictly per-client pools, never shared.
+7. **Deliverability cockpit** — maillog truth, DNSBL, DMARC RUA/TLS-RPT ingest,
+   seed probes, per-message timeline keyed by Message-ID.
+8. **Dashboard (Next.js + tRPC)** — plain-text-first composer, capacity and
+   reputation views, client portals under agency brands.
 
-Full topology + data model: `.bootspring/context/ARCHITECTURE.md`. Real deploy fabric: `.bootspring/context/INFRA.md`.
+Full topology + invariants: `planning/ARCHITECTURE.md`. Fleet math:
+`planning/INFRA.md`. Legal map: `planning/COMPLIANCE.md`.
 
 ---
 
 ## Integrations
 
-**Sending:** AWS SES (v1, behind `MailProvider`)
-**DNS / edge / storage:** Cloudflare (one-click DNS verify, edge, R2)
-**Database:** Postgres 18 + pgvector (Hostinger Data box .211)
-**Queue/cache:** Redis/Valkey (Data box .211)
-**Analytics:** ClickHouse or Tinybird
-**Auth:** Auth.js (credentials + OAuth)
-**Compatibility:** Resend SDK (drop-in via base URL), official ems SDK
+**Sending:** own Postfix MTA (behind `MailProvider`; Gmail/Outlook only as
+migration-compat, never the core path)
+**DNS / storage:** Cloudflare (registrar/DNS + R2)
+**Database:** Postgres 18 + pgvector (Data box .211)
+**Queue/cache:** Valkey (Data box .211)
+**Analytics:** self-hosted ClickHouse
+**Inference:** OpenRouter (single gateway, cost-capped; human-gated drafts only)
+**Payments:** Stripe behind a `BillingProvider` seam (pay-per-verified-delivered)
+**Telemetry (read-only, optional):** Google Postmaster / Microsoft SNDS
+
+**Refused:** open tracking on by default, cross-customer warmup pools,
+newsletter/lifecycle mode, third-party verification/blacklist/analytics
+vendors. Full list: `planning/VISION.md` §7.
 
 ---
 
-## MVP Features (Phase 1 — Transactional Core)
+## MVP Features (Phase 1 — The Fleet + The Product)
 
-1. Auth, organizations, projects, RBAC (multi-tenant spine)
-2. Sending domains + DKIM/SPF/DMARC auto-setup + one-click Cloudflare DNS verification
-3. Scoped, hashed API keys
-4. Resend-compatible send API (`/emails`, `/emails/batch`, `GET /emails/:id`, scheduling, idempotency)
-5. Durable send pipeline (BullMQ → SES) behind the `MailProvider` seam
-6. SES/SNS event ingestion + automatic suppression on bounce/complaint
-7. Searchable logs + per-message event timeline
-8. HMAC-signed webhooks with retries + replay
-9. Deliverability basics (rates + alerts) + abuse screening
-10. White-label foundations (custom dashboard domain, branding, reseller usage rollup)
+1. Blast node #1 alive: own IP, rDNS, DKIM-signing, port-25 egress, `90-verify.sh` green
+2. Ten domains + 25 mailboxes provisioned end to end, zero manual steps
+3. Warmup ramping unattended with demonstrated hold + rollback
+4. Router deciding < 50ms p95 with a readable trace per decision
+5. Bounce taxonomy > 98% non-`UNKNOWN` from verbatim SMTP replies
+6. Sequence engine: enrol → materialize → halt-on-any-signal
+7. Compliance gates that demonstrably block (jurisdiction, consent, suppression, footer)
+8. Verification with a published false-valid rate; ambiguous-means-suppressed
+9. Per-message timeline + usage metering with zero drift vs raw events
+10. Agency spine: scoped keys, per-client DKIM/tracking, cost-plus sub-billing
 
-Detail: `.bootspring/context/PRD.md` · spec/plan/tasks: `.bootspring/specs/transactional-core/`.
+Detail: `planning/ROADMAP.md` · queue: `planning/TODO.md` (source: `planning/backlog/`).
 
 ---
 
 ## Implementation Phases
 
-- **Phase 0 — Foundation spike:** prove the drop-in send path end to end on the fleet (one authenticated email → real inbox + one ingested event).
-- **Phase 1 — Transactional Core (MVP):** the 10 features above.
-- **Phase 2 — Deliverability Suite:** dedicated IPs + warmup, suppression UI, inbox-placement testing, reputation/blocklist/DMARC monitoring, BIMI.
-- **Phase 3 — Marketing / Lifecycle:** contacts, segments, broadcasts, editor, automations on the same event stream.
-- **Phase 4 — Scale & Enterprise:** BYO-SES, self-host, multi-provider routing, SSO, reseller marketplace.
+- **Phase 0 — Foundation (days 0–14):** fork green, fleet schema, node #1, policy skeleton, first Gmail `250` from our own maillog.
+- **Phase 1 — The Fleet (days 15–35):** warmup, router, maillog→bounce taxonomy, DNSBL/DMARC/TLS-RPT receivers, cockpit v1.
+- **Phase 2 — The Product (days 36–60):** sequences, leads, verification, inbox, AI gateway (human-gated), Stripe metering.
+- **Phase 3 — GA (days 61–90):** seed placement ≥85% Gmail / ≥75% Microsoft, pentest, DR drill, honesty audit, second-operator week.
 
-Detail + sequencing rationale: `.bootspring/context/ROADMAP.md`.
+Stop conditions (port 25 unobtainable, placement below gate, operator cost,
+compliance unworkable): `planning/ROADMAP.md`.
 
 ---
 
-*Seed for [Bootspring](https://bootspring.com). Merged context: `planning/SEED.md`. Full context docs: `.bootspring/context/`.*
+*Seed for [Bootspring](https://bootspring.com). Merged context: `planning/SEED.md` (archived original: `planning/lineage/SEED-usermails.md`). Full context docs: `planning/`.*
