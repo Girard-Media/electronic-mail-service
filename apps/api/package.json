@@ -19,7 +19,7 @@
     "@ems/sequence": "workspace:*",
     "@hono/node-server": "^1.13.0",
     "ems-migrate": "workspace:*",
-    "hono": "^4.6.0",
+    "hono": "^4.13.11",
     "tsx": "catalog:",
     "zod": "catalog:"
   },
