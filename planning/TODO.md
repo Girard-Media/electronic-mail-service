@@ -23,7 +23,7 @@
 - [x] `task-1735` E18-003 — Define the light and dark palettes on :root with a documented contrast floor
 - [x] `task-1736` E18-004 — Build the layout shell: sidebar, top bar, workspace switcher, command palette
 - [ ] `task-1737` E18-005 — Implement the command palette with fuzzy search across every entity
-- [ ] `task-1738` E18-006 — Implement global keyboard shortcuts with a discoverable help sheet
+- [x] `task-1738` E18-006 — Implement global keyboard shortcuts with a discoverable help sheet
 - [ ] `task-1739` E18-007 — Establish the data layer: cached, deduped, no fetch-on-mount waterfalls
 - [ ] `task-1740` E18-008 — Forbid per-row fetching in any list; batch at the route
 - [ ] `task-1741` E18-009 — Add a lint rule catching fetch-on-mount in a component
