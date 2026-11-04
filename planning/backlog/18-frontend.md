@@ -6,8 +6,8 @@ The campaign builder should be plain and fast, not clever.
 
 ## Foundation
 - [x] E18-001 — Strip the inherited usermails marketing pages from apps/web
-- [ ] E18-002 — Establish the EMS design tokens: colour, type scale, spacing, radius, elevation
-- [ ] E18-003 — Define the light and dark palettes on :root with a documented contrast floor
+- [x] E18-002 — Establish the EMS design tokens: colour, type scale, spacing, radius, elevation
+- [x] E18-003 — Define the light and dark palettes on :root with a documented contrast floor
 - [ ] E18-004 — Build the layout shell: sidebar, top bar, workspace switcher, command palette
 - [ ] E18-005 — Implement the command palette with fuzzy search across every entity
 - [ ] E18-006 — Implement global keyboard shortcuts with a discoverable help sheet
