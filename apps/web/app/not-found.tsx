@@ -17,7 +17,7 @@ export default function NotFound() {
       <section className="hero">
         <div className="wrap center">
           <span className="eyebrow">
-            <i className="ti ti-mail-question" /> 404
+            <i className="ti ti-mail-question" aria-hidden="true" /> 404
           </span>
           <h1>This address doesn&apos;t exist</h1>
           <p className="muted">
@@ -34,10 +34,10 @@ export default function NotFound() {
             }}
           >
             <Link className="btn pri" href="/">
-              <i className="ti ti-home" /> Back home
+              <i className="ti ti-home" aria-hidden="true" /> Back home
             </Link>
             <Link className="btn" href="/status">
-              <i className="ti ti-activity-heartbeat" /> Service status
+              <i className="ti ti-activity-heartbeat" aria-hidden="true" /> Service status
             </Link>
           </div>
         </div>

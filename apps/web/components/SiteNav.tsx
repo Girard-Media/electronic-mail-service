@@ -8,7 +8,7 @@ export function SiteNav() {
     <header className="nav">
       <div className="wrap">
         <Link className="brand" href="/">
-          <i className="ti ti-mail-fast" />
+          <i className="ti ti-mail-fast" aria-hidden="true" />
           EMS
         </Link>
         <nav>

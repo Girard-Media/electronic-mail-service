@@ -20,7 +20,7 @@ export function TenantChrome({ org, children }: { org: TenantBrand; children: Re
                 style={{ height: 26, width: "auto", borderRadius: 6 }}
               />
             ) : (
-              <i className="ti ti-mail-fast" style={{ color: accent }} />
+              <i className="ti ti-mail-fast" style={{ color: accent }} aria-hidden="true" />
             )}
             {org.name}
           </span>

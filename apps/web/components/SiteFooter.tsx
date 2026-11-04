@@ -8,7 +8,7 @@ export function SiteFooter() {
         <div className="cols">
           <div style={{ maxWidth: 300 }}>
             <Link className="brand" href="/">
-              <i className="ti ti-mail-fast" />
+              <i className="ti ti-mail-fast" aria-hidden="true" />
               EMS
             </Link>
             <p className="muted" style={{ marginTop: 14 }}>

@@ -56,10 +56,10 @@ export default function Home() {
           </p>
           <div className="cta">
             <a className="btn pri lg" href="/dashboard">
-              <i className="ti ti-layout-dashboard" /> Open the dashboard
+              <i className="ti ti-layout-dashboard" aria-hidden="true" /> Open the dashboard
             </a>
             <Link className="btn lg" href="/status">
-              <i className="ti ti-activity-heartbeat" /> Service status
+              <i className="ti ti-activity-heartbeat" aria-hidden="true" /> Service status
             </Link>
           </div>
         </div>
@@ -75,7 +75,7 @@ export default function Home() {
             {GATES.map((g) => (
               <div className="card" key={g.title}>
                 <div className="ic">
-                  <i className={`ti ${g.icon}`} />
+                  <i className={`ti ${g.icon}`} aria-hidden="true" />
                 </div>
                 <h3>{g.title}</h3>
                 <p>{g.body}</p>

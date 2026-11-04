@@ -27,7 +27,7 @@ export default function Error({
       <section className="hero">
         <div className="wrap center">
           <span className="eyebrow">
-            <i className="ti ti-alert-triangle" /> Something broke
+            <i className="ti ti-alert-triangle" aria-hidden="true" /> Something broke
           </span>
           <h1>That didn&apos;t load</h1>
           <p className="muted">
@@ -51,13 +51,13 @@ export default function Error({
             }}
           >
             <button className="btn pri" onClick={reset} type="button">
-              <i className="ti ti-refresh" /> Try again
+              <i className="ti ti-refresh" aria-hidden="true" /> Try again
             </button>
             <Link className="btn" href="/">
-              <i className="ti ti-home" /> Back home
+              <i className="ti ti-home" aria-hidden="true" /> Back home
             </Link>
             <Link className="btn" href="/status">
-              <i className="ti ti-activity-heartbeat" /> Service status
+              <i className="ti ti-activity-heartbeat" aria-hidden="true" /> Service status
             </Link>
           </div>
         </div>
