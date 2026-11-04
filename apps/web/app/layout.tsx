@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
 import "./globals.css";
+import { THEME_BOOT_SCRIPT } from "@/lib/theme";
 
 const DESCRIPTION =
   "Developer-first, white-label application email. A drop-in Resend-compatible API on a mail server we operate — delivered, bounced, and complained are real events, not a send count.";
@@ -28,16 +29,21 @@ export const metadata: Metadata = {
   },
 };
 
-// Matches --bg in globals.css so mobile browser chrome blends with the page.
+// Matches --bg in tokens.css (dark default, light opt-in) so mobile browser chrome
+// blends with the page. colorScheme lists both so form controls follow the theme.
 export const viewport: Viewport = {
   themeColor: "#0a0d14",
-  colorScheme: "dark",
+  colorScheme: "dark light",
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
+        {/* Applies a stored light-theme choice before first paint (E18-004). The
+            only attribute it touches is data-theme on <html>, hence
+            suppressHydrationWarning above. CSP script-src allows inline. */}
+        <script dangerouslySetInnerHTML={{ __html: THEME_BOOT_SCRIPT }} />
         {/* Linked, not bundled: the icon font lives in public/ and its own
             @font-face URL is relative ("./fonts/…"), so it only resolves when
             the stylesheet is served from /vendor/. A CSS @import of an absolute

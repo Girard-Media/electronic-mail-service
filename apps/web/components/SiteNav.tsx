@@ -1,7 +1,8 @@
 import Link from "next/link";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
-// Shared marketing top nav. Server component — the only interactivity is CSS hover and
-// the >820px nav reveal, so no client JS. Mirrors apps/api/public/*.html header.
+// Shared marketing top nav. Server component; the only client island is the
+// light/dark ThemeToggle (E18-004). Mirrors apps/api/public/*.html header.
 export function SiteNav() {
   return (
     <header className="nav">
@@ -16,6 +17,7 @@ export function SiteNav() {
           <Link href="/security">Security</Link>
         </nav>
         <div className="right">
+          <ThemeToggle />
           {/* /dashboard is still served by the Hono app until the Phase 5 port. */}
           <a href="/dashboard" style={{ color: "var(--tx2)", fontSize: "14.5px", fontWeight: 500 }}>
             Dashboard
