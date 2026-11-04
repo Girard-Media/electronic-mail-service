@@ -27,8 +27,8 @@ The campaign builder should be plain and fast, not clever.
 - [ ] E18-020 — Fail CI on a performance budget regression
 - [ ] E18-021 — Implement responsive layouts down to mobile for the inbox and campaign views
 - [ ] E18-022 — Implement full keyboard navigation and visible focus rings
-- [ ] E18-023 — Meet WCAG AA contrast on every token pair
-- [ ] E18-024 — Add screen-reader labels on every icon-only control
+- [x] E18-023 — Meet WCAG AA contrast on every token pair
+- [x] E18-024 — Add screen-reader labels on every icon-only control
 - [ ] E18-025 — Add an automated accessibility check to CI
 - [ ] E18-026 — Implement the toast and notification system with a persistent activity feed
 - [ ] E18-027 — Never show a toast as the only record of an important event
