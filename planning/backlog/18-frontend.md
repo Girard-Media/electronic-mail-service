@@ -5,7 +5,7 @@ Infrastructure and Deliverability are the differentiated surfaces and get the de
 The campaign builder should be plain and fast, not clever.
 
 ## Foundation
-- [ ] E18-001 — Strip the inherited usermails marketing pages from apps/web
+- [x] E18-001 — Strip the inherited usermails marketing pages from apps/web
 - [ ] E18-002 — Establish the EMS design tokens: colour, type scale, spacing, radius, elevation
 - [ ] E18-003 — Define the light and dark palettes on :root with a documented contrast floor
 - [ ] E18-004 — Build the layout shell: sidebar, top bar, workspace switcher, command palette
