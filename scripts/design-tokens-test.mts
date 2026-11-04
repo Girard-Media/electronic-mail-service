@@ -1,4 +1,4 @@
-// E18-002/003: the design tokens exist in one place, both palettes define the
+// E18-002/003/023: the design tokens exist in one place, both palettes define the
 // same colour tokens, and every text/surface pair meets the documented WCAG AA
 // contrast floor. Parses apps/web/app/tokens.css directly so the test cannot
 // drift from what the browser actually loads.
@@ -37,6 +37,7 @@ export function contrast(a: string, b: string): number {
 }
 
 // Self-check the maths against known WCAG reference values.
+// (over() is checked below, after its definition.)
 ok("contrast maths: black on white is 21:1", Math.abs(contrast("#000000", "#ffffff") - 21) < 0.01);
 ok("contrast maths: #767676 on white is 4.54:1", Math.abs(contrast("#767676", "#ffffff") - 4.54) < 0.01);
 
@@ -45,8 +46,21 @@ const light = block(css, ':root[data-theme="light"]');
 const HEX = /^#[0-9a-f]{6}$/i;
 const SURFACES = ["--bg", "--bg2", "--surface", "--surface2"];
 const TEXT = ["--tx", "--tx2", "--tx3", "--brand2", "--ok", "--warn", "--danger"];
+const TINTED = [
+  ["--ok", "--okbg"], ["--warn", "--warnbg"], ["--danger", "--dangerbg"],
+  ["--brand2", "--brandsoft"], ["--tx", "--brandsoft"],
+] as const;
+// Composite an rgba() tint over an opaque hex surface → opaque hex.
+export function over(tint: string, surface: string): string {
+  const m = /rgba\(\s*(\d+),\s*(\d+),\s*(\d+),\s*([\d.]+)\s*\)/.exec(tint);
+  if (!m) return tint;
+  const a = Number(m[4]);
+  const base = [0, 2, 4].map((i) => parseInt(surface.replace("#", "").slice(i, i + 2), 16));
+  return "#" + [1, 2, 3].map((i, j) => Math.round(Number(m[i]) * a + base[j] * (1 - a)).toString(16).padStart(2, "0")).join("");
+}
 const isColour = (v: string) => HEX.test(v) || v.startsWith("rgba(");
 
+ok("tint compositing: 50% white over black is #808080", over("rgba(255, 255, 255, .5)", "#000000") === "#808080");
 ok("dark palette is on :root", dark.size > 0);
 ok("light palette is on :root[data-theme=light]", light.size > 0);
 ok("dark sets color-scheme: dark", /:root\s*{[^}]*color-scheme:\s*dark/.test(css));
@@ -71,6 +85,13 @@ for (const [name, palette] of [["dark", dark], ["light", light]] as const) {
   }
   const focus = Math.min(...SURFACES.map((s) => contrast(palette.get("--focus")!, palette.get(s)!)));
   ok(`${name}: --focus ≥ 3:1 on every surface`, focus >= 3, focus.toFixed(2));
+  // E18-023: tinted pairs. Badges, notes, the active nav item and the selected
+  // command-palette row put text on a translucent tint; composite the tint over
+  // each surface and hold the result to the same 4.5:1 floor.
+  for (const [text, tint] of TINTED) {
+    const worst = Math.min(...SURFACES.map((s) => contrast(palette.get(text)!, over(palette.get(tint)!, palette.get(s)!))));
+    ok(`${name}: ${text} ≥ 4.5:1 on ${tint} over every surface`, worst >= 4.5, worst.toFixed(2));
+  }
 }
 
 for (const group of ["--font-sans", "--font-mono", "--fs-base", "--lh-body", "--sp-4", "--radius-md", "--elev-2"]) {
