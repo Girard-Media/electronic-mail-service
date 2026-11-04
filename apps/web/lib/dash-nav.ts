@@ -22,7 +22,8 @@ export type Workspace = { orgId: string; name: string; role: string };
 export type Command =
   | { id: string; group: "Navigate"; label: string; icon: string; kind: "href"; href: string }
   | { id: string; group: "Workspace"; label: string; icon: string; kind: "switch"; orgId: string }
-  | { id: string; group: "Preferences"; label: string; icon: string; kind: "theme" };
+  | { id: string; group: "Preferences"; label: string; icon: string; kind: "theme" }
+  | { id: string; group: "Help"; label: string; icon: string; kind: "shortcuts" };
 
 export function buildCommands(opts: {
   workspaces: Workspace[];
@@ -53,6 +54,7 @@ export function buildCommands(opts: {
     icon: opts.theme === "light" ? "ti-moon" : "ti-sun",
     kind: "theme",
   });
+  cmds.push({ id: "shortcuts", group: "Help", label: "Keyboard shortcuts", icon: "ti-keyboard", kind: "shortcuts" });
   return cmds;
 }
 

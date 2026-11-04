@@ -6,10 +6,11 @@ import { DashGate } from "@/components/DashGate";
 import { DashNav } from "@/components/DashNav";
 import { CommandPalette } from "@/components/CommandPalette";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { KeyboardShortcuts } from "@/components/KeyboardShortcuts";
 import { WorkspaceSwitcher } from "@/components/WorkspaceSwitcher";
 
 // Next dashboard layout shell (E18-004): sidebar, top bar with workspace switcher,
-// command palette (Cmd/Ctrl+K) and light/dark toggle. The full dashboard is ported
+// command palette (Cmd/Ctrl+K), keyboard shortcuts (E18-006) and light/dark toggle. The full dashboard is ported
 // view by view; until parity the Hono static dashboard (apps/api/public/dashboard.html)
 // stays primary and next.config.ts redirects /dashboard there. Per-user → force-dynamic.
 export const dynamic = "force-dynamic";
@@ -38,6 +39,7 @@ export default async function DashboardLayout({ children }: { children: ReactNod
           <WorkspaceSwitcher workspaces={workspaces} activeOrgId={activeOrgId} activeName={orgName} role={session.role} />
           <div className="dash-top-tools">
             <CommandPalette workspaces={workspaces} activeOrgId={activeOrgId} />
+            <KeyboardShortcuts />
             <ThemeToggle />
             <span className="muted dash-email">{session.user.email}</span>
           </div>

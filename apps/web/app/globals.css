@@ -183,3 +183,13 @@ footer .bot { display: flex; justify-content: space-between; align-items: center
 .cmdk-group { margin-left: auto; font-size: 11.5px; color: var(--tx2); }
 .cmdk-empty { padding: 14px 18px; margin: 0; color: var(--tx2); font-size: 14px; }
 .cmdk-hint { margin: 0; padding: 8px 16px; border-top: 1px solid var(--line); }
+.kbd-sheet { width: min(520px, 100%); }
+.kbd-sheet-head { display: flex; align-items: center; justify-content: space-between; padding: 12px 12px 12px 18px; border-bottom: 1px solid var(--line); }
+.kbd-sheet-head h2 { margin: 0; font-size: 16px; }
+.kbd-list { margin: 0; padding: 8px 18px; }
+.kbd-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 8px 0; border-bottom: 1px solid var(--line); }
+.kbd-row:last-child { border-bottom: 0; }
+.kbd-row dt { font-size: 14.5px; color: var(--tx); }
+.kbd-row dd { margin: 0; white-space: nowrap; }
+.kbd-row kbd { font-family: var(--font-mono); font-size: 12px; color: var(--tx); background: var(--surface); border: 1px solid var(--line2); border-radius: 6px; padding: 2px 7px; }
+.kbd-or { font-size: 12px; color: var(--tx2); }

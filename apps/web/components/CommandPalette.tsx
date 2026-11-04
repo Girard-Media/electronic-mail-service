@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { buildCommands, filterCommands, moveActive, type Command, type Workspace } from "@/lib/dash-nav";
 import { applyTheme, currentTheme, otherTheme, subscribeTheme } from "@/lib/theme";
 import { switchWorkspace } from "@/components/WorkspaceSwitcher";
+import { OPEN_PALETTE_EVENT, OPEN_SHORTCUTS_EVENT } from "@/lib/shortcuts";
 
 // Dashboard command palette shell (E18-004). Opens with Cmd/Ctrl+K or the top-bar
 // button; a modal dialog with a combobox input driving a listbox (aria-activedescendant),
@@ -48,8 +49,15 @@ export function CommandPalette(props: { workspaces: Workspace[]; activeOrgId: st
         else show();
       }
     };
+    const onOpen = () => {
+      if (!open) show();
+    };
     window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
+    window.addEventListener(OPEN_PALETTE_EVENT, onOpen);
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      window.removeEventListener(OPEN_PALETTE_EVENT, onOpen);
+    };
   }, [open, show, close]);
 
   useEffect(() => {
@@ -61,6 +69,9 @@ export function CommandPalette(props: { workspaces: Workspace[]; activeOrgId: st
     if (cmd.kind === "theme") {
       applyTheme(otherTheme(theme));
       close();
+    } else if (cmd.kind === "shortcuts") {
+      setOpen(false);
+      window.dispatchEvent(new Event(OPEN_SHORTCUTS_EVENT));
     } else if (cmd.kind === "href") {
       setOpen(false);
       if (/^https?:/.test(cmd.href)) window.location.assign(cmd.href);
