@@ -21,7 +21,7 @@
 - [x] `task-1733` E18-001 — Strip the inherited usermails marketing pages from apps/web
 - [x] `task-1734` E18-002 — Establish the EMS design tokens: colour, type scale, spacing, radius, elevation
 - [x] `task-1735` E18-003 — Define the light and dark palettes on :root with a documented contrast floor
-- [ ] `task-1736` E18-004 — Build the layout shell: sidebar, top bar, workspace switcher, command palette
+- [x] `task-1736` E18-004 — Build the layout shell: sidebar, top bar, workspace switcher, command palette
 - [ ] `task-1737` E18-005 — Implement the command palette with fuzzy search across every entity
 - [ ] `task-1738` E18-006 — Implement global keyboard shortcuts with a discoverable help sheet
 - [ ] `task-1739` E18-007 — Establish the data layer: cached, deduped, no fetch-on-mount waterfalls
