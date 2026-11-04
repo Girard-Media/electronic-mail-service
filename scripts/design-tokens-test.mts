@@ -83,6 +83,18 @@ ok("globals.css no longer declares its own :root palette", !/:root\s*{/.test(glo
 ok("filled buttons use the token pair the floor covers",
   /\.btn\.pri\s*{[^}]*color:\s*var\(--on-brand\)/.test(globals) && /\.btn\.pri:hover\s*{[^}]*var\(--brand-hover\)/.test(globals));
 
+// apps/api/public/site.css is the Hono-served dashboard/marketing palette (still
+// primary until the Next port reaches parity). It keeps its own compact :root,
+// so hold its text tokens to the same 4.5:1 floor on its own surfaces.
+const site = readFileSync(join(root, "apps/api/public/site.css"), "utf8");
+const siteRoot = new Map<string, string>();
+const siteBody = /:root\s*{([^}]*)}/.exec(site)?.[1] ?? "";
+for (const m of siteBody.matchAll(/(--[a-z0-9-]+)\s*:\s*([^;]+);/g)) siteRoot.set(m[1], m[2].trim());
+for (const t of ["--tx", "--tx2", "--tx3", "--brand2", "--ok", "--warn"]) {
+  const worst = Math.min(...SURFACES.map((s) => contrast(siteRoot.get(t)!, siteRoot.get(s)!)));
+  ok(`site.css: ${t} ≥ 4.5:1 on every surface`, worst >= 4.5, worst.toFixed(2));
+}
+
 if (fail) {
   console.error(`\n${fail} design-token check(s) failed`);
   process.exit(1);
