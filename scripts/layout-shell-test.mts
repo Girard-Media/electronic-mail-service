@@ -18,6 +18,7 @@ import {
   workspacesFromSession,
 } from "../apps/web/lib/dash-nav.ts";
 import { checkSwitchRequest } from "../apps/web/lib/workspace-switch.ts";
+import { SHORTCUTS, isEditableTarget, resolveShortcut } from "../apps/web/lib/shortcuts.ts";
 
 let passed = 0;
 const t = (name: string, fn: () => void) => {
@@ -185,6 +186,51 @@ t("workspace switch: route forwards cookies to the API and relays Set-Cookie", (
   assert.match(src, /\/app\/subaccounts\/switch/);
   assert.match(src, /getSetCookie\(\)/);
   assert.match(src, /checkSwitchRequest/);
+});
+
+console.log("keyboard shortcuts (E18-006)");
+
+t("shortcuts: single keys, the g-o sequence, and nothing while typing or with modifiers", () => {
+  assert.deepEqual(resolveShortcut({ key: "?" }, null), { action: "help", pending: null });
+  assert.deepEqual(resolveShortcut({ key: "/" }, null), { action: "palette", pending: null });
+  assert.deepEqual(resolveShortcut({ key: "T" }, null), { action: "theme", pending: null });
+  assert.deepEqual(resolveShortcut({ key: "g" }, null), { action: null, pending: "g" });
+  assert.deepEqual(resolveShortcut({ key: "o" }, "g"), { action: "go-overview", pending: null });
+  assert.deepEqual(resolveShortcut({ key: "x" }, "g"), { action: null, pending: null });
+  assert.deepEqual(resolveShortcut({ key: "o" }, null), { action: null, pending: null });
+  assert.deepEqual(resolveShortcut({ key: "t", editable: true }, null), { action: null, pending: null });
+  assert.deepEqual(resolveShortcut({ key: "t", ctrlKey: true }, null), { action: null, pending: null });
+  assert.deepEqual(resolveShortcut({ key: "t", metaKey: true }, null), { action: null, pending: null });
+});
+
+t("shortcuts: text fields and contenteditable count as typing; buttons and checkboxes don't", () => {
+  assert.equal(isEditableTarget({ tagName: "INPUT", type: "text" }), true);
+  assert.equal(isEditableTarget({ tagName: "input" }), true);
+  assert.equal(isEditableTarget({ tagName: "TEXTAREA" }), true);
+  assert.equal(isEditableTarget({ tagName: "SELECT" }), true);
+  assert.equal(isEditableTarget({ tagName: "DIV", isContentEditable: true }), true);
+  assert.equal(isEditableTarget({ tagName: "INPUT", type: "checkbox" }), false);
+  assert.equal(isEditableTarget({ tagName: "BUTTON" }), false);
+  assert.equal(isEditableTarget(null), false);
+});
+
+t("shortcuts: every action in the help sheet is reachable by a key the handler resolves", () => {
+  const reachable = new Set(
+    [["?"], ["/"], ["t"], ["g", "o"]].map((seq) => {
+      let pending: string | null = null;
+      let action = null;
+      for (const key of seq) ({ action, pending } = resolveShortcut({ key }, pending));
+      return action;
+    }),
+  );
+  for (const s of SHORTCUTS) assert.ok(reachable.has(s.action), `${s.label} is wired`);
+  const cmds = buildCommands({ workspaces, activeOrgId: "org_a", theme: "dark" });
+  assert.ok(cmds.some((c) => c.kind === "shortcuts"), "the palette offers the help sheet");
+  const src = web("components/KeyboardShortcuts.tsx");
+  for (const needle of ['role="dialog"', 'aria-modal="true"', "aria-labelledby", 'aria-label="Keyboard shortcuts"', "SHORTCUTS.map"]) {
+    assert.ok(src.includes(needle), `KeyboardShortcuts has ${needle}`);
+  }
+  assert.match(web("app/dashboard/layout.tsx"), /<KeyboardShortcuts \/>/);
 });
 
 console.log(`layout-shell-test: ${passed} passed`);
