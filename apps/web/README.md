@@ -21,7 +21,12 @@ proof (`/status`), and a Valkey-backed `cacheHandler` (`cache-handler.cjs`) so a
 revalidate on one container is seen by all replicas. The handler **fails open** — no
 `REDIS_URL` or any Redis error degrades to local regeneration — so it's safe on a
 single box and in dev. Cross-instance invalidation is only *provable* on a real
-multi-container deploy. Next up: marketing port, blog engine, `proxy.ts` subdomains.
+multi-container deploy.
+
+Marketing: the inherited usermails pages (features, pricing, deliverability, docs)
+were stripped in E18-001. The apex now serves a plain EMS landing, the blog, status,
+and the legal pages (privacy/terms/security still carry usermails-era wording and
+need an owner rewrite).
 
 ### Env
 - `DATABASE_URL` — Postgres (install + build + runtime; `env.ts` is strict).

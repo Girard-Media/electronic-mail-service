@@ -128,26 +128,16 @@ const MARKETING_ORIGIN = "https://electronicmailservices.com";
 // It must NOT redirect to the marketing site — hostssh's blue-green asset gate
 // follows the redirect, reads the Next page's HTML, then resolves its
 // /_next/* assets against THIS container (which has no such route) and fails
-// the deploy on 5 phantom 404s. Marketing sub-paths below still redirect.
+// the deploy on 5 phantom 404s. The inherited usermails marketing paths
+// (/features, /pricing, /deliverability, /docs*) were stripped from apps/web
+// (E18-001), so they are no longer redirected — they would land on a 404.
 app.get("/", (c) =>
   c.json({
     service: "ems-api",
-    docs: `${MARKETING_ORIGIN}/docs/dev`,
     website: MARKETING_ORIGIN,
     health: { live: "/livez", ready: "/readyz" },
   }),
 );
-
-for (const path of [
-  "/features",
-  "/pricing",
-  "/deliverability",
-  "/docs",
-  "/docs/user",
-  "/docs/dev",
-]) {
-  app.get(path, (c) => c.redirect(`${MARKETING_ORIGIN}${path}`, 302));
-}
 
 // ---- API ----
 // Liveness: the process is up. Always 200 if we can answer — never put Postgres

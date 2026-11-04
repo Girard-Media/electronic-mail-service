@@ -14,7 +14,7 @@ const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://electronicmailser
 );
 
 // Only content surfaces the pipeline legitimately publishes may be revalidated.
-const REVALIDATE_PREFIXES = ["/blog", "/features", "/pricing", "/deliverability", "/docs"];
+const REVALIDATE_PREFIXES = ["/blog"];
 function isRevalidatablePath(p: string): boolean {
   if (!p.startsWith("/") || p.includes("..")) return false;
   if (p === "/") return true;

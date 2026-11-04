@@ -3,7 +3,7 @@ import { SITE_URL, getSitemapRows } from "@/lib/blog";
 
 // Single sitemap served at /sitemap.xml (where robots.ts points + Google expects it).
 // Google caps a sitemap at 50k URLs / 50MB; our near-term catalog (~10k blog posts +
-// the marketing routes) is comfortably under that, so chunking would be premature —
+// the static routes) is comfortably under that, so chunking would be premature —
 // and a single default-export sitemap avoids the generateSitemaps id-coercion + missing
 // /sitemap.xml-index pitfalls. If the catalog ever approaches ~45k, switch to chunked
 // generateSitemaps + an explicit index route. DB access is wrapped: an unreachable DB
@@ -12,12 +12,6 @@ const MAX_BLOG_URLS = 45_000; // safety margin under the 50k cap (leaves room fo
 
 const STATIC_ROUTES: { path: string; changeFrequency: MetadataRoute.Sitemap[number]["changeFrequency"]; priority: number }[] = [
   { path: "/", changeFrequency: "weekly", priority: 1 },
-  { path: "/features", changeFrequency: "weekly", priority: 0.8 },
-  { path: "/pricing", changeFrequency: "weekly", priority: 0.8 },
-  { path: "/deliverability", changeFrequency: "weekly", priority: 0.7 },
-  { path: "/docs", changeFrequency: "weekly", priority: 0.7 },
-  { path: "/docs/user", changeFrequency: "monthly", priority: 0.5 },
-  { path: "/docs/dev", changeFrequency: "monthly", priority: 0.5 },
   { path: "/blog", changeFrequency: "daily", priority: 0.7 },
   { path: "/status", changeFrequency: "hourly", priority: 0.4 },
   { path: "/privacy", changeFrequency: "monthly", priority: 0.3 },

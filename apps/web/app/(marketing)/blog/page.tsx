@@ -8,9 +8,9 @@ import { listPublished, formatDate, type BlogCard } from "@/lib/blog";
 export const revalidate = 600;
 
 export const metadata: Metadata = {
-  title: "Blog — deliverability, transactional email & developer guides",
+  title: "Blog — cold outreach deliverability and infrastructure",
   description:
-    "Guides on transactional email, deliverability (SPF/DKIM/DMARC), and shipping application email developers actually trust.",
+    "Notes on running cold B2B outreach on owned infrastructure: sender authentication (SPF/DKIM/DMARC), warmup, placement, and reputation.",
   alternates: { canonical: "/blog" },
 };
 
@@ -33,8 +33,8 @@ export default async function BlogIndex() {
             Email that <span className="g">lands</span>, explained.
           </h1>
           <p className="sub">
-            Deliverability, transactional email, and developer guides from the team
-            building application email on infrastructure you control.
+            Deliverability and infrastructure notes from the team building cold B2B
+            outreach on servers, IPs, and a mail log we own.
           </p>
         </div>
       </section>

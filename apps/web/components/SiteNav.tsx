@@ -11,10 +11,9 @@ export function SiteNav() {
           EMS
         </Link>
         <nav>
-          <Link href="/features">Features</Link>
-          <Link href="/deliverability">Deliverability</Link>
-          <Link href="/pricing">Pricing</Link>
-          <Link href="/docs">Docs</Link>
+          <Link href="/blog">Blog</Link>
+          <Link href="/status">Status</Link>
+          <Link href="/security">Security</Link>
         </nav>
         <div className="right">
           {/* /dashboard is still served by the Hono app until the Phase 5 port. */}

@@ -22,7 +22,7 @@ export default function NotFound() {
           <h1>This address doesn&apos;t exist</h1>
           <p className="muted">
             The page you asked for isn&apos;t here — it may have moved, or the link may
-            have a typo. Your email is unaffected.
+            have a typo.
           </p>
           <div
             style={{
@@ -35,9 +35,6 @@ export default function NotFound() {
           >
             <Link className="btn pri" href="/">
               <i className="ti ti-home" /> Back home
-            </Link>
-            <Link className="btn" href="/docs">
-              <i className="ti ti-book-2" /> Read the docs
             </Link>
             <Link className="btn" href="/status">
               <i className="ti ti-activity-heartbeat" /> Service status
