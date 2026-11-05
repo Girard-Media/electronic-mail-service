@@ -2,7 +2,7 @@
 
 import { useEffect, useId, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import type { Workspace } from "@/lib/dash-nav";
+import { moveActive, type Workspace } from "@/lib/dash-nav";
 
 // Switch the active organization (E18-004). Posts to the same-origin bridge in
 // app/api/workspace/switch, which forwards to the API's membership-checked switch.
@@ -20,6 +20,12 @@ export async function switchWorkspace(orgId: string): Promise<void> {
   }
 }
 
+const MENU_KEYS = new Set(["ArrowDown", "ArrowUp", "Home", "End"]);
+
+function menuItems(root: HTMLElement | null): HTMLButtonElement[] {
+  return root ? Array.from(root.querySelectorAll<HTMLButtonElement>(".ws-item")) : [];
+}
+
 export function WorkspaceSwitcher(props: {
   workspaces: Workspace[];
   activeOrgId: string | null;
@@ -34,6 +40,15 @@ export function WorkspaceSwitcher(props: {
   const rootRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const canSwitch = props.workspaces.length > 1;
+
+  // E18-022: opening the menu moves focus to the current workspace; arrows, Home and
+  // End move between items, and focus leaving the switcher closes it, so a keyboard
+  // user never has a menu left open behind them.
+  useEffect(() => {
+    if (!open) return;
+    const items = menuItems(rootRef.current);
+    (items.find((b) => b.getAttribute("aria-current") === "true") ?? items[0])?.focus();
+  }, [open]);
 
   useEffect(() => {
     if (!open) return;
@@ -80,7 +95,23 @@ export function WorkspaceSwitcher(props: {
         <span className="sr-only">Switch workspace</span>
       </button>
       {open ? (
-        <ul className="ws-menu" id={menuId} aria-label="Workspaces">
+        <ul
+          className="ws-menu"
+          id={menuId}
+          aria-label="Workspaces"
+          onKeyDown={(e) => {
+            if (!MENU_KEYS.has(e.key)) return; // Enter/Space/Tab keep their defaults
+            const items = menuItems(rootRef.current);
+            const at = items.indexOf(document.activeElement as HTMLButtonElement);
+            e.preventDefault();
+            items[moveActive(e.key, Math.max(at, 0), items.length)]?.focus();
+          }}
+          onBlur={(e) => {
+            // While a switch is in flight the items are disabled and drop focus; keep
+            // the menu open so a failure still shows its error inside it.
+            if (busy === null && !rootRef.current?.contains(e.relatedTarget as Node | null)) setOpen(false);
+          }}
+        >
           {props.workspaces.map((ws) => {
             const active = ws.orgId === props.activeOrgId;
             return (

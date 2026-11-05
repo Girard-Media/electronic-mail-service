@@ -49,6 +49,47 @@ for (const file of files) {
   }
 }
 
+// E18-022: keyboard reach and visible focus.
+// 1. No positive tabIndex (it reorders focus away from reading order), and no click
+//    handler on a non-interactive element without a role and a key handler.
+for (const file of files) {
+  const src = readFileSync(file, "utf8");
+  const rel = relative(".", file);
+  for (const m of src.matchAll(/tabIndex=\{(\d+)\}/g)) {
+    if (Number(m[1]) > 0) problems.push(`${rel}: positive tabIndex={${m[1]}}`);
+  }
+  for (const m of src.matchAll(/<(div|span|li|section|p)\b((?:=>|[^>])*)\bonClick=/g)) {
+    const attrs = m[2] + src.slice(m.index! + m[0].length, src.indexOf(">", m.index! + m[0].length));
+    // A listbox option driven by its combobox input (aria-activedescendant) takes its
+    // keys on the input, which is the ARIA pattern; it needs no key handler of its own.
+    const comboOption = /\brole="option"/.test(attrs) && /aria-activedescendant=/.test(src);
+    if (!comboOption && (!/\brole=/.test(attrs) || !/onKeyDown=/.test(attrs))) problems.push(`${rel}: <${m[1]} onClick> without role and onKeyDown`);
+  }
+}
+// 2. The global ring exists, survives forced-colors, and every outline removal is
+//    either a programmatic focus target (tabIndex=-1) or paired with a :focus-within ring.
+const css = readFileSync("apps/web/app/globals.css", "utf8");
+const cssRules = css.replace(/\/\*[\s\S]*?\*\//g, "");
+if (!/(^|\n):focus-visible\s*\{[^}]*outline:\s*2px solid var\(--focus\)/.test(cssRules)) problems.push("globals.css: no global :focus-visible ring");
+if (!/@media \(forced-colors: active\)[^{]*\{[^}]*:focus-visible[^}]*outline:/.test(cssRules)) problems.push("globals.css: no forced-colors focus outline");
+const ALLOWED_OUTLINE_NONE: Record<string, RegExp> = {
+  ".dash-main:focus": /id="dash-main" tabIndex=\{-1\}/, // skip-link target, not a control
+  ".cmdk-input input": /\.cmdk-input:focus-within\s*\{[^}]*box-shadow:[^}]*var\(--focus\)/,
+};
+for (const m of cssRules.matchAll(/([^{}]+)\{[^}]*outline:\s*(?:none|0)\b[^}]*\}/g)) {
+  const sel = m[1].trim();
+  const guard = ALLOWED_OUTLINE_NONE[sel];
+  const layout = readFileSync("apps/web/app/dashboard/layout.tsx", "utf8");
+  if (!guard || !(guard.test(cssRules) || guard.test(layout))) problems.push(`globals.css: ${sel} removes the focus outline with no replacement ring`);
+}
+// 3. The sidebar is never removed from tab order on narrow screens.
+if (/\.dash-side\s*\{[^}]*display:\s*none/.test(cssRules)) problems.push("globals.css: .dash-side hidden; nav unreachable by keyboard on mobile");
+// 4. The workspace menu supports arrow keys and closes when focus leaves it.
+const ws = readFileSync("apps/web/components/WorkspaceSwitcher.tsx", "utf8");
+for (const need of ["onKeyDown=", "moveActive(", "onBlur=", ".focus()"]) {
+  if (!ws.includes(need)) problems.push(`WorkspaceSwitcher.tsx: missing ${need} (menu keyboard support)`);
+}
+
 console.log(`web a11y: ${icons} icons, ${controls} controls scanned across ${files.length} files`);
 if (problems.length) {
   for (const p of problems) console.error(`✗ ${p}`);
@@ -61,3 +102,4 @@ const hasText = (s: string) => s.replace(/<i\b[^>]*\/>/g, "").replace(/<[^>]+>/g
 assert.equal(hasText(/<(button)\b[^>]*>([\s\S]*?)<\/button>/.exec(bad)![2]), false);
 assert.equal(/aria-hidden="true"/.test('<i className="ti ti-x" />'), false);
 console.log("web a11y: all icon-only controls labelled, all icons aria-hidden");
+console.log("web a11y: focus rings intact (incl. forced-colors), no positive tabIndex, nav reachable at every width");
