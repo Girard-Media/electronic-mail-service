@@ -39,7 +39,7 @@
 - [ ] `task-1751` E18-019 — Measure and budget interaction-to-next-paint per route
 - [ ] `task-1752` E18-020 — Fail CI on a performance budget regression
 - [ ] `task-1753` E18-021 — Implement responsive layouts down to mobile for the inbox and campaign views
-- [ ] `task-1754` E18-022 — Implement full keyboard navigation and visible focus rings
+- [x] `task-1754` E18-022 — Implement full keyboard navigation and visible focus rings
 - [x] `task-1755` E18-023 — Meet WCAG AA contrast on every token pair
 - [x] `task-1756` E18-024 — Add screen-reader labels on every icon-only control
 - [ ] `task-1757` E18-025 — Add an automated accessibility check to CI
