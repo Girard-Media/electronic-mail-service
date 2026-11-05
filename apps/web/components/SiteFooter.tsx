@@ -8,29 +8,17 @@ export function SiteFooter() {
         <div className="cols">
           <div style={{ maxWidth: 300 }}>
             <Link className="brand" href="/">
-              <i className="ti ti-mail-fast" />
+              <i className="ti ti-mail-fast" aria-hidden="true" />
               EMS
             </Link>
             <p className="muted" style={{ marginTop: 14 }}>
-              Application email on infrastructure you control. Transactional today,
-              lifecycle &amp; automation tomorrow — on one event stream.
+              Cold B2B outreach on infrastructure we own end to end — our servers,
+              IPs, mail transfer agent, and mail log.
             </p>
           </div>
           <div>
             <b>Product</b>
-            <Link href="/features">Features</Link>
-            <Link href="/deliverability">Deliverability</Link>
-            <Link href="/pricing">Pricing</Link>
             <a href="/dashboard">Dashboard</a>
-          </div>
-          <div>
-            <b>Developers</b>
-            <Link href="/docs">Docs</Link>
-            <Link href="/docs/dev#quickstart">Quickstart</Link>
-            <Link href="/docs/dev#api">API reference</Link>
-            <Link href="/docs/user#inbox">Inbox</Link>
-            <Link href="/docs/dev#inbound">Inbound</Link>
-            <Link href="/docs/dev#migrate">Migration guide</Link>
           </div>
           <div>
             <b>Company</b>

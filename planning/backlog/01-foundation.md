@@ -11,15 +11,15 @@ inherited subsystem is consciously kept, retargeted, or deleted.
 - [x] E01-006 — git init and commit the fork baseline
 - [x] E01-007 — pnpm install clean; lockfile regenerated as a fork artifact
 - [x] E01-008 — pnpm typecheck green on the fork (fixed: packages/mcp imported the old `ems` SDK name; @ems/sdk must be built first)
-- [ ] E01-009a — Make `pnpm typecheck` build @ems/sdk first, or emit types in place, so the ordering is not a tribal fact
+- [x] E01-009a — Make `pnpm typecheck` build @ems/sdk first, or emit types in place, so the ordering is not a tribal fact
 - [x] E01-009 — pnpm lint green — but only apps/web defines a lint script; see E01-009b
 - [x] E01-009b — Add an eslint config and a lint script to the other ten workspace packages; 10 of 11 are currently unlinted
 - [x] E01-010 — Run the inherited pnpm test suite; triage every failure into keep/retarget/delete
 - [x] E01-011 — Update bootspring.config.js: name ems, hosting hostssh, analytics clickhouse, email own-mta
 - [x] E01-012 — Rewrite CLAUDE.md for EMS: product definition, constraints, repo map, commands
-- [ ] E01-013 — Rewrite AGENTS.md with the EMS send-path invariants I1–I7 as agent-visible rules
+- [x] E01-013 — Rewrite AGENTS.md with the EMS send-path invariants I1–I7 as agent-visible rules
 - [x] E01-014 — Rewrite README.md: what ships, what does not, honest status line
-- [ ] E01-015 — Rewrite SEED.md as the EMS seed brief; archive the usermails original under planning/lineage/
+- [x] E01-015 — Rewrite SEED.md as the EMS seed brief; archive the usermails original under planning/lineage/
 - [x] E01-016 — Delete .bootspring/specs/transactional-core (usermails lineage, not ours)
 - [x] E01-017 — Rewrite .bootspring/context/VISION.md from planning/VISION.md
 - [x] E01-018 — Rewrite .bootspring/context/ARCHITECTURE.md from planning/ARCHITECTURE.md
@@ -30,12 +30,12 @@ inherited subsystem is consciously kept, retargeted, or deleted.
 - [x] E01-023 — Rewrite .bootspring/context/AUDIENCE.md: agency, SDR team, founder-led sales
 - [x] E01-024 — Write .bootspring/context/DECISIONS.md D1..D20 for EMS (own MTA, no warmup pool, opens off by default…)
 - [x] E01-025 — Reset .bootspring/facts and project-memory to EMS facts only
-- [ ] E01-026 — Decide and record: keep apps/dashboard (legacy Hono SPA) or delete in favour of apps/web
-- [ ] E01-027 — Delete apps/api/public/*.html static marketing pages superseded by apps/web
-- [ ] E01-028 — Audit packages/migrate sources; retarget from ESP-migration to outreach-platform migration
-- [ ] E01-029 — Decide the public npm name for the SDK and record it in DECISIONS
-- [ ] E01-030 — Add .nvmrc pinned to the Node version in engines
-- [ ] E01-031 — Add pnpm workspace catalog for shared dep versions to stop drift between packages
+- [x] E01-026 — Decide and record: keep apps/dashboard (legacy Hono SPA) or delete in favour of apps/web
+- [x] E01-027 — Delete apps/api/public/*.html static marketing pages superseded by apps/web
+- [x] E01-028 — Audit packages/migrate sources; retarget from ESP-migration to outreach-platform migration
+- [x] E01-029 — Decide the public npm name for the SDK and record it in DECISIONS
+- [x] E01-030 — Add .nvmrc pinned to the Node version in engines
+- [x] E01-031 — Add pnpm workspace catalog for shared dep versions to stop drift between packages
 - [x] E01-032 — Create the empty package skeletons for fleet, router, warmup, reputation, deliverability
 - [x] E01-033 — Create the empty package skeletons for policy, verify, sequence, leads, inbox
 - [x] E01-034 — Create the empty package skeletons for ai, billing, registrar
@@ -45,14 +45,14 @@ inherited subsystem is consciously kept, retargeted, or deleted.
 - [x] E01-038 — Create apps/dmarc-ingest skeleton (Hono, receives RUA/TLS-RPT mail)
 - [x] E01-039 — Create apps/seedbox skeleton (placement probe agent)
 - [x] E01-040 — Create apps/fleet-agent skeleton (per-node agent)
-- [ ] E01-041 — Update pnpm-workspace.yaml if any new app lives outside apps/*
-- [ ] E01-042 — Update Dockerfile to build the new apps in the single-image pipeline
-- [ ] E01-043 — Update Procfile / start script for the new sibling processes
+- [x] E01-041 — Update pnpm-workspace.yaml if any new app lives outside apps/*
+- [x] E01-042 — Update Dockerfile to build the new apps in the single-image pipeline
+- [x] E01-043 — Update Procfile / start script for the new sibling processes
 - [x] E01-044 — Update .env.example with every new EMS variable, grouped and commented
-- [ ] E01-045 — Add packages/core/src/env.ts entries for all new variables with zod validation
-- [ ] E01-046 — Fail fast at boot on any missing required env var, with the variable name in the error
+- [x] E01-045 — Add packages/core/src/env.ts entries for all new variables with zod validation
+- [x] E01-046 — Fail fast at boot on any missing required env var, with the variable name in the error
 - [ ] E01-047 — Add a git remote for the EMS hostssh deploy target (do not push yet)
-- [ ] E01-048 — Create the GitHub repo Girard-Media/electronic-mail-service and push main
+- [x] E01-048 — Create the GitHub repo Girard-Media/electronic-mail-service and push main
 - [ ] E01-049 — Update .github/workflows/ci.yml for the new packages and gates
 - [ ] E01-050 — Add a CI job that runs prisma validate on every push
 - [ ] E01-051 — Add a CI job that runs prisma format --check to keep the schema canonical

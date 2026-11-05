@@ -1,7 +1,7 @@
 # electronic-mail-service - Build Todo
 
 > Single source of truth for autonomous build execution
-> Updated: 2026-09-14
+> Updated: 2026-11-04
 
 ---
 
@@ -10,20 +10,20 @@
 | Metric | Value |
 |---|---:|
 | Total Tasks | 2533 |
-| Completed | 484 |
-| Remaining | 2049 |
+| Completed | 506 |
+| Remaining | 2027 |
 | In Progress | 0 |
 
 ---
 
-## Foundation (50/801 — 6%)
+## Foundation (51/801 — 6%)
 
-- [ ] `task-1733` E18-001 — Strip the inherited usermails marketing pages from apps/web
-- [ ] `task-1734` E18-002 — Establish the EMS design tokens: colour, type scale, spacing, radius, elevation
-- [ ] `task-1735` E18-003 — Define the light and dark palettes on :root with a documented contrast floor
-- [ ] `task-1736` E18-004 — Build the layout shell: sidebar, top bar, workspace switcher, command palette
+- [x] `task-1733` E18-001 — Strip the inherited usermails marketing pages from apps/web
+- [x] `task-1734` E18-002 — Establish the EMS design tokens: colour, type scale, spacing, radius, elevation
+- [x] `task-1735` E18-003 — Define the light and dark palettes on :root with a documented contrast floor
+- [x] `task-1736` E18-004 — Build the layout shell: sidebar, top bar, workspace switcher, command palette
 - [ ] `task-1737` E18-005 — Implement the command palette with fuzzy search across every entity
-- [ ] `task-1738` E18-006 — Implement global keyboard shortcuts with a discoverable help sheet
+- [x] `task-1738` E18-006 — Implement global keyboard shortcuts with a discoverable help sheet
 - [ ] `task-1739` E18-007 — Establish the data layer: cached, deduped, no fetch-on-mount waterfalls
 - [ ] `task-1740` E18-008 — Forbid per-row fetching in any list; batch at the route
 - [ ] `task-1741` E18-009 — Add a lint rule catching fetch-on-mount in a component
@@ -39,9 +39,9 @@
 - [ ] `task-1751` E18-019 — Measure and budget interaction-to-next-paint per route
 - [ ] `task-1752` E18-020 — Fail CI on a performance budget regression
 - [ ] `task-1753` E18-021 — Implement responsive layouts down to mobile for the inbox and campaign views
-- [ ] `task-1754` E18-022 — Implement full keyboard navigation and visible focus rings
-- [ ] `task-1755` E18-023 — Meet WCAG AA contrast on every token pair
-- [ ] `task-1756` E18-024 — Add screen-reader labels on every icon-only control
+- [x] `task-1754` E18-022 — Implement full keyboard navigation and visible focus rings
+- [x] `task-1755` E18-023 — Meet WCAG AA contrast on every token pair
+- [x] `task-1756` E18-024 — Add screen-reader labels on every icon-only control
 - [ ] `task-1757` E18-025 — Add an automated accessibility check to CI
 - [ ] `task-1758` E18-026 — Implement the toast and notification system with a persistent activity feed
 - [ ] `task-1759` E18-027 — Never show a toast as the only record of an important event
@@ -822,7 +822,7 @@
 
 ---
 
-## MVP (434/1732 — 25%)
+## MVP (455/1732 — 26%)
 
 - [x] `task-0001` E01-001 — Hard-fork usermails into electronic-mail-service (exclude .git, node_modules, lockfile) (`completed`)
 - [x] `task-0002` E01-002 — Global rebrand usermails → ems / @usermails → @ems across 172 files (`completed`)
@@ -832,15 +832,15 @@
 - [x] `task-0006` E01-006 — git init and commit the fork baseline (`completed`)
 - [x] `task-0007` E01-007 — pnpm install clean; lockfile regenerated as a fork artifact (`completed`)
 - [x] `task-0008` E01-008 — pnpm typecheck green on the fork (fixed: packages/mcp imported the old `ems` SDK name; @ems/sdk must be built first) (`completed`)
-- [ ] `task-0009` E01-009a — Make `pnpm typecheck` build @ems/sdk first, or emit types in place, so the ordering is not a tribal fact
+- [x] `task-0009` E01-009a — Make `pnpm typecheck` build @ems/sdk first, or emit types in place, so the ordering is not a tribal fact
 - [x] `task-0010` E01-009 — pnpm lint green — but only apps/web defines a lint script; see E01-009b (`completed`)
 - [x] `task-0011` E01-009b — Add an eslint config and a lint script to the other ten workspace packages; 10 of 11 are currently unlinted (`completed`)
 - [x] `task-0012` E01-010 — Run the inherited pnpm test suite; triage every failure into keep/retarget/delete (`completed`)
 - [x] `task-0013` E01-011 — Update bootspring.config.js: name ems, hosting hostssh, analytics clickhouse, email own-mta (`completed`)
 - [x] `task-0014` E01-012 — Rewrite CLAUDE.md for EMS: product definition, constraints, repo map, commands (`completed`)
-- [ ] `task-0015` E01-013 — Rewrite AGENTS.md with the EMS send-path invariants I1–I7 as agent-visible rules
+- [x] `task-0015` E01-013 — Rewrite AGENTS.md with the EMS send-path invariants I1–I7 as agent-visible rules
 - [x] `task-0016` E01-014 — Rewrite README.md: what ships, what does not, honest status line (`completed`)
-- [ ] `task-0017` E01-015 — Rewrite SEED.md as the EMS seed brief; archive the usermails original under planning/lineage/
+- [x] `task-0017` E01-015 — Rewrite SEED.md as the EMS seed brief; archive the usermails original under planning/lineage/
 - [x] `task-0018` E01-016 — Delete .bootspring/specs/transactional-core (usermails lineage, not ours) (`completed`)
 - [x] `task-0019` E01-017 — Rewrite .bootspring/context/VISION.md from planning/VISION.md (`completed`)
 - [x] `task-0020` E01-018 — Rewrite .bootspring/context/ARCHITECTURE.md from planning/ARCHITECTURE.md (`completed`)
@@ -851,12 +851,12 @@
 - [x] `task-0025` E01-023 — Rewrite .bootspring/context/AUDIENCE.md: agency, SDR team, founder-led sales (`completed`)
 - [x] `task-0026` E01-024 — Write .bootspring/context/DECISIONS.md D1..D20 for EMS (own MTA, no warmup pool, opens off by default…) (`completed`)
 - [x] `task-0027` E01-025 — Reset .bootspring/facts and project-memory to EMS facts only (`completed`)
-- [ ] `task-0028` E01-026 — Decide and record: keep apps/dashboard (legacy Hono SPA) or delete in favour of apps/web
-- [ ] `task-0029` E01-027 — Delete apps/api/public/*.html static marketing pages superseded by apps/web
-- [ ] `task-0030` E01-028 — Audit packages/migrate sources; retarget from ESP-migration to outreach-platform migration
-- [ ] `task-0031` E01-029 — Decide the public npm name for the SDK and record it in DECISIONS
-- [ ] `task-0032` E01-030 — Add .nvmrc pinned to the Node version in engines
-- [ ] `task-0033` E01-031 — Add pnpm workspace catalog for shared dep versions to stop drift between packages
+- [x] `task-0028` E01-026 — Decide and record: keep apps/dashboard (legacy Hono SPA) or delete in favour of apps/web
+- [x] `task-0029` E01-027 — Delete apps/api/public/*.html static marketing pages superseded by apps/web
+- [x] `task-0030` E01-028 — Audit packages/migrate sources; retarget from ESP-migration to outreach-platform migration
+- [x] `task-0031` E01-029 — Decide the public npm name for the SDK and record it in DECISIONS
+- [x] `task-0032` E01-030 — Add .nvmrc pinned to the Node version in engines
+- [x] `task-0033` E01-031 — Add pnpm workspace catalog for shared dep versions to stop drift between packages
 - [x] `task-0034` E01-032 — Create the empty package skeletons for fleet, router, warmup, reputation, deliverability (`completed`)
 - [x] `task-0035` E01-033 — Create the empty package skeletons for policy, verify, sequence, leads, inbox (`completed`)
 - [x] `task-0036` E01-034 — Create the empty package skeletons for ai, billing, registrar (`completed`)
@@ -864,16 +864,16 @@
 - [x] `task-0038` E01-036 — Confirmed no tsconfig path aliases are needed: packages export ./src directly and resolve through the pnpm workspace link (`completed`)
 - [x] `task-0039` E01-037 — Add a dependency-direction lint rule: no cross-domain package imports except via interfaces (`completed`)
 - [x] `task-0040` E01-038 — Create apps/dmarc-ingest skeleton (Hono, receives RUA/TLS-RPT mail) (`completed`)
-- [ ] `task-0041` E01-039 — Create apps/seedbox skeleton
-- [ ] `task-0042` E01-040 — Create apps/fleet-agent skeleton
-- [ ] `task-0043` E01-041 — Update pnpm-workspace.yaml if any new app lives outside apps/*
-- [ ] `task-0044` E01-042 — Update Dockerfile to build the new apps in the single-image pipeline
-- [ ] `task-0045` E01-043 — Update Procfile / start script for the new sibling processes
+- [x] `task-0041` E01-039 — Create apps/seedbox skeleton
+- [x] `task-0042` E01-040 — Create apps/fleet-agent skeleton
+- [x] `task-0043` E01-041 — Update pnpm-workspace.yaml if any new app lives outside apps/*
+- [x] `task-0044` E01-042 — Update Dockerfile to build the new apps in the single-image pipeline
+- [x] `task-0045` E01-043 — Update Procfile / start script for the new sibling processes
 - [x] `task-0046` E01-044 — Update .env.example with every new EMS variable, grouped and commented (`completed`)
-- [ ] `task-0047` E01-045 — Add packages/core/src/env.ts entries for all new variables with zod validation
-- [ ] `task-0048` E01-046 — Fail fast at boot on any missing required env var, with the variable name in the error
+- [x] `task-0047` E01-045 — Add packages/core/src/env.ts entries for all new variables with zod validation
+- [x] `task-0048` E01-046 — Fail fast at boot on any missing required env var, with the variable name in the error
 - [ ] `task-0049` E01-047 — Add a git remote for the EMS hostssh deploy target
-- [ ] `task-0050` E01-048 — Create the GitHub repo Girard-Media/electronic-mail-service and push main
+- [x] `task-0050` E01-048 — Create the GitHub repo Girard-Media/electronic-mail-service and push main
 - [ ] `task-0051` E01-049 — Update .github/workflows/ci.yml for the new packages and gates
 - [ ] `task-0052` E01-050 — Add a CI job that runs prisma validate on every push
 - [ ] `task-0053` E01-051 — Add a CI job that runs prisma format --check to keep the schema canonical
@@ -1223,7 +1223,7 @@
 - [ ] `task-0397` E05-005 — Implement domain PAUSED with a required reason and automatic router exclusion
 - [ ] `task-0398` E05-006 — Implement domain RETIRING: stop new enrolments, finish in-flight sequences
 - [ ] `task-0399` E05-007 — Implement domain BURNED as terminal with permanent reuse blocking
-- [ ] `task-0400` E05-008 — Compute domain daily cap as the sum of live mailbox caps times a safety factor
+- [x] `task-0400` E05-008 — Compute domain daily cap as the sum of live mailbox caps times a safety factor
 - [ ] `task-0401` E05-009 — Never allow a domain cap to exceed the sum of its mailbox hard caps
 - [x] `task-0402` E05-010 — Enforce a maximum of three mailboxes per domain by default, configurable per plan (`completed`)
 - [ ] `task-0403` E05-011 — Build the domain detail cockpit: auth status, warmup, caps, mailboxes, reputation, listings
@@ -1231,7 +1231,7 @@
 - [ ] `task-0405` E05-013 — Add a domain health timeline showing every status change with its cause
 - [ ] `task-0406` E05-014 — Add a domain comparison view for diagnosing divergent performance
 - [x] `task-0407` E05-015 — Implement the Persona model CRUD with mandatory postal address (`/app/fleet/personas`) (`completed`)
-- [ ] `task-0408` E05-016 — Refuse to create a persona without a postal address
+- [x] `task-0408` E05-016 — Refuse to create a persona without a postal address
 - [ ] `task-0409` E05-017 — Validate the postal address format per country
 - [x] `task-0410` E05-018 — Generate the plain-text signature block from the persona (`completed`)
 - [x] `task-0411` E05-019 — Generate the HTML signature block (escaped; contrast tokens still open) (`completed`)
@@ -2195,7 +2195,7 @@
 - [x] `task-1369` E15-005 — Mark an enrolment BLOCKED_BY_POLICY with the reason rather than silently skipping (`completed`)
 - [x] `task-1370` E15-006 — Implement step materialisation into SendIntent with a computed dueAt (`completed`)
 - [x] `task-1371` E15-007 — Compute dueAt from the previous step, the delay, the window, and the timezone (`completed`)
-- [ ] `task-1372` E15-008 — Never materialise more than the next step per enrolment
+- [x] `task-1372` E15-008 — Never materialise more than the next step per enrolment
 - [ ] `task-1373` E15-009 — Implement step conditions: no reply, opened, clicked, custom field match
 - [ ] `task-1374` E15-010 — Evaluate conditions at materialisation, not at creation
 - [x] `task-1375` E15-011 — Implement variant assignment deterministically from hash(leadId, stepId) (`completed`)
@@ -2219,7 +2219,7 @@
 - [ ] `task-1393` E15-029 — Require an operator action to resume an auto-paused campaign
 - [ ] `task-1394` E15-030 — Implement campaign completion when every enrolment reaches a terminal state
 - [ ] `task-1395` E15-031 — Build the campaign creation flow as a linear wizard with no dead ends
-- [ ] `task-1396` E15-031a — CampaignMailbox join: attach mailboxes / domains to a campaign
+- [x] `task-1396` E15-031a — CampaignMailbox join: attach mailboxes / domains to a campaign
 - [x] `task-1397` E15-031b — Router honours the attached mailbox set (`mailboxIds`) over named `domainPool` (`completed`)
 - [x] `task-1398` E15-031c — Dashboard API: `GET/POST /app/campaigns`, `PUT /app/campaigns/:id/mailboxes` (`completed`)
 - [x] `task-1399` E15-031d — Send worker loads `CampaignMailbox` rows and passes `mailboxIds` into `route()` (`apps/workers/src/route-intent.ts`, `QUEUE_INTENT`) (`completed`)

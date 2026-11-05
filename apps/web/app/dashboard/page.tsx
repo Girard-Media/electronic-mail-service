@@ -36,7 +36,7 @@ export default async function DashboardOverview() {
         {cards.map((c) => (
           <div className="card" key={c.label}>
             <div className="ic">
-              <i className={`ti ${c.icon}`} />
+              <i className={`ti ${c.icon}`} aria-hidden="true" />
             </div>
             <h3 style={{ fontSize: 15, color: "var(--tx2)", fontWeight: 600 }}>{c.label}</h3>
             <p style={{ fontSize: 20, color: "var(--tx)", marginTop: 2 }}>{c.value}</p>

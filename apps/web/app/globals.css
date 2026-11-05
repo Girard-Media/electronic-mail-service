@@ -3,22 +3,19 @@
    available alongside for new component work; these proven component classes drive the
    ported marketing pages. */
 @import "tailwindcss";
+/* Colour, type, spacing, radius and elevation live in tokens.css (E18-002/003). */
+@import "./tokens.css";
 
-:root {
-  --bg: #0a0d14; --bg2: #0e121b; --surface: #141a26; --surface2: #10151f;
-  --line: #1e2636; --line2: #2a3348;
-  --tx: #e7eaf2; --tx2: #9098ad; --tx3: #5b6479;
-  --brand: #6d5efc; --brand2: #8a7bff; --brandsoft: rgba(109, 94, 252, .14);
-  --ok: #34d399; --okbg: rgba(52, 211, 153, .12); --warn: #f3b257;
-  --r: 10px; --rl: 14px; --rxl: 20px; --max: 1140px;
-  color-scheme: dark;
-}
 * { box-sizing: border-box; }
+:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+/* E18-022: forced-colors (Windows High Contrast) drops box-shadow rings; keep a real
+   outline there for every focused control, including the palette input. */
+@media (forced-colors: active) { :focus-visible, .cmdk-input input:focus { outline: 2px solid CanvasText; outline-offset: 2px; } }
 html { scroll-behavior: smooth; }
 body {
   margin: 0; background: var(--bg); color: var(--tx);
-  font-family: ui-sans-serif, system-ui, -apple-system, sans-serif;
-  font-size: 16px; line-height: 1.6; -webkit-font-smoothing: antialiased;
+  font-family: var(--font-sans);
+  font-size: var(--fs-base); line-height: var(--lh-body); -webkit-font-smoothing: antialiased;
 }
 .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; overflow-wrap: break-word; word-break: break-word; }
 a { color: inherit; text-decoration: none; }
@@ -29,7 +26,7 @@ section { padding: 84px 0; }
 .eyebrow { font-size: 13px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--brand2); }
 
 /* nav */
-.nav { position: sticky; top: 0; z-index: 50; background: rgba(10, 13, 20, .82); backdrop-filter: blur(10px); border-bottom: 1px solid var(--line); }
+.nav { position: sticky; top: 0; z-index: 50; background: color-mix(in srgb, var(--bg) 82%, transparent); backdrop-filter: blur(10px); border-bottom: 1px solid var(--line); }
 .nav .wrap { display: flex; align-items: center; gap: 24px; height: 64px; }
 .brand { display: flex; align-items: center; gap: 6px; font-weight: 800; font-size: 18px; letter-spacing: -.02em; }
 .brand i { color: var(--brand2); font-size: 22px; line-height: 1; }
@@ -41,9 +38,9 @@ section { padding: 84px 0; }
 
 /* buttons */
 .btn { display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--line2); background: transparent; color: var(--tx); border-radius: 10px; padding: 10px 16px; font-size: 14.5px; font-weight: 600; cursor: pointer; font-family: inherit; transition: .15s; }
-.btn:hover { background: var(--surface); border-color: #36405a; }
-.btn.pri { background: var(--brand); border-color: var(--brand); color: #fff; }
-.btn.pri:hover { background: var(--brand2); border-color: var(--brand2); }
+.btn:hover { background: var(--surface); border-color: var(--line2); }
+.btn.pri { background: var(--brand); border-color: var(--brand); color: var(--on-brand); }
+.btn.pri:hover { background: var(--brand-hover); border-color: var(--brand-hover); }
 .btn.lg { padding: 13px 22px; font-size: 16px; }
 
 /* hero */
@@ -138,17 +135,77 @@ footer .bot { display: flex; justify-content: space-between; align-items: center
 
 /* dashboard shell (Phase 5 foundation) */
 .dash-shell { display: grid; grid-template-columns: 248px 1fr; min-height: 100vh; }
-@media (max-width: 800px) { .dash-shell { grid-template-columns: 1fr; } .dash-side { display: none; } }
 .dash-side { border-right: 1px solid var(--line); background: var(--surface2); padding: 20px 16px; display: flex; flex-direction: column; }
-.dash-nav { display: flex; flex-direction: column; gap: 4px; }
+.dash-nav ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
 .dash-nav-item { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: var(--r); font-size: 14.5px; font-weight: 500; color: var(--tx2); }
 .dash-nav-item i { font-size: 18px; }
 .dash-nav-item.active { background: var(--brandsoft); color: var(--brand2); }
+.dash-nav-item:not(.soon):hover { background: var(--surface); color: var(--tx); }
 .dash-nav-item.soon { color: var(--tx3); cursor: default; }
+/* E18-022: below 800px the sidebar becomes a horizontal, scrollable strip above the
+   content instead of a full-height column. It stays in the DOM and in tab order, so
+   every section is still reachable by Tab; the earlier display:none rule never applied
+   (it preceded .dash-side's own display) and would have stranded keyboard users. */
+@media (max-width: 800px) {
+  .dash-shell { grid-template-columns: 1fr; }
+  .dash-side { flex-direction: row; align-items: center; gap: 16px; padding: 10px 16px; border-right: 0; border-bottom: 1px solid var(--line); overflow-x: auto; }
+  .dash-side .brand { margin-bottom: 0 !important; flex-shrink: 0; }
+  .dash-nav ul { flex-direction: row; }
+  .dash-nav-item { white-space: nowrap; padding: 7px 10px; }
+}
 .dash-soon { margin-left: auto; font-size: 10px; text-transform: uppercase; letter-spacing: .06em; background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 1px 7px; color: var(--tx3); }
 .dash-body { display: flex; flex-direction: column; min-width: 0; }
-.dash-top { display: flex; align-items: center; justify-content: space-between; gap: 16px; height: 60px; padding: 0 24px; border-bottom: 1px solid var(--line); background: rgba(10, 13, 20, .6); }
+.dash-top { display: flex; align-items: center; justify-content: space-between; gap: 16px; height: 60px; padding: 0 24px; border-bottom: 1px solid var(--line); background: color-mix(in srgb, var(--bg) 60%, transparent); }
 .dash-org { display: flex; align-items: center; gap: 10px; font-size: 15px; }
 .dash-org i { color: var(--brand2); }
 .dash-role { font-size: 11px; text-transform: uppercase; letter-spacing: .06em; background: var(--brandsoft); color: var(--brand2); border: 1px solid rgba(109, 94, 252, .3); border-radius: 999px; padding: 2px 9px; }
 .dash-main { padding: 28px 24px; max-width: 1100px; width: 100%; }
+
+/* ---- Layout shell (E18-004): theme toggle, workspace switcher, command palette ---- */
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+.skip-link { position: absolute; left: 12px; top: -48px; z-index: 200; background: var(--surface); color: var(--tx); border: 1px solid var(--line2); border-radius: var(--r); padding: 8px 12px; }
+.skip-link:focus { top: 12px; }
+.dash-main:focus { outline: none; }
+.icon-btn { padding: 0; width: 38px; height: 38px; justify-content: center; }
+.icon-btn i { font-size: 18px; }
+.dash-top-tools { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.dash-email { font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 220px; }
+@media (max-width: 800px) { .dash-email { display: none; } }
+.ws-switch { position: relative; }
+.ws-trigger { background: transparent; border: 1px solid transparent; border-radius: var(--r); padding: 6px 10px; color: var(--tx); font: inherit; cursor: pointer; }
+.ws-trigger:hover, .ws-trigger[aria-expanded="true"] { background: var(--surface); border-color: var(--line); }
+.ws-trigger .ti-selector { color: var(--tx3); }
+.ws-menu { position: absolute; top: calc(100% + 6px); left: 0; z-index: 60; min-width: 260px; list-style: none; margin: 0; padding: 6px; background: var(--surface2); border: 1px solid var(--line2); border-radius: var(--rl); box-shadow: 0 12px 32px rgba(0, 0, 0, .28); }
+.ws-item { display: flex; width: 100%; align-items: center; justify-content: space-between; gap: 12px; padding: 8px 10px; border: 0; border-radius: var(--r); background: transparent; color: var(--tx); font: inherit; font-size: 14px; text-align: left; cursor: pointer; }
+.ws-item:hover, .ws-item[aria-current="true"] { background: var(--surface); }
+.ws-meta { font-size: 12px; color: var(--tx2); text-transform: capitalize; }
+.ws-error { padding: 8px 10px; font-size: 13px; color: var(--danger); }
+.cmdk-trigger { gap: 8px; color: var(--tx2); font-weight: 500; font-size: 13.5px; height: 38px; }
+.cmdk-trigger kbd, .cmdk-hint { font-family: inherit; font-size: 11.5px; color: var(--tx2); }
+.cmdk-trigger kbd { border: 1px solid var(--line2); border-radius: 6px; padding: 1px 6px; }
+@media (max-width: 640px) { .cmdk-trigger span, .cmdk-trigger kbd { display: none; } }
+.cmdk-backdrop { position: fixed; inset: 0; z-index: 100; background: color-mix(in srgb, var(--bg) 70%, transparent); backdrop-filter: blur(4px); display: flex; justify-content: center; align-items: flex-start; padding: 12vh 16px 16px; }
+.cmdk { width: min(620px, 100%); background: var(--surface2); border: 1px solid var(--line2); border-radius: var(--rl); box-shadow: 0 24px 64px rgba(0, 0, 0, .35); overflow: hidden; }
+.cmdk-input { display: flex; align-items: center; gap: 10px; padding: 0 16px; border-bottom: 1px solid var(--line); }
+.cmdk-input i { color: var(--tx2); font-size: 18px; }
+.cmdk-input input { flex: 1; height: 52px; border: 0; background: transparent; color: var(--tx); font: inherit; font-size: 15.5px; outline: none; }
+/* E18-022: the palette input draws no outline of its own (it fills the row), so the
+   row carries the ring whenever the input has keyboard focus. */
+.cmdk-input:focus-within { box-shadow: inset 0 0 0 2px var(--focus); }
+.cmdk-list { list-style: none; margin: 0; padding: 6px; max-height: 50vh; overflow-y: auto; }
+.cmdk-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: var(--r); font-size: 14.5px; color: var(--tx); cursor: pointer; }
+.cmdk-item i { color: var(--tx2); font-size: 18px; }
+.cmdk-item[aria-selected="true"] { background: var(--brandsoft); }
+.cmdk-group { margin-left: auto; font-size: 11.5px; color: var(--tx2); }
+.cmdk-empty { padding: 14px 18px; margin: 0; color: var(--tx2); font-size: 14px; }
+.cmdk-hint { margin: 0; padding: 8px 16px; border-top: 1px solid var(--line); }
+.kbd-sheet { width: min(520px, 100%); }
+.kbd-sheet-head { display: flex; align-items: center; justify-content: space-between; padding: 12px 12px 12px 18px; border-bottom: 1px solid var(--line); }
+.kbd-sheet-head h2 { margin: 0; font-size: 16px; }
+.kbd-list { margin: 0; padding: 8px 18px; }
+.kbd-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 8px 0; border-bottom: 1px solid var(--line); }
+.kbd-row:last-child { border-bottom: 0; }
+.kbd-row dt { font-size: 14.5px; color: var(--tx); }
+.kbd-row dd { margin: 0; white-space: nowrap; }
+.kbd-row kbd { font-family: var(--font-mono); font-size: 12px; color: var(--tx); background: var(--surface); border: 1px solid var(--line2); border-radius: 6px; padding: 2px 7px; }
+.kbd-or { font-size: 12px; color: var(--tx2); }

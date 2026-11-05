@@ -1,0 +1,67 @@
+/* EMS design tokens (E18-002) and light/dark palettes (E18-003).
+ *
+ * The single source of colour, type, spacing, radius and elevation for apps/web.
+ * Dark is the default palette on :root. Light is opt-in on
+ * :root[data-theme="light"], so the current dark-only surface keeps rendering
+ * as it does until a theme switch ships.
+ *
+ * Contrast floor (WCAG 2.2 AA), enforced by scripts/design-tokens-test.mts:
+ *   - Text tokens (--tx, --tx2, --tx3, --brand2, --ok, --warn, --danger) are at
+ *     least 4.5:1 on every surface token (--bg, --bg2, --surface, --surface2).
+ *   - --on-brand is at least 4.5:1 on --brand and on --brand-hover (filled buttons).
+ *   - --focus is at least 3:1 on every surface (non-text focus indicator, 1.4.11).
+ *   - --line and --line2 are decorative separators and are exempt. Interactive
+ *     control boundaries must use --focus or a text token, never a line token.
+ * Both palettes must define exactly the same colour tokens.
+ */
+:root {
+  /* colour: dark palette (default) */
+  --bg: #0a0d14; --bg2: #0e121b; --surface: #141a26; --surface2: #10151f;
+  --line: #1e2636; --line2: #2a3348;
+  --tx: #e7eaf2; --tx2: #9098ad; --tx3: #7d869c;
+  --brand: #6d5efc; --brand2: #8a7bff; --brand-hover: #5b4bf0; --on-brand: #ffffff;
+  --brandsoft: rgba(109, 94, 252, .14);
+  --ok: #34d399; --okbg: rgba(52, 211, 153, .12);
+  --warn: #f3b257; --warnbg: rgba(243, 178, 87, .13);
+  --danger: #f87171; --dangerbg: rgba(248, 113, 113, .12);
+  --focus: #8a7bff;
+  --elev-1: 0 1px 2px rgba(0, 0, 0, .40);
+  --elev-2: 0 4px 12px rgba(0, 0, 0, .45);
+  --elev-3: 0 12px 32px rgba(0, 0, 0, .55);
+  color-scheme: dark;
+
+  /* type */
+  --font-sans: ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  --fs-xs: 12px; --fs-sm: 13px; --fs-md: 14.5px; --fs-base: 16px; --fs-lg: 18px;
+  --fs-xl: 20px; --fs-2xl: 24px; --fs-3xl: 34px; --fs-display: clamp(34px, 6vw, 62px);
+  --lh-tight: 1.1; --lh-body: 1.6; --lh-prose: 1.8;
+  --fw-regular: 400; --fw-medium: 500; --fw-semibold: 600; --fw-bold: 700; --fw-heavy: 800;
+
+  /* spacing: 4px base */
+  --sp-1: 4px; --sp-2: 8px; --sp-3: 12px; --sp-4: 16px; --sp-5: 20px; --sp-6: 24px;
+  --sp-8: 32px; --sp-10: 40px; --sp-12: 48px; --sp-16: 64px; --sp-20: 84px;
+
+  /* radius (--r/--rl/--rxl kept as the names existing components use) */
+  --radius-sm: 6px; --radius-md: 10px; --radius-lg: 14px; --radius-xl: 20px; --radius-pill: 999px;
+  --r: var(--radius-md); --rl: var(--radius-lg); --rxl: var(--radius-xl);
+
+  /* layout */
+  --max: 1140px;
+}
+
+:root[data-theme="light"] {
+  --bg: #f7f8fb; --bg2: #eef0f5; --surface: #ffffff; --surface2: #f1f3f8;
+  --line: #e1e5ee; --line2: #c9cfdc;
+  --tx: #0f1420; --tx2: #4a5368; --tx3: #5f6880;
+  --brand: #5b4bf0; --brand2: #4a3ad6; --brand-hover: #4a3ad6; --on-brand: #ffffff;
+  --brandsoft: rgba(91, 75, 240, .10);
+  --ok: #066a4c; --okbg: rgba(6, 106, 76, .10);
+  --warn: #92400e; --warnbg: rgba(146, 64, 14, .10);
+  --danger: #b91c1c; --dangerbg: rgba(185, 28, 28, .08);
+  --focus: #5b4bf0;
+  --elev-1: 0 1px 2px rgba(15, 20, 32, .08);
+  --elev-2: 0 4px 12px rgba(15, 20, 32, .10);
+  --elev-3: 0 12px 32px rgba(15, 20, 32, .14);
+  color-scheme: light;
+}

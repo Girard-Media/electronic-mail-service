@@ -89,7 +89,7 @@ export default async function Status() {
   return (
     <main className="wrap" style={{ padding: "72px 24px 96px", maxWidth: 720 }}>
       <span className="eyebrow">
-        <i className="ti ti-activity" /> Status
+        <i className="ti ti-activity" aria-hidden="true" /> Status
       </span>
       <h1 style={{ fontSize: 36, marginTop: 12 }}>{headline}</h1>
       <p className="muted" style={{ marginTop: 10 }}>

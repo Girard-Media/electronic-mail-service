@@ -1,6 +1,6 @@
 // Crash-structure headers + launch-honesty wiring so the API, Next, and
 // marketing surfaces cannot silently drop them.
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { securityHeaders } from "../packages/core/src/security-headers.js";
@@ -70,10 +70,14 @@ ok(
   "tenant Sign in is the live Hono dashboard",
   src("apps/web/components/TenantHomeView.tsx").includes("https://app.electronicmailservices.com/dashboard"),
 );
-ok(
-  "docs do not present npm install as live",
-  src("apps/web/app/(marketing)/docs/dev/page.tsx").includes("not on npm yet"),
-);
+// E18-001: the inherited usermails (transactional, Resend-compatible) marketing
+// pages are gone from apps/web and must not come back through the chrome.
+for (const gone of ["features", "pricing", "deliverability", "docs"]) {
+  ok(`inherited /${gone} marketing page stripped`, !existsSync(join(root, `apps/web/app/(marketing)/${gone}`)));
+}
+for (const f of ["apps/web/components/SiteNav.tsx", "apps/web/components/SiteFooter.tsx", "apps/web/app/sitemap.ts", "apps/web/app/not-found.tsx"]) {
+  ok(`${f} links no stripped page`, !/["'`]\/(features|pricing|deliverability|docs)\b/.test(src(f)));
+}
 
 const appTs = src("apps/api/src/routes/app.ts");
 ok(

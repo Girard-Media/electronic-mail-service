@@ -108,7 +108,7 @@ export default async function BlogPost({ params }: Params) {
         <div className="wrap" style={{ maxWidth: 820 }}>
           <div style={{ marginBottom: 14 }}>
             <Link className="btn" href="/blog">
-              <i className="ti ti-arrow-left" /> All posts
+              <i className="ti ti-arrow-left" aria-hidden="true" /> All posts
             </Link>
           </div>
           {post.category ? <span className="eyebrow">{post.category}</span> : null}

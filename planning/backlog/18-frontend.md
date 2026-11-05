@@ -5,12 +5,12 @@ Infrastructure and Deliverability are the differentiated surfaces and get the de
 The campaign builder should be plain and fast, not clever.
 
 ## Foundation
-- [ ] E18-001 — Strip the inherited usermails marketing pages from apps/web
-- [ ] E18-002 — Establish the EMS design tokens: colour, type scale, spacing, radius, elevation
-- [ ] E18-003 — Define the light and dark palettes on :root with a documented contrast floor
-- [ ] E18-004 — Build the layout shell: sidebar, top bar, workspace switcher, command palette
+- [x] E18-001 — Strip the inherited usermails marketing pages from apps/web
+- [x] E18-002 — Establish the EMS design tokens: colour, type scale, spacing, radius, elevation
+- [x] E18-003 — Define the light and dark palettes on :root with a documented contrast floor
+- [x] E18-004 — Build the layout shell: sidebar, top bar, workspace switcher, command palette
 - [ ] E18-005 — Implement the command palette with fuzzy search across every entity
-- [ ] E18-006 — Implement global keyboard shortcuts with a discoverable help sheet
+- [x] E18-006 — Implement global keyboard shortcuts with a discoverable help sheet
 - [ ] E18-007 — Establish the data layer: cached, deduped, no fetch-on-mount waterfalls
 - [ ] E18-008 — Forbid per-row fetching in any list; batch at the route
 - [ ] E18-009 — Add a lint rule catching fetch-on-mount in a component
@@ -26,9 +26,9 @@ The campaign builder should be plain and fast, not clever.
 - [ ] E18-019 — Measure and budget interaction-to-next-paint per route
 - [ ] E18-020 — Fail CI on a performance budget regression
 - [ ] E18-021 — Implement responsive layouts down to mobile for the inbox and campaign views
-- [ ] E18-022 — Implement full keyboard navigation and visible focus rings
-- [ ] E18-023 — Meet WCAG AA contrast on every token pair
-- [ ] E18-024 — Add screen-reader labels on every icon-only control
+- [x] E18-022 — Implement full keyboard navigation and visible focus rings
+- [x] E18-023 — Meet WCAG AA contrast on every token pair
+- [x] E18-024 — Add screen-reader labels on every icon-only control
 - [ ] E18-025 — Add an automated accessibility check to CI
 - [ ] E18-026 — Implement the toast and notification system with a persistent activity feed
 - [ ] E18-027 — Never show a toast as the only record of an important event

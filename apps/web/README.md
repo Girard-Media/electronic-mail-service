@@ -21,7 +21,20 @@ proof (`/status`), and a Valkey-backed `cacheHandler` (`cache-handler.cjs`) so a
 revalidate on one container is seen by all replicas. The handler **fails open** — no
 `REDIS_URL` or any Redis error degrades to local regeneration — so it's safe on a
 single box and in dev. Cross-instance invalidation is only *provable* on a real
-multi-container deploy. Next up: marketing port, blog engine, `proxy.ts` subdomains.
+multi-container deploy.
+
+Marketing: the inherited usermails pages (features, pricing, deliverability, docs)
+were stripped in E18-001. The apex now serves a plain EMS landing, the blog, status,
+and the legal pages (privacy/terms/security still carry usermails-era wording and
+need an owner rewrite).
+
+### Design tokens (E18-002/003)
+`app/tokens.css` is the only place colour, type scale, spacing, radius and elevation
+are declared; `globals.css` imports it and components read `var(--…)`. Dark is the
+default palette on `:root`; light is opt-in via `<html data-theme="light">`. The
+contrast floor (text ≥ 4.5:1 on every surface, `--on-brand` ≥ 4.5:1 on filled
+buttons, `--focus` ≥ 3:1) is enforced by `scripts/design-tokens-test.mts`, which runs
+in `pnpm test`. Add a token to both palettes or the test fails.
 
 ### Env
 - `DATABASE_URL` — Postgres (install + build + runtime; `env.ts` is strict).
