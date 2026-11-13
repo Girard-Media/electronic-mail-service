@@ -17,7 +17,7 @@
     "@ems/providers": "workspace:*",
     "@ems/router": "workspace:*",
     "@ems/sequence": "workspace:*",
-    "@hono/node-server": "^1.13.0",
+    "@hono/node-server": "^2.1.6",
     "ems-migrate": "workspace:*",
     "hono": "^4.6.0",
     "tsx": "catalog:",
